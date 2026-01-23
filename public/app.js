@@ -40,21 +40,19 @@ function render(items) {
     const title = item.title || item.name;
     const isTV = currentType === "tv";
 
-    // Build the base tvplayer link
-    let linkHref = `/tvplayer.html?id=${item.id}&title=${encodeURIComponent(title)}&type=${currentType}`;
-
+    // Build CinemaOS URL using the title
+    let cinemaUrl = "";
     if (isTV) {
-      linkHref += `&season=1&episode=1`;
+      cinemaUrl = `https://cinemaos.tech/tv/${encodeURIComponent(title)}/season-1-episode-1`;
+    } else {
+      cinemaUrl = `https://cinemaos.tech/movie/${encodeURIComponent(title)}`;
     }
 
-    // Encode the tvplayer URL to Ocho
-    const encoded = btoa(window.location.origin + linkHref)
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=/g, "");
+    // Encode for Ocho
+    const encoded = btoa(cinemaUrl).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
 
     const link = document.createElement("a");
-    link.href = `/ocho/${encoded}`;
+    link.href = `/ocho/${encoded}`; // Ocho proxy
     link.className = "movie";
     link.style.textDecoration = "none";
     link.style.color = "inherit";
