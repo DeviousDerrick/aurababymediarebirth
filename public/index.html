@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <title>AuraBaby Media</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
-
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: 'Poppins', sans-serif; background: #000; color: #fff; }
@@ -20,27 +18,15 @@
     #tabs .tab.active { background: #7c7cff; color: #000; box-shadow: 0 0 12px rgba(124,124,255,0.6); }
 
     main { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; padding: 20px; }
-  .movie {
-  display: block;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.movie img {
-  width: 100%;
-  display: block;
-  pointer-events: none;
-}
-
-    .movie:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(124,124,255,0.25); }
+    .movie { cursor: pointer; }
     .movie img { width: 100%; display: block; background: #000; }
     .movie-info { padding: 10px; }
     .movie-info h3 { font-size: 14px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .movie-info span { font-size: 12px; opacity: 0.7; }
+    .movie:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(124,124,255,0.25); }
   </style>
 </head>
 <body>
-
   <header>
     <h1>AuraBaby <span>Media</span></h1>
     <input id="search" type="text" placeholder="Search..." />
@@ -61,68 +47,21 @@
     const moviesEl = document.getElementById("movies");
     const searchInput = document.getElementById("search");
     const tabs = document.querySelectorAll("#tabs .tab");
+    let currentType = "movie";
 
-    let currentType = "movie"; // default
-
-    // Load default movies
+    // Load popular items on start
     getItems(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
 
-    // ===== Tabs logic =====
     tabs.forEach(tab => {
       tab.addEventListener("click", () => {
         tabs.forEach(t => t.classList.remove("active"));
         tab.classList.add("active");
-
-        currentType = tab.dataset.type; // movie or tv
-        searchInput.value = ""; // clear search
+        currentType = tab.dataset.type;
+        searchInput.value = "";
         getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
       });
     });
 
-    // ===== Fetch function =====
-    async function getItems(url) {
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        showItems(data.results);
-      } catch (err) {
-        console.error("Failed to fetch items:", err);
-        moviesEl.innerHTML = "<p style='color:red'>Failed to load content.</p>";
-      }
-    }
-
-   function showItems(items) {
-  moviesEl.innerHTML = "";
-
-  items.forEach(item => {
-    const movieEl = document.createElement("div");
-    movieEl.className = "movie";
-
-    const id = item.id;
-    const title = encodeURIComponent(item.title || item.name);
-
-    movieEl.innerHTML = `
-      <img src="${item.poster_path ? IMG_URL + item.poster_path : ''}" alt="${item.title || item.name}">
-      <div class="movie-info">
-        <h3>${item.title || item.name}</h3>
-        <span>⭐ ${item.vote_average}</span>
-      </div>
-    `;
-
-    // ✅ CLICK HANDLER (THIS WAS MISSING)
-    movieEl.addEventListener("click", () => {
-      if (currentType === "movie") {
-        window.location.href = `/tvplayer.html?id=${id}&title=${title}&type=movie&source=vidfast`;
-      } else {
-        window.location.href = `/tvplayer.html?id=${id}&title=${title}&type=tv&season=1&episode=1&source=vidfast`;
-      }
-    });
-
-    moviesEl.appendChild(movieEl);
-  });
-}
-
-    // ===== Search logic =====
     searchInput.addEventListener("input", e => {
       const query = e.target.value.trim();
       if (!query) {
@@ -131,7 +70,48 @@
       }
       getItems(`${BASE_URL}/search/${currentType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
     });
-  </script>
 
+    async function getItems(url) {
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        showItems(data.results);
+      } catch {
+        moviesEl.innerHTML = "<p style='color:red'>Failed to load content.</p>";
+      }
+    }
+
+    async function showItems(items) {
+      moviesEl.innerHTML = "";
+      for (const item of items) {
+        const movieEl = document.createElement("div");
+        movieEl.className = "movie";
+
+        const id = item.id;
+        const title = encodeURIComponent(item.title || item.name);
+
+        movieEl.innerHTML = `
+          <img src="${item.poster_path ? IMG_URL + item.poster_path : ''}" alt="${item.title || item.name}">
+          <div class="movie-info">
+            <h3>${item.title || item.name}</h3>
+            <span>⭐ ${item.vote_average}</span>
+          </div>
+        `;
+
+        movieEl.addEventListener("click", async () => {
+          let type = currentType;
+          let season = 1, episode = 1;
+          const url = `/tvplayer.html?id=${id}&title=${title}&type=${type}&season=${season}&episode=${episode}`;
+          // Encode via Project Ocho
+          const resp = await fetch(`/api/encode?url=${encodeURIComponent(url)}`);
+          const data = await resp.json();
+          if (data.proxyUrl) window.location.href = data.proxyUrl;
+          else window.location.href = url;
+        });
+
+        moviesEl.appendChild(movieEl);
+      }
+    }
+  </script>
 </body>
 </html>
