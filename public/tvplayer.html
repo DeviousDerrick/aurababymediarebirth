@@ -2,39 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Player | AuraBaby</title>
+  <title>AuraBaby Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body, html { margin:0; padding:0; width:100%; height:100%; background:black; }
-    iframe { width:100%; height:100%; border:none; }
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      font-family: sans-serif;
+    }
+    iframe {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+    }
   </style>
 </head>
 <body>
-  <iframe id="player" allowfullscreen></iframe>
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const type = params.get("type");
-    const id = params.get("id");
-    const title = params.get("title");
-    const season = params.get("season") || 1;
-    const episode = params.get("episode") || 1;
 
-    let targetUrl = "";
+<iframe id="player" allowfullscreen></iframe>
 
-    if(type === "movie") {
-      targetUrl = `https://cinemaos.tech/movie/${id}`;
-    } else {
-      targetUrl = `https://cinemaos.tech/tv/${id}/${season}/${episode}`;
-    }
+<script>
+  const params = new URLSearchParams(window.location.search);
 
-    // Encode through Project Ocho
-    fetch(`/api/encode?url=${encodeURIComponent(targetUrl)}`)
-      .then(r => r.json())
-      .then(data => {
-        if(data.proxyUrl) document.getElementById("player").src = data.proxyUrl;
-        else document.getElementById("player").src = targetUrl;
-      })
-      .catch(()=> document.getElementById("player").src = targetUrl);
-  </script>
+  const id = params.get("id");
+  const season = params.get("season");
+  const episode = params.get("episode");
+  const source = params.get("source") || "vidfast";
+
+  let targetUrl = "";
+
+  // Build CinemaOS / Vidfast URL
+  if (season && episode) {
+    targetUrl = `https://cinemaos.tech/tv/${id}/${season}/${episode}`;
+  } else {
+    targetUrl = `https://cinemaos.tech/movie/${id}`;
+  }
+
+  // Encode through Ocho
+  fetch(`/api/encode?url=${encodeURIComponent(targetUrl)}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("player").src = data.proxy;
+    })
+    .catch(() => {
+      document.body.innerHTML = "<h2>Failed to load player</h2>";
+    });
+</script>
+
 </body>
 </html>
