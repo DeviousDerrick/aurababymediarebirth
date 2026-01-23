@@ -33,18 +33,24 @@ async function load(url) {
 
 function render(items) {
   grid.innerHTML = "";
+
   items.forEach(item => {
+    if (!item.poster_path) return;
+
     const title = item.title || item.name;
-    const card = document.createElement("div");
-    card.className = "movie";
-    card.innerHTML = `
-      <img src="${IMG + item.poster_path}">
+
+    const link = document.createElement("a");
+    link.href =
+      `/tvplayer.html?id=${item.id}&title=${encodeURIComponent(title)}&season=1&episode=1&source=vidfast`;
+    link.className = "movie";
+    link.style.textDecoration = "none";
+    link.style.color = "inherit";
+
+    link.innerHTML = `
+      <img src="https://image.tmdb.org/t/p/w500${item.poster_path}" />
       <h3>${title}</h3>
     `;
-    card.onclick = () => {
-      location.href =
-        `/tvplayer.html?id=${item.id}&title=${encodeURIComponent(title)}&season=1&episode=1&source=vidfast`;
-    };
-    grid.appendChild(card);
+
+    grid.appendChild(link);
   });
 }
