@@ -1,69 +1,50 @@
 const API_KEY = "72f0a0fa086259c4fc4b8bf0b856e446";
-const BASE_URL = "https://api.themoviedb.org/3";
-const IMG_URL = "https://image.tmdb.org/t/p/w500";
+const BASE = "https://api.themoviedb.org/3";
+const IMG = "https://image.tmdb.org/t/p/w500";
 
-const moviesEl = document.getElementById("movies");
-const searchInput = document.getElementById("search");
-const tabs = document.querySelectorAll("#tabs .tab");
+const grid = document.getElementById("movies");
+const search = document.getElementById("search");
+const tabs = document.querySelectorAll(".tab");
 
-let currentType = "movie"; // default
+let currentType = "movie";
 
-// Load default movies
-getItems(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+load(`${BASE}/movie/popular?api_key=${API_KEY}`);
 
-// ===== Tabs logic =====
 tabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    // Remove active from all
+  tab.onclick = () => {
     tabs.forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
-
-    currentType = tab.dataset.type; // movie or tv
-
-    // Fetch popular movies or shows
-    getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
-    searchInput.value = ""; // clear search
-  });
+    currentType = tab.dataset.type;
+    load(`${BASE}/${currentType}/popular?api_key=${API_KEY}`);
+  };
 });
 
-// ===== Fetch function =====
-async function getItems(url) {
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    showItems(data.results);
-  } catch (err) {
-    console.error("Failed to fetch items:", err);
-    moviesEl.innerHTML = "<p style='color:red'>Failed to load content.</p>";
-  }
+search.oninput = e => {
+  const q = e.target.value.trim();
+  if (!q) return load(`${BASE}/${currentType}/popular?api_key=${API_KEY}`);
+  load(`${BASE}/search/${currentType}?api_key=${API_KEY}&query=${q}`);
+};
+
+async function load(url) {
+  const res = await fetch(url);
+  const data = await res.json();
+  render(data.results);
 }
 
-function showItems(items) {
-  moviesEl.innerHTML = "";
-
+function render(items) {
+  grid.innerHTML = "";
   items.forEach(item => {
-    const movieEl = document.createElement("div");
-    movieEl.className = "movie";
-
-    movieEl.innerHTML = `
-      <img src="${item.poster_path ? IMG_URL + item.poster_path : ''}" alt="${item.name || item.title}">
-      <div class="movie-info">
-        <h3>${item.title || item.name}</h3>
-        <span>⭐ ${item.vote_average}</span>
-      </div>
+    const title = item.title || item.name;
+    const card = document.createElement("div");
+    card.className = "movie";
+    card.innerHTML = `
+      <img src="${IMG + item.poster_path}">
+      <h3>${title}</h3>
     `;
-
-    moviesEl.appendChild(movieEl);
+    card.onclick = () => {
+      location.href =
+        `/tvplayer.html?id=${item.id}&title=${encodeURIComponent(title)}&season=1&episode=1&source=vidfast`;
+    };
+    grid.appendChild(card);
   });
 }
-
-// ===== Search logic =====
-searchInput.addEventListener("input", e => {
-  const query = e.target.value.trim();
-  if (!query) {
-    getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
-    return;
-  }
-
-  getItems(`${BASE_URL}/search/${currentType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-});
