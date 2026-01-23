@@ -38,10 +38,23 @@ function render(items) {
     if (!item.poster_path) return;
 
     const title = item.title || item.name;
+    const isTV = currentType === "tv";
 
     const link = document.createElement("a");
-    link.href =
-      `/tvplayer.html?id=${item.id}&title=${encodeURIComponent(title)}&season=1&episode=1&source=vidfast`;
+
+    // ✅ Movies vs TV routing
+    if (isTV) {
+      link.href =
+        `/tvplayer.html?id=${item.id}` +
+        `&title=${encodeURIComponent(title)}` +
+        `&season=1&episode=1&source=vidfast`;
+    } else {
+      link.href =
+        `/tvplayer.html?id=${item.id}` +
+        `&title=${encodeURIComponent(title)}` +
+        `&source=vidfast`;
+    }
+
     link.className = "movie";
     link.style.textDecoration = "none";
     link.style.color = "inherit";
