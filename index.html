@@ -96,6 +96,32 @@
       font-size: 12px;
       opacity: 0.7;
     }
+    #tabs {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  background: #0a0a0a;
+  padding: 10px 0;
+  border-bottom: 1px solid #111;
+}
+
+#tabs .tab {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: 0.2s;
+}
+
+#tabs .tab.active {
+  background: #7c7cff;
+  color: #000;
+  box-shadow: 0 0 12px rgba(124,124,255,0.6);
+}
+
   </style>
 </head>
 <body>
@@ -104,6 +130,19 @@
     <h1>AuraBaby <span>Media</span></h1>
     <input id="search" type="text" placeholder="Search movies..." />
   </header>
+  
+  <header>
+  <h1>AuraBaby <span>Media</span></h1>
+  <input id="search" type="text" placeholder="Search..." />
+</header>
+
+<nav id="tabs">
+  <button class="tab active" data-type="movie">Movies</button>
+  <button class="tab" data-type="tv">Shows</button>
+</nav>
+
+<main id="movies"></main>
+
 
   <main id="movies"></main>
 
