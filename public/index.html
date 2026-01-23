@@ -18,12 +18,11 @@
     #tabs .tab.active { background: #7c7cff; color: #000; box-shadow: 0 0 12px rgba(124,124,255,0.6); }
 
     main { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; padding: 20px; }
-    .movie { cursor: pointer; }
-    .movie img { width: 100%; display: block; background: #000; }
-    .movie-info { padding: 10px; }
-    .movie-info h3 { font-size: 14px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .movie-info span { font-size: 12px; opacity: 0.7; }
+    .movie { cursor: default; background: #111; border-radius: 8px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
     .movie:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(124,124,255,0.25); }
+    .movie img { width: 100%; display: block; }
+    .movie h3 { font-size: 14px; margin: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .movie span { font-size: 12px; margin-left: 8px; opacity: 0.7; }
   </style>
 </head>
 <body>
@@ -39,79 +38,7 @@
 
   <main id="movies"></main>
 
-  <script>
-    const API_KEY = "72f0a0fa086259c4fc4b8bf0b856e446";
-    const BASE_URL = "https://api.themoviedb.org/3";
-    const IMG_URL = "https://image.tmdb.org/t/p/w500";
-
-    const moviesEl = document.getElementById("movies");
-    const searchInput = document.getElementById("search");
-    const tabs = document.querySelectorAll("#tabs .tab");
-    let currentType = "movie";
-
-    // Load popular items on start
-    getItems(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
-
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        currentType = tab.dataset.type;
-        searchInput.value = "";
-        getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
-      });
-    });
-
-    searchInput.addEventListener("input", e => {
-      const query = e.target.value.trim();
-      if (!query) {
-        getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
-        return;
-      }
-      getItems(`${BASE_URL}/search/${currentType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-    });
-
-    async function getItems(url) {
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        showItems(data.results);
-      } catch {
-        moviesEl.innerHTML = "<p style='color:red'>Failed to load content.</p>";
-      }
-    }
-
-    async function showItems(items) {
-      moviesEl.innerHTML = "";
-      for (const item of items) {
-        const movieEl = document.createElement("div");
-        movieEl.className = "movie";
-
-        const id = item.id;
-        const title = encodeURIComponent(item.title || item.name);
-
-        movieEl.innerHTML = `
-          <img src="${item.poster_path ? IMG_URL + item.poster_path : ''}" alt="${item.title || item.name}">
-          <div class="movie-info">
-            <h3>${item.title || item.name}</h3>
-            <span>⭐ ${item.vote_average}</span>
-          </div>
-        `;
-
-        movieEl.addEventListener("click", async () => {
-          let type = currentType;
-          let season = 1, episode = 1;
-          const url = `/tvplayer.html?id=${id}&title=${title}&type=${type}&season=${season}&episode=${episode}`;
-          // Encode via Project Ocho
-          const resp = await fetch(`/api/encode?url=${encodeURIComponent(url)}`);
-          const data = await resp.json();
-          if (data.proxyUrl) window.location.href = data.proxyUrl;
-          else window.location.href = url;
-        });
-
-        moviesEl.appendChild(movieEl);
-      }
-    }
-  </script>
+  <!-- Link to external JS -->
+  <script src="app.js"></script>
 </body>
 </html>
