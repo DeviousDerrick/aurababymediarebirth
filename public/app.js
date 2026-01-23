@@ -1,65 +1,91 @@
 const API_KEY = "72f0a0fa086259c4fc4b8bf0b856e446";
-const BASE_URL = "https://api.themoviedb.org/3";
-const IMG_URL = "https://image.tmdb.org/t/p/w500";
+const BASE = "https://api.themoviedb.org/3";
+const IMG = "https://image.tmdb.org/t/p/w500";
 
-const moviesEl = document.getElementById("movies");
-const searchInput = document.getElementById("search");
-const tabs = document.querySelectorAll("#tabs .tab");
+const grid = document.getElementById("movies");
+const search = document.getElementById("search");
+const tabs = document.querySelectorAll(".tab");
 let currentType = "movie";
 
-// Load default movies
-getItems(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+// Overlay elements
+const overlay = document.getElementById("overlay");
+const closeOverlay = document.getElementById("closeOverlay");
+const overlayTitle = document.getElementById("overlayTitle");
+const overlayDesc = document.getElementById("overlayDesc");
+const overlayRating = document.getElementById("overlayRating");
+const overlayDate = document.getElementById("overlayDate");
+const overlayVotes = document.getElementById("overlayVotes");
+const overlayPoster = document.getElementById("overlayPoster");
 
+// Load default movies
+load(`${BASE}/movie/popular?api_key=${API_KEY}`);
+
+// Tab click logic
 tabs.forEach(tab => {
-  tab.addEventListener("click", () => {
+  tab.onclick = () => {
     tabs.forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
     currentType = tab.dataset.type;
-    searchInput.value = "";
-    getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
-  });
+    search.value = "";
+    load(`${BASE}/${currentType}/popular?api_key=${API_KEY}`);
+  };
 });
 
-searchInput.addEventListener("input", e => {
-  const query = e.target.value.trim();
-  if (!query) {
-    getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
-    return;
-  }
-  getItems(`${BASE_URL}/search/${currentType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-});
+// Search logic
+search.oninput = e => {
+  const q = e.target.value.trim();
+  if (!q) return load(`${BASE}/${currentType}/popular?api_key=${API_KEY}`);
+  load(`${BASE}/search/${currentType}?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
+};
 
-async function getItems(url) {
+// Fetch data from TMDB
+async function load(url) {
   try {
     const res = await fetch(url);
     const data = await res.json();
-    showItems(data.results);
-  } catch {
-    moviesEl.innerHTML = "<p style='color:red'>Failed to load content.</p>";
+    render(data.results);
+  } catch (err) {
+    console.error("Failed to fetch:", err);
+    grid.innerHTML = "<p style='color:red'>Failed to load content.</p>";
   }
 }
 
-function showItems(items) {
-  moviesEl.innerHTML = "";
-  if (!items || !items.length) {
-    moviesEl.innerHTML = "<p style='color:#aaa'>No movies or shows found.</p>";
-    return;
-  }
-
+// Render movies/shows
+function render(items) {
+  grid.innerHTML = "";
   items.forEach(item => {
     if (!item.poster_path) return;
     const title = item.title || item.name;
-    const rating = item.vote_average || 0;
 
-    const movieEl = document.createElement("div");
-    movieEl.className = "movie";
+    const card = document.createElement("div");
+    card.className = "movie";
 
-    movieEl.innerHTML = `
-      <img src="${IMG_URL + item.poster_path}" alt="${title}" />
-      <h3>${title}</h3>
-      <span>⭐ ${rating}</span>
+    card.innerHTML = `
+      <img src="${IMG + item.poster_path}" alt="${title}" />
+      <div class="movie-info">
+        <h3>${title}</h3>
+        <span>⭐ ${item.vote_average}</span>
+      </div>
     `;
 
-    moviesEl.appendChild(movieEl);
+    // Show overlay on click
+    card.onclick = () => {
+      overlayTitle.textContent = title;
+      overlayDesc.textContent = item.overview || "No description available.";
+      overlayRating.textContent = item.vote_average;
+      overlayDate.textContent = item.release_date || item.first_air_date || "N/A";
+      overlayVotes.textContent = item.vote_count || 0;
+      overlayPoster.src = IMG + item.poster_path;
+
+      overlay.classList.remove("hidden");
+    };
+
+    grid.appendChild(card);
   });
 }
+
+// Close overlay
+closeOverlay.onclick = () => overlay.classList.add("hidden");
+overlay.onclick = e => {
+  if (e.target === overlay) overlay.classList.add("hidden");
+};
