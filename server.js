@@ -2,14 +2,13 @@ import express from 'express';
 import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { URL } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Serve frontend
+// Serve TMDB frontend at root
 app.use(express.static(path.join(__dirname, 'public')));
 
 // CORS Middleware
@@ -33,7 +32,7 @@ function decodeProxyUrl(encoded) {
   return Buffer.from(base64 + '='.repeat(padding), 'base64').toString('utf-8');
 }
 
-// API Encoder
+// API Encoder for proxying external links
 app.get('/api/encode', (req, res) => {
   const url = req.query.url;
   if (!url) return res.status(400).json({ error: 'URL required' });
@@ -41,7 +40,7 @@ app.get('/api/encode', (req, res) => {
   res.json({ encoded: encodeProxyUrl(fullUrl), proxyUrl: `/ocho/${encodeProxyUrl(fullUrl)}` });
 });
 
-// Proxy route
+// Proxy external requests
 app.use('/ocho/:url(*)', async (req, res) => {
   const encodedUrl = req.params.url;
   try {
@@ -83,7 +82,7 @@ app.use('/ocho/:url(*)', async (req, res) => {
   }
 });
 
-// Kill Service Worker
+// Kill any service worker from proxied sites
 app.get('/sw.js', (req, res) => {
   res.set('Content-Type', 'application/javascript');
   res.send(`
