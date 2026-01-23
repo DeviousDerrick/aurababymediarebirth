@@ -1,51 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TV Player</title>
-  <style>
-    body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-    header { padding: 20px; text-align: center; }
-    iframe { border: none; width: 100%; max-width: 1000px; height: 560px; margin-top: 20px; }
-  </style>
+  <title>Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body>
-  <header>
-    <h1 id="title">Loading...</h1>
-    <p id="info"></p>
-  </header>
+<body style="margin:0;background:black">
 
-  <iframe id="player" src="" allowfullscreen></iframe>
+<iframe
+  id="player"
+  width="100%"
+  height="100%"
+  allowfullscreen>
+</iframe>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-    const title = params.get('title') || "Unknown";
-    const season = params.get('season') || "";
-    const episode = params.get('episode') || "";
-    const source = params.get('source') || "vidfast";
+<script>
+  const p = new URLSearchParams(location.search);
+  const id = p.get("id");
 
-    document.getElementById('title').textContent = title;
-    document.getElementById('info').textContent = `Season: ${season}, Episode: ${episode}`;
+  fetch(`/api/encode?url=https://vidfast.net/embed/${id}`)
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById("player").src = d.proxy;
+    });
+</script>
 
-    if (id && source === 'vidfast') {
-      // Construct the Vidfast link through the proxy
-      const vidfastUrl = `https://vidfast.net/watch/${id}`;
-      fetch(`/api/encode?url=${encodeURIComponent(vidfastUrl)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.proxyUrl) {
-            document.getElementById('player').src = data.proxyUrl;
-          } else {
-            document.getElementById('player').src = vidfastUrl; // fallback
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          document.getElementById('player').src = vidfastUrl;
-        });
-    }
-  </script>
 </body>
 </html>
