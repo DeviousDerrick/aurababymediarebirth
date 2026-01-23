@@ -1,39 +1,55 @@
-// ===== TMDB Constants =====
-const API_KEY = "72f0a0fa086259c4fc4b8bf0b856e446"; // Only for testing
+const API_KEY = "72f0a0fa086259c4fc4b8bf0b856e446";
 const BASE_URL = "https://api.themoviedb.org/3";
 const IMG_URL = "https://image.tmdb.org/t/p/w500";
 
-// ===== DOM Elements =====
 const moviesEl = document.getElementById("movies");
 const searchInput = document.getElementById("search");
+const tabs = document.querySelectorAll("#tabs .tab");
 
-// ===== Load Popular Movies on Start =====
-getMovies(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+let currentType = "movie"; // default
 
-// ===== Functions =====
-async function getMovies(url) {
+// Load default movies
+getItems(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+
+// ===== Tabs logic =====
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    // Remove active from all
+    tabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+
+    currentType = tab.dataset.type; // movie or tv
+
+    // Fetch popular movies or shows
+    getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
+    searchInput.value = ""; // clear search
+  });
+});
+
+// ===== Fetch function =====
+async function getItems(url) {
   try {
     const res = await fetch(url);
     const data = await res.json();
-    showMovies(data.results);
+    showItems(data.results);
   } catch (err) {
-    console.error("Failed to fetch movies:", err);
-    moviesEl.innerHTML = "<p style='color:red'>Failed to load movies.</p>";
+    console.error("Failed to fetch items:", err);
+    moviesEl.innerHTML = "<p style='color:red'>Failed to load content.</p>";
   }
 }
 
-function showMovies(movies) {
+function showItems(items) {
   moviesEl.innerHTML = "";
 
-  movies.forEach(movie => {
+  items.forEach(item => {
     const movieEl = document.createElement("div");
     movieEl.className = "movie";
 
     movieEl.innerHTML = `
-      <img src="${movie.poster_path ? IMG_URL + movie.poster_path : ''}" alt="${movie.title}">
+      <img src="${item.poster_path ? IMG_URL + item.poster_path : ''}" alt="${item.name || item.title}">
       <div class="movie-info">
-        <h3>${movie.title}</h3>
-        <span>⭐ ${movie.vote_average}</span>
+        <h3>${item.title || item.name}</h3>
+        <span>⭐ ${item.vote_average}</span>
       </div>
     `;
 
@@ -41,13 +57,13 @@ function showMovies(movies) {
   });
 }
 
-// ===== Search Movies =====
+// ===== Search logic =====
 searchInput.addEventListener("input", e => {
   const query = e.target.value.trim();
-
-  if (query) {
-    getMovies(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-  } else {
-    getMovies(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+  if (!query) {
+    getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
+    return;
   }
+
+  getItems(`${BASE_URL}/search/${currentType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
 });
