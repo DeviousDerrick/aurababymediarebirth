@@ -5,25 +5,7 @@
   <title>AuraBaby Media</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: 'Poppins', sans-serif; background: #000; color: #fff; }
-    header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; background: #0a0a0a; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #111; }
-    header h1 { font-weight: 800; font-size: 24px; margin: 0; }
-    header h1 span { color: #7c7cff; text-shadow: 0 0 12px rgba(124,124,255,0.6); }
-    header input { background: #111; border: none; color: white; padding: 10px 14px; border-radius: 10px; width: 220px; outline: none; font-size: 14px; }
-
-    #tabs { display: flex; justify-content: center; gap: 16px; background: #0a0a0a; padding: 10px 0; border-bottom: 1px solid #111; }
-    #tabs .tab { background: #111; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s; }
-    #tabs .tab.active { background: #7c7cff; color: #000; box-shadow: 0 0 12px rgba(124,124,255,0.6); }
-
-    main { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; padding: 20px; }
-    .movie { cursor: default; background: #111; border-radius: 8px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
-    .movie:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(124,124,255,0.25); }
-    .movie img { width: 100%; display: block; }
-    .movie h3 { font-size: 14px; margin: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .movie span { font-size: 12px; margin-left: 8px; opacity: 0.7; }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
@@ -38,7 +20,23 @@
 
   <main id="movies"></main>
 
-  <!-- Link to external JS -->
+  <!-- Movie Detail Overlay -->
+  <div id="overlay" class="overlay hidden">
+    <div class="overlay-content">
+      <span id="closeOverlay">&times;</span>
+      <div class="overlay-left">
+        <h2 id="overlayTitle"></h2>
+        <p id="overlayDesc"></p>
+        <p><strong>⭐ Rating:</strong> <span id="overlayRating"></span></p>
+        <p><strong>Release Date:</strong> <span id="overlayDate"></span></p>
+        <p><strong>Votes:</strong> <span id="overlayVotes"></span></p>
+      </div>
+      <div class="overlay-right">
+        <img id="overlayPoster" src="" alt="Poster" />
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
