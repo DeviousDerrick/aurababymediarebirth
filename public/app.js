@@ -40,27 +40,27 @@ function render(items) {
     const title = item.title || item.name;
     const isTV = currentType === "tv";
 
-    const link = document.createElement("a");
+    // Build the base tvplayer link
+    let linkHref = `/tvplayer.html?id=${item.id}&title=${encodeURIComponent(title)}&type=${currentType}`;
 
-    // ✅ Movies vs TV routing
     if (isTV) {
-      link.href =
-        `/tvplayer.html?id=${item.id}` +
-        `&title=${encodeURIComponent(title)}` +
-        `&season=1&episode=1&source=vidfast`;
-    } else {
-      link.href =
-        `/tvplayer.html?id=${item.id}` +
-        `&title=${encodeURIComponent(title)}` +
-        `&source=vidfast`;
+      linkHref += `&season=1&episode=1`;
     }
 
+    // Encode the tvplayer URL to Ocho
+    const encoded = btoa(window.location.origin + linkHref)
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=/g, "");
+
+    const link = document.createElement("a");
+    link.href = `/ocho/${encoded}`;
     link.className = "movie";
     link.style.textDecoration = "none";
     link.style.color = "inherit";
 
     link.innerHTML = `
-      <img src="https://image.tmdb.org/t/p/w500${item.poster_path}" />
+      <img src="${IMG + item.poster_path}" />
       <h3>${title}</h3>
     `;
 
