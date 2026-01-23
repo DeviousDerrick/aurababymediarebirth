@@ -5,41 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Player | AuraBaby</title>
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+    body, html { margin:0; padding:0; width:100%; height:100%; background:black; }
+    iframe { width:100%; height:100%; border:none; }
   </style>
 </head>
 <body>
+  <iframe id="player" allowfullscreen></iframe>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get("type");
+    const id = params.get("id");
+    const title = params.get("title");
+    const season = params.get("season") || 1;
+    const episode = params.get("episode") || 1;
 
-<iframe id="player" allowfullscreen></iframe>
+    let targetUrl = "";
 
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const type = params.get("type");
-  const id = params.get("id");
-  const season = params.get("season") || 1;
-  const episode = params.get("episode") || 1;
+    if(type === "movie") {
+      targetUrl = `https://cinemaos.tech/movie/${id}`;
+    } else {
+      targetUrl = `https://cinemaos.tech/tv/${id}/${season}/${episode}`;
+    }
 
-  let src = "";
-
-  if (type === "movie") {
-    src = `https://cinemaos.tech/movie/${id}`;
-  } else {
-    src = `https://cinemaos.tech/tv/${id}/${season}/${episode}`;
-  }
-
-  document.getElementById("player").src = src;
-</script>
-
+    // Encode through Project Ocho
+    fetch(`/api/encode?url=${encodeURIComponent(targetUrl)}`)
+      .then(r => r.json())
+      .then(data => {
+        if(data.proxyUrl) document.getElementById("player").src = data.proxyUrl;
+        else document.getElementById("player").src = targetUrl;
+      })
+      .catch(()=> document.getElementById("player").src = targetUrl);
+  </script>
 </body>
 </html>
