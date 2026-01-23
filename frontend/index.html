@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AuraBaby Media</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #000;
+      color: #fff;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px;
+      background: #0a0a0a;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid #111;
+    }
+
+    header h1 {
+      font-weight: 800;
+      font-size: 24px;
+      margin: 0;
+    }
+
+    header h1 span {
+      color: #7c7cff;
+      text-shadow: 0 0 12px rgba(124,124,255,0.6);
+    }
+
+    header input {
+      background: #111;
+      border: none;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      width: 220px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .movie {
+      background: #111;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .movie:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(124,124,255,0.25);
+    }
+
+    .movie img {
+      width: 100%;
+      display: block;
+      background: #000;
+    }
+
+    .movie-info {
+      padding: 10px;
+    }
+
+    .movie-info h3 {
+      font-size: 14px;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .movie-info span {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>AuraBaby <span>Media</span></h1>
+    <input id="search" type="text" placeholder="Search movies..." />
+  </header>
+
+  <main id="movies"></main>
+
+  <script>
+    const API_KEY = "72f0a0fa086259c4fc4b8bf0b856e446";
+    const BASE_URL = "https://api.themoviedb.org/3";
+    const IMG_URL = "https://image.tmdb.org/t/p/w500";
+
+    const moviesEl = document.getElementById("movies");
+    const searchInput = document.getElementById("search");
+
+    // Load popular movies on start
+    loadMovies(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+
+    async function loadMovies(url) {
+      const res = await fetch(url);
+      const data = await res.json();
+      showMovies(data.results);
+    }
+
+    function showMovies(movies) {
+      moviesEl.innerHTML = "";
+
+      movies.forEach(movie => {
+        const movieEl = document.createElement("div");
+        movieEl.className = "movie";
+
+        movieEl.innerHTML = `
+          <img src="${movie.poster_path ? IMG_URL + movie.poster_path : ''}">
+          <div class="movie-info">
+            <h3>${movie.title}</h3>
+            <span>⭐ ${movie.vote_average}</span>
+          </div>
+        `;
+
+        moviesEl.appendChild(movieEl);
+      });
+    }
+
+    // Search
+    searchInput.addEventListener("input", e => {
+      const q = e.target.value.trim();
+      if (q) {
+        loadMovies(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
+      } else {
+        loadMovies(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+      }
+    });
+  </script>
+
+</body>
+</html>
