@@ -1,118 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project Ocho</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #0a0a0a;
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-.container { max-width: 600px; width: 100%; text-align: center; }
-h1 { font-size: 2.5rem; margin-bottom: 2rem; font-weight: 300; letter-spacing: -1px; }
-.search-box { display: flex; gap: 10px; margin-bottom: 2rem; }
-#urlInput {
-    flex: 1;
-    background: #1a1a1a;
-    border: 1px solid #333;
-    padding: 15px 20px;
-    font-size: 1rem;
-    color: #fff;
-    border-radius: 8px;
-    outline: none;
-    transition: border-color 0.2s;
-}
-#urlInput:focus { border-color: #555; }
-#urlInput::placeholder { color: #666; }
-#goButton {
-    background: #fff;
-    color: #000;
-    border: none;
-    padding: 15px 30px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-#goButton:hover { background: #e0e0e0; }
-.error {
-    background: #1a0000;
-    border: 1px solid #330000;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 20px;
-    display: none;
-    color: #ff6666;
-}
-</style>
+  <meta charset="UTF-8" />
+  <title>AuraBaby Media</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Poppins', sans-serif; background: #000; color: #fff; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; background: #0a0a0a; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #111; }
+    header h1 { font-weight: 800; font-size: 24px; margin: 0; }
+    header h1 span { color: #7c7cff; text-shadow: 0 0 12px rgba(124,124,255,0.6); }
+    header input { background: #111; border: none; color: white; padding: 10px 14px; border-radius: 10px; width: 220px; outline: none; font-size: 14px; }
+
+    #tabs { display: flex; justify-content: center; gap: 16px; background: #0a0a0a; padding: 10px 0; border-bottom: 1px solid #111; }
+    #tabs .tab { background: #111; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s; }
+    #tabs .tab.active { background: #7c7cff; color: #000; box-shadow: 0 0 12px rgba(124,124,255,0.6); }
+
+    main { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; padding: 20px; }
+    .movie { background: #111; border-radius: 14px; overflow: hidden; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .movie:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(124,124,255,0.25); }
+    .movie img { width: 100%; display: block; background: #000; }
+    .movie-info { padding: 10px; }
+    .movie-info h3 { font-size: 14px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .movie-info span { font-size: 12px; opacity: 0.7; }
+  </style>
 </head>
 <body>
-<div class="container">
-    <h1>Project Ocho</h1>
-    <div class="search-box">
-        <input type="text" id="urlInput" placeholder="Enter URL or search..." autocomplete="off">
-        <button id="goButton">Go</button>
-    </div>
-    <div class="error" id="errorMsg"></div>
-</div>
 
-<script>
-// Register service worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW failed:', err));
-}
+  <header>
+    <h1>AuraBaby <span>Media</span></h1>
+    <input id="search" type="text" placeholder="Search..." />
+  </header>
 
-const urlInput = document.getElementById('urlInput');
-const goButton = document.getElementById('goButton');
-const errorMsg = document.getElementById('errorMsg');
+  <nav id="tabs">
+    <button class="tab active" data-type="movie">Movies</button>
+    <button class="tab" data-type="tv">Shows</button>
+  </nav>
 
-async function navigateToUrl(url) {
-    try {
-        errorMsg.style.display = 'none';
-        let targetUrl = url.trim();
+  <main id="movies"></main>
 
-        // Smart detection: search if no dots
-        if (!targetUrl.includes('.') && !targetUrl.startsWith('http')) {
-            targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(targetUrl);
-        }
+  <script>
+    const API_KEY = "72f0a0fa086259c4fc4b8bf0b856e446";
+    const BASE_URL = "https://api.themoviedb.org/3";
+    const IMG_URL = "https://image.tmdb.org/t/p/w500";
 
-        // Add https:// if missing
-        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
-            targetUrl = 'https://' + targetUrl;
-        }
+    const moviesEl = document.getElementById("movies");
+    const searchInput = document.getElementById("search");
+    const tabs = document.querySelectorAll("#tabs .tab");
 
-        // Encode via proxy API
-        const response = await fetch(`/api/encode?url=${encodeURIComponent(targetUrl)}`);
-        const data = await response.json();
+    let currentType = "movie"; // default
 
-        if (data.error) throw new Error(data.error);
+    // Load default movies
+    getItems(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
 
-        // Navigate to proxied URL
-        window.location.href = data.proxyUrl;
-    } catch (err) {
-        errorMsg.textContent = err.message;
-        errorMsg.style.display = 'block';
+    // ===== Tabs logic =====
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        currentType = tab.dataset.type; // movie or tv
+        searchInput.value = ""; // clear search
+        getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
+      });
+    });
+
+    // ===== Fetch function =====
+    async function getItems(url) {
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        showItems(data.results);
+      } catch (err) {
+        console.error("Failed to fetch items:", err);
+        moviesEl.innerHTML = "<p style='color:red'>Failed to load content.</p>";
+      }
     }
-}
 
-goButton.addEventListener('click', () => {
-    if (urlInput.value) navigateToUrl(urlInput.value);
-});
+    function showItems(items) {
+      moviesEl.innerHTML = "";
+      items.forEach(item => {
+        const movieEl = document.createElement("div");
+        movieEl.className = "movie";
+        movieEl.innerHTML = `
+          <img src="${item.poster_path ? IMG_URL + item.poster_path : ''}" alt="${item.title || item.name}">
+          <div class="movie-info">
+            <h3>${item.title || item.name}</h3>
+            <span>⭐ ${item.vote_average}</span>
+          </div>
+        `;
+        moviesEl.appendChild(movieEl);
+      });
+    }
 
-urlInput.addEventListener('keypress', e => {
-    if (e.key === 'Enter' && urlInput.value) navigateToUrl(urlInput.value);
-});
+    // ===== Search logic =====
+    searchInput.addEventListener("input", e => {
+      const query = e.target.value.trim();
+      if (!query) {
+        getItems(`${BASE_URL}/${currentType}/popular?api_key=${API_KEY}`);
+        return;
+      }
+      getItems(`${BASE_URL}/search/${currentType}?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+    });
+  </script>
 
-urlInput.focus();
-</script>
 </body>
 </html>
