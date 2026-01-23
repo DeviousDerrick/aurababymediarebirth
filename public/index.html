@@ -20,7 +20,18 @@
     #tabs .tab.active { background: #7c7cff; color: #000; box-shadow: 0 0 12px rgba(124,124,255,0.6); }
 
     main { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; padding: 20px; }
-    .movie { background: #111; border-radius: 14px; overflow: hidden; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .movie {
+  display: block;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.movie img {
+  width: 100%;
+  display: block;
+  pointer-events: none;
+}
+
     .movie:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(124,124,255,0.25); }
     .movie img { width: 100%; display: block; background: #000; }
     .movie-info { padding: 10px; }
