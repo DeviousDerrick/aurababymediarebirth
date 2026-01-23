@@ -24,32 +24,28 @@
 
 <script>
   const params = new URLSearchParams(window.location.search);
-
-  const type = params.get("type") || "movie";
+  const type = params.get("type");
   const id = params.get("id");
   const season = params.get("season") || 1;
   const episode = params.get("episode") || 1;
 
-  if (!id) {
-    document.body.innerHTML = "<h1 style='color:white'>Missing ID</h1>";
-    throw new Error("Missing ID");
+  // Build the target URL for Vidfast / CinemaOS
+  let targetUrl = '';
+  if(type === 'movie') {
+      targetUrl = `https://cinemaos.tech/movie/${id}`;
+  } else {
+      targetUrl = `https://cinemaos.tech/tv/${id}/${season}/${episode}`;
   }
 
-  // Build the correct CinemaOS embed URL
-  const target =
-    type === "movie"
-      ? `https://cinemaos.tech/embed/movie/${id}`
-      : `https://cinemaos.tech/embed/tv/${id}/${season}/${episode}`;
+  // Encode the URL to Ocho
+  const encoded = btoa(targetUrl).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
 
-  // Encode for Ocho proxy
-  const encoded = btoa(target)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
-
-  // Load inside Ocho iframe
-  document.getElementById("player").src = `/ocho/${encoded}`;
+  // Absolute path to Ocho on your server
+  const proxyBase = window.location.origin;
+  const iframe = document.getElementById("player");
+  iframe.src = proxyBase + '/ocho/' + encoded;
 </script>
+
 
 </body>
 </html>
