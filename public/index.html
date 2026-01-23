@@ -91,21 +91,36 @@
       }
     }
 
-    function showItems(items) {
-      moviesEl.innerHTML = "";
-      items.forEach(item => {
-        const movieEl = document.createElement("div");
-        movieEl.className = "movie";
-        movieEl.innerHTML = `
-          <img src="${item.poster_path ? IMG_URL + item.poster_path : ''}" alt="${item.title || item.name}">
-          <div class="movie-info">
-            <h3>${item.title || item.name}</h3>
-            <span>⭐ ${item.vote_average}</span>
-          </div>
-        `;
-        moviesEl.appendChild(movieEl);
-      });
-    }
+   function showItems(items) {
+  moviesEl.innerHTML = "";
+
+  items.forEach(item => {
+    const movieEl = document.createElement("div");
+    movieEl.className = "movie";
+
+    const id = item.id;
+    const title = encodeURIComponent(item.title || item.name);
+
+    movieEl.innerHTML = `
+      <img src="${item.poster_path ? IMG_URL + item.poster_path : ''}" alt="${item.title || item.name}">
+      <div class="movie-info">
+        <h3>${item.title || item.name}</h3>
+        <span>⭐ ${item.vote_average}</span>
+      </div>
+    `;
+
+    // ✅ CLICK HANDLER (THIS WAS MISSING)
+    movieEl.addEventListener("click", () => {
+      if (currentType === "movie") {
+        window.location.href = `/tvplayer.html?id=${id}&title=${title}&type=movie&source=vidfast`;
+      } else {
+        window.location.href = `/tvplayer.html?id=${id}&title=${title}&type=tv&season=1&episode=1&source=vidfast`;
+      }
+    });
+
+    moviesEl.appendChild(movieEl);
+  });
+}
 
     // ===== Search logic =====
     searchInput.addEventListener("input", e => {
