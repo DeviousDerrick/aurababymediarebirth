@@ -16,4 +16,4 @@ self.addEventListener('fetch', event => {
       if (clientUrl.pathname.startsWith('/ocho/')) return fetch(event.request);
       return fetch(event.request);
   }));
-});
+});;
