@@ -84,9 +84,7 @@ function render(items) {
       </div>
     `;
     
-    // Show overlay on click
     card.onclick = () => showDetails(item);
-    
     grid.appendChild(card);
   });
 }
@@ -101,7 +99,6 @@ async function showDetails(item) {
   overlayVotes.textContent = item.vote_count || 0;
   overlayPoster.src = IMG + item.poster_path;
   
-  // Show/hide TV controls
   if (currentType === "tv") {
     tvControls.classList.remove("hidden");
     await loadTVShowDetails(item.id);
@@ -112,16 +109,14 @@ async function showDetails(item) {
   overlay.classList.remove("hidden");
 }
 
-// Load TV show details (seasons and episodes)
+// Load TV show details
 async function loadTVShowDetails(tvId) {
   try {
-    // Get TV show details
     const res = await fetch(`${BASE}/tv/${tvId}?api_key=${API_KEY}`);
     const data = await res.json();
     
     currentSeasons = data.number_of_seasons;
     
-    // Populate season dropdown
     seasonSelect.innerHTML = "";
     for (let i = 1; i <= currentSeasons; i++) {
       const option = document.createElement("option");
@@ -130,15 +125,13 @@ async function loadTVShowDetails(tvId) {
       seasonSelect.appendChild(option);
     }
     
-    // Load episodes for season 1
     await loadEpisodes(tvId, 1);
-    
   } catch (err) {
     console.error("Failed to load TV details:", err);
   }
 }
 
-// Load episodes for a specific season
+// Load episodes for a season
 async function loadEpisodes(tvId, season) {
   try {
     episodeSelect.innerHTML = "<option>Loading...</option>";
@@ -148,25 +141,22 @@ async function loadEpisodes(tvId, season) {
     
     episodeData[season] = data.episodes;
     
-    // Populate episode dropdown
     episodeSelect.innerHTML = "";
-    data.episodes.forEach((ep, index) => {
+    data.episodes.forEach((ep) => {
       const option = document.createElement("option");
       option.value = ep.episode_number;
       option.textContent = `${ep.episode_number}. ${ep.name}`;
       episodeSelect.appendChild(option);
     });
     
-    // Show first episode info
     showEpisodeInfo(season, 1);
-    
   } catch (err) {
     console.error("Failed to load episodes:", err);
     episodeSelect.innerHTML = "<option>Failed to load</option>";
   }
 }
 
-// Show episode information
+// Show episode info
 function showEpisodeInfo(season, episodeNum) {
   const episodes = episodeData[season];
   if (!episodes) return;
@@ -181,14 +171,13 @@ function showEpisodeInfo(season, episodeNum) {
   episodeRating.textContent = episode.vote_average ? `⭐ ${episode.vote_average.toFixed(1)}` : "";
 }
 
-// Season change handler
+// Season change
 seasonSelect.onchange = async function() {
   const season = parseInt(this.value);
   
   if (!episodeData[season]) {
     await loadEpisodes(currentItemId, season);
   } else {
-    // Populate from cache
     episodeSelect.innerHTML = "";
     episodeData[season].forEach((ep) => {
       const option = document.createElement("option");
@@ -200,14 +189,14 @@ seasonSelect.onchange = async function() {
   }
 };
 
-// Episode change handler
+// Episode change
 episodeSelect.onchange = function() {
   const season = parseInt(seasonSelect.value);
   const episode = parseInt(this.value);
   showEpisodeInfo(season, episode);
 };
 
-// Play button click
+// Play button
 playButton.onclick = () => {
   let playerUrl = `tvplayer.html?type=${currentType}&id=${currentItemId}`;
   
