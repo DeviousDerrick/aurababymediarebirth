@@ -60,6 +60,22 @@
       transform: translate(-50%, -50%);
       color: white;
       font-size: 18px;
+      text-align: center;
+    }
+    
+    .loading-spinner {
+      border: 4px solid #333;
+      border-top: 4px solid #7c7cff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -69,8 +85,11 @@
     <button class="back-button" onclick="window.history.back()">← Back</button>
   </div>
   
-  <div class="loading" id="loading">Loading player...</div>
-  <iframe id="player" allowfullscreen></iframe>
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading player...</p>
+  </div>
+  <iframe id="player" allowfullscreen allow="autoplay; encrypted-media"></iframe>
   
   <script>
     // Get parameters from URL
@@ -88,29 +107,40 @@
       titleEl.textContent = "Playing Movie";
     }
     
-    // Construct the CinemaOS URL
+    // Construct the streaming URL with AUTOPLAY
     let targetUrl = "";
     if (type === "movie") {
-      targetUrl = `https://cinemaos.tech/movie/${id}`;
+      // Use CinemaOS embed for movies (autoplay)
+      targetUrl = `https://vidsrc.xyz/embed/movie/${id}`;
     } else if (type === "tv") {
-      targetUrl = `https://cinemaos.tech/tv/${id}/${season}/${episode}`;
+      // Use Vifast for TV shows (better TV support)
+      targetUrl = `https://vidsrc.xyz/embed/tv/${id}/${season}/${episode}`;
     } else {
       console.error("Unknown type:", type);
-      document.getElementById("loading").textContent = "Error: Invalid content type";
+      document.getElementById("loading").innerHTML = "<p>Error: Invalid content type</p>";
     }
+    
+    console.log("Target URL:", targetUrl);
     
     // Encode to Ocho proxy
     const encoded = btoa(targetUrl).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
     
     // Set iframe to go through Ocho
-    const proxyBase = window.location.origin; // your own domain
+    const proxyBase = window.location.origin;
     const playerFrame = document.getElementById("player");
     playerFrame.src = `${proxyBase}/ocho/${encoded}`;
+    
+    console.log("Proxy URL:", playerFrame.src);
     
     // Hide loading message when iframe loads
     playerFrame.onload = () => {
       document.getElementById("loading").style.display = 'none';
     };
+    
+    // Timeout fallback
+    setTimeout(() => {
+      document.getElementById("loading").style.display = 'none';
+    }, 5000);
   </script>
 </body>
 </html>
