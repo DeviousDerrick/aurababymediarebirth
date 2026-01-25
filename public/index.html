@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>AuraBaby Media</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -31,13 +31,31 @@
         
         <!-- TV Show Season/Episode Selector -->
         <div id="tvControls" class="tv-controls hidden">
-          <div class="control-group">
-            <label for="seasonSelect">Season:</label>
-            <input type="number" id="seasonSelect" value="1" min="1" />
+          <div class="season-episode-grid">
+            <div class="control-group">
+              <label for="seasonSelect">Season</label>
+              <select id="seasonSelect" class="select-input">
+                <option value="1">Season 1</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label for="episodeSelect">Episode</label>
+              <select id="episodeSelect" class="select-input">
+                <option value="1">Loading...</option>
+              </select>
+            </div>
           </div>
-          <div class="control-group">
-            <label for="episodeSelect">Episode:</label>
-            <input type="number" id="episodeSelect" value="1" min="1" />
+          
+          <!-- Episode Info Card -->
+          <div id="episodeInfo" class="episode-info hidden">
+            <div class="episode-details">
+              <h4 id="episodeTitle">Episode Title</h4>
+              <p id="episodeOverview">Episode description...</p>
+              <div class="episode-meta">
+                <span id="episodeAirDate"></span>
+                <span id="episodeRating"></span>
+              </div>
+            </div>
           </div>
         </div>
         
