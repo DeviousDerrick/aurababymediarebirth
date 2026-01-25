@@ -12,14 +12,12 @@
     <h1>AuraBaby <span>Media</span></h1>
     <input id="search" type="text" placeholder="Search..." />
   </header>
-
   <nav id="tabs">
     <button class="tab active" data-type="movie">Movies</button>
     <button class="tab" data-type="tv">Shows</button>
   </nav>
-
   <main id="movies"></main>
-
+  
   <!-- Movie Detail Overlay -->
   <div id="overlay" class="overlay hidden">
     <div class="overlay-content">
@@ -30,13 +28,28 @@
         <p><strong>⭐ Rating:</strong> <span id="overlayRating"></span></p>
         <p><strong>Release Date:</strong> <span id="overlayDate"></span></p>
         <p><strong>Votes:</strong> <span id="overlayVotes"></span></p>
+        
+        <!-- TV Show Season/Episode Selector -->
+        <div id="tvControls" class="tv-controls hidden">
+          <div class="control-group">
+            <label for="seasonSelect">Season:</label>
+            <input type="number" id="seasonSelect" value="1" min="1" />
+          </div>
+          <div class="control-group">
+            <label for="episodeSelect">Episode:</label>
+            <input type="number" id="episodeSelect" value="1" min="1" />
+          </div>
+        </div>
+        
+        <!-- Play Button -->
+        <button id="playButton" class="play-button">▶ Play Now</button>
       </div>
       <div class="overlay-right">
         <img id="overlayPoster" src="" alt="Poster" />
       </div>
     </div>
   </div>
-
+  
   <script src="app.js"></script>
 </body>
 </html>
