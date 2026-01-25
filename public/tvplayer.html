@@ -13,44 +13,104 @@
       background: black;
       display: flex;
       flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
+    
+    .player-header {
+      background: #0a0a0a;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #333;
+    }
+    
+    .player-header h1 {
+      color: white;
+      font-size: 18px;
+      margin: 0;
+    }
+    
+    .back-button {
+      background: #7c7cff;
+      color: black;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    
+    .back-button:hover {
+      background: #6b6bef;
+    }
+    
     iframe {
       flex: 1;
       border: none;
       width: 100%;
       height: 100%;
     }
+    
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
-
-<iframe id="player" allowfullscreen></iframe>
-
-<script>
-  // Get parameters from URL
-  const params = new URLSearchParams(window.location.search);
-  const type = params.get("type");
-  const id = params.get("id");
-  const season = params.get("season") || 1;
-  const episode = params.get("episode") || 1;
-
-  // Construct the CinemaOS URL
-  let targetUrl = "";
-  if(type === "movie") {
-    targetUrl = `https://cinemaos.tech/movie/${id}`;
-  } else if(type === "tv") {
-    targetUrl = `https://cinemaos.tech/tv/${id}/${season}/${episode}`;
-  } else {
-    console.error("Unknown type:", type);
-  }
-
-  // Encode to Ocho proxy
-  const encoded = btoa(targetUrl).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-
-  // Set iframe to go through Ocho
-  const proxyBase = window.location.origin; // your own domain
-  document.getElementById("player").src = `${proxyBase}/ocho/${encoded}`;
-</script>
-
+  <div class="player-header">
+    <h1 id="playerTitle">Loading...</h1>
+    <button class="back-button" onclick="window.history.back()">← Back</button>
+  </div>
+  
+  <div class="loading" id="loading">Loading player...</div>
+  <iframe id="player" allowfullscreen></iframe>
+  
+  <script>
+    // Get parameters from URL
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get("type");
+    const id = params.get("id");
+    const season = params.get("season") || 1;
+    const episode = params.get("episode") || 1;
+    
+    // Update title
+    const titleEl = document.getElementById("playerTitle");
+    if (type === "tv") {
+      titleEl.textContent = `Playing TV Show - S${season}E${episode}`;
+    } else {
+      titleEl.textContent = "Playing Movie";
+    }
+    
+    // Construct the CinemaOS URL
+    let targetUrl = "";
+    if (type === "movie") {
+      targetUrl = `https://cinemaos.tech/movie/${id}`;
+    } else if (type === "tv") {
+      targetUrl = `https://cinemaos.tech/tv/${id}/${season}/${episode}`;
+    } else {
+      console.error("Unknown type:", type);
+      document.getElementById("loading").textContent = "Error: Invalid content type";
+    }
+    
+    // Encode to Ocho proxy
+    const encoded = btoa(targetUrl).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    
+    // Set iframe to go through Ocho
+    const proxyBase = window.location.origin; // your own domain
+    const playerFrame = document.getElementById("player");
+    playerFrame.src = `${proxyBase}/ocho/${encoded}`;
+    
+    // Hide loading message when iframe loads
+    playerFrame.onload = () => {
+      document.getElementById("loading").style.display = 'none';
+    };
+  </script>
 </body>
 </html>
