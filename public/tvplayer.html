@@ -82,6 +82,7 @@
       color: white;
       font-size: 18px;
       text-align: center;
+      z-index: 10;
     }
     
     .loading-spinner {
@@ -105,11 +106,16 @@
     <h1 id="playerTitle">Loading...</h1>
     <div class="header-controls">
       <select id="sourceSelector" class="source-selector">
+        <option value="vidsrc.xyz">VidSrc.xyz (Recommended)</option>
+        <option value="cinemaos">CinemaOS</option>
         <option value="vidsrc.me">VidSrc.me</option>
         <option value="embed.su">Embed.su</option>
+        <option value="vidsrc.pro">VidSrc.pro</option>
         <option value="2embed">2Embed</option>
         <option value="embedsoap">EmbedSoap</option>
         <option value="autoembed">AutoEmbed</option>
+        <option value="vidsrc.cc">VidSrc.cc</option>
+        <option value="smashystream">SmashyStream</option>
       </select>
       <button class="back-button" onclick="window.history.back()">← Back</button>
     </div>
@@ -139,8 +145,16 @@
       titleEl.textContent = "Playing Movie";
     }
     
-    // Different streaming sources
+    // 10 Different streaming sources
     const sources = {
+      'vidsrc.xyz': {
+        movie: `https://vidsrc.xyz/embed/movie/${id}`,
+        tv: `https://vidsrc.xyz/embed/tv/${id}/${season}/${episode}`
+      },
+      'cinemaos': {
+        movie: `https://cinemaos.tech/movie/${id}`,
+        tv: `https://cinemaos.tech/tv/${id}/${season}/${episode}`
+      },
       'vidsrc.me': {
         movie: `https://vidsrc.me/embed/movie?tmdb=${id}`,
         tv: `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
@@ -148,6 +162,10 @@
       'embed.su': {
         movie: `https://embed.su/embed/movie/${id}`,
         tv: `https://embed.su/embed/tv/${id}/${season}/${episode}`
+      },
+      'vidsrc.pro': {
+        movie: `https://vidsrc.pro/embed/movie/${id}`,
+        tv: `https://vidsrc.pro/embed/tv/${id}/${season}/${episode}`
       },
       '2embed': {
         movie: `https://www.2embed.cc/embed/${id}`,
@@ -160,6 +178,14 @@
       'autoembed': {
         movie: `https://autoembed.co/movie/tmdb/${id}`,
         tv: `https://autoembed.co/tv/tmdb/${id}-${season}-${episode}`
+      },
+      'vidsrc.cc': {
+        movie: `https://vidsrc.cc/v2/embed/movie/${id}`,
+        tv: `https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}`
+      },
+      'smashystream': {
+        movie: `https://player.smashy.stream/movie/${id}`,
+        tv: `https://player.smashy.stream/tv/${id}/${season}/${episode}`
       }
     };
     
@@ -180,6 +206,7 @@
         return;
       }
       
+      console.log("Loading source:", sourceName);
       console.log("Target URL:", targetUrl);
       
       // Show loading
@@ -192,7 +219,7 @@
       console.log("Proxy URL:", playerFrame.src);
     }
     
-    // Load default source
+    // Load default source (vidsrc.xyz - usually most reliable)
     loadSource(sourceSelector.value);
     
     // Change source when dropdown changes
@@ -202,13 +229,15 @@
     
     // Hide loading when iframe loads
     playerFrame.onload = () => {
-      document.getElementById("loading").style.display = 'none';
+      setTimeout(() => {
+        document.getElementById("loading").style.display = 'none';
+      }, 1000);
     };
     
     // Timeout fallback
     setTimeout(() => {
       document.getElementById("loading").style.display = 'none';
-    }, 5000);
+    }, 8000);
   </script>
 </body>
 </html>
