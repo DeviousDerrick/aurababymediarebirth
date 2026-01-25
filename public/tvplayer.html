@@ -31,6 +31,27 @@
       margin: 0;
     }
     
+    .header-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .source-selector {
+      background: #1a1a1a;
+      color: white;
+      border: 1px solid #333;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+    }
+    
+    .source-selector:hover {
+      border-color: #7c7cff;
+    }
+    
     .back-button {
       background: #7c7cff;
       color: black;
@@ -82,7 +103,16 @@
 <body>
   <div class="player-header">
     <h1 id="playerTitle">Loading...</h1>
-    <button class="back-button" onclick="window.history.back()">← Back</button>
+    <div class="header-controls">
+      <select id="sourceSelector" class="source-selector">
+        <option value="vidsrc.me">VidSrc.me</option>
+        <option value="embed.su">Embed.su</option>
+        <option value="2embed">2Embed</option>
+        <option value="embedsoap">EmbedSoap</option>
+        <option value="autoembed">AutoEmbed</option>
+      </select>
+      <button class="back-button" onclick="window.history.back()">← Back</button>
+    </div>
   </div>
   
   <div class="loading" id="loading">
@@ -99,37 +129,78 @@
     const episode = params.get("episode") || 1;
     
     const titleEl = document.getElementById("playerTitle");
+    const sourceSelector = document.getElementById("sourceSelector");
+    const playerFrame = document.getElementById("player");
+    const proxyBase = window.location.origin;
+    
     if (type === "tv") {
-      titleEl.textContent = `TV Show - Season ${season} Episode ${episode}`;
+      titleEl.textContent = `TV Show - S${season}E${episode}`;
     } else {
       titleEl.textContent = "Playing Movie";
     }
     
-    let targetUrl = "";
-    if (type === "movie") {
-      // Use CinemaOS for movies (works great)
-      targetUrl = `https://cinemaos.tech/movie/${id}`;
-    } else if (type === "tv") {
-      // Use vidsrc.to for TV shows (much better support)
-      targetUrl = `https://vidsrc.to/embed/tv/${id}/${season}/${episode}`;
-    } else {
-      console.error("Unknown type:", type);
-      document.getElementById("loading").innerHTML = "<p>Error: Invalid content type</p>";
+    // Different streaming sources
+    const sources = {
+      'vidsrc.me': {
+        movie: `https://vidsrc.me/embed/movie?tmdb=${id}`,
+        tv: `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
+      },
+      'embed.su': {
+        movie: `https://embed.su/embed/movie/${id}`,
+        tv: `https://embed.su/embed/tv/${id}/${season}/${episode}`
+      },
+      '2embed': {
+        movie: `https://www.2embed.cc/embed/${id}`,
+        tv: `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}`
+      },
+      'embedsoap': {
+        movie: `https://www.embedsoap.com/embed/movie/?id=${id}`,
+        tv: `https://www.embedsoap.com/embed/tv/?id=${id}&s=${season}&e=${episode}`
+      },
+      'autoembed': {
+        movie: `https://autoembed.co/movie/tmdb/${id}`,
+        tv: `https://autoembed.co/tv/tmdb/${id}-${season}-${episode}`
+      }
+    };
+    
+    function loadSource(sourceName) {
+      const source = sources[sourceName];
+      if (!source) {
+        console.error("Unknown source:", sourceName);
+        return;
+      }
+      
+      let targetUrl = "";
+      if (type === "movie") {
+        targetUrl = source.movie;
+      } else if (type === "tv") {
+        targetUrl = source.tv;
+      } else {
+        document.getElementById("loading").innerHTML = "<p>Error: Invalid content type</p>";
+        return;
+      }
+      
+      console.log("Target URL:", targetUrl);
+      
+      // Show loading
+      document.getElementById("loading").style.display = 'block';
+      
+      // Encode to Ocho proxy
+      const encoded = btoa(targetUrl).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      playerFrame.src = `${proxyBase}/ocho/${encoded}`;
+      
+      console.log("Proxy URL:", playerFrame.src);
     }
     
-    console.log("Target URL:", targetUrl);
+    // Load default source
+    loadSource(sourceSelector.value);
     
-    // Encode to Ocho proxy
-    const encoded = btoa(targetUrl).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    // Change source when dropdown changes
+    sourceSelector.onchange = function() {
+      loadSource(this.value);
+    };
     
-    // Set iframe to go through Ocho
-    const proxyBase = window.location.origin;
-    const playerFrame = document.getElementById("player");
-    playerFrame.src = `${proxyBase}/ocho/${encoded}`;
-    
-    console.log("Proxy URL:", playerFrame.src);
-    
-    // Hide loading message when iframe loads
+    // Hide loading when iframe loads
     playerFrame.onload = () => {
       document.getElementById("loading").style.display = 'none';
     };
