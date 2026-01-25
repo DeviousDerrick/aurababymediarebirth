@@ -8,6 +8,8 @@ const tabs = document.querySelectorAll(".tab");
 
 let currentType = "movie";
 let currentItemId = null;
+let currentSeasons = 1;
+let episodeData = {};
 
 // Overlay elements
 const overlay = document.getElementById("overlay");
@@ -22,6 +24,11 @@ const playButton = document.getElementById("playButton");
 const tvControls = document.getElementById("tvControls");
 const seasonSelect = document.getElementById("seasonSelect");
 const episodeSelect = document.getElementById("episodeSelect");
+const episodeInfo = document.getElementById("episodeInfo");
+const episodeTitle = document.getElementById("episodeTitle");
+const episodeOverview = document.getElementById("episodeOverview");
+const episodeAirDate = document.getElementById("episodeAirDate");
+const episodeRating = document.getElementById("episodeRating");
 
 // Load default movies
 load(`${BASE}/movie/popular?api_key=${API_KEY}`);
@@ -73,35 +80,132 @@ function render(items) {
       </div>
       <div class="movie-info">
         <h3>${title}</h3>
-        <span>⭐ ${item.vote_average}</span>
+        <span>⭐ ${item.vote_average.toFixed(1)}</span>
       </div>
     `;
     
     // Show overlay on click
-    card.onclick = () => {
-      currentItemId = item.id;
-      overlayTitle.textContent = title;
-      overlayDesc.textContent = item.overview || "No description available.";
-      overlayRating.textContent = item.vote_average;
-      overlayDate.textContent = item.release_date || item.first_air_date || "N/A";
-      overlayVotes.textContent = item.vote_count || 0;
-      overlayPoster.src = IMG + item.poster_path;
-      
-      // Show/hide TV controls
-      if (currentType === "tv") {
-        tvControls.classList.remove("hidden");
-        seasonSelect.value = 1;
-        episodeSelect.value = 1;
-      } else {
-        tvControls.classList.add("hidden");
-      }
-      
-      overlay.classList.remove("hidden");
-    };
+    card.onclick = () => showDetails(item);
     
     grid.appendChild(card);
   });
 }
+
+// Show details overlay
+async function showDetails(item) {
+  currentItemId = item.id;
+  overlayTitle.textContent = item.title || item.name;
+  overlayDesc.textContent = item.overview || "No description available.";
+  overlayRating.textContent = item.vote_average.toFixed(1);
+  overlayDate.textContent = item.release_date || item.first_air_date || "N/A";
+  overlayVotes.textContent = item.vote_count || 0;
+  overlayPoster.src = IMG + item.poster_path;
+  
+  // Show/hide TV controls
+  if (currentType === "tv") {
+    tvControls.classList.remove("hidden");
+    await loadTVShowDetails(item.id);
+  } else {
+    tvControls.classList.add("hidden");
+  }
+  
+  overlay.classList.remove("hidden");
+}
+
+// Load TV show details (seasons and episodes)
+async function loadTVShowDetails(tvId) {
+  try {
+    // Get TV show details
+    const res = await fetch(`${BASE}/tv/${tvId}?api_key=${API_KEY}`);
+    const data = await res.json();
+    
+    currentSeasons = data.number_of_seasons;
+    
+    // Populate season dropdown
+    seasonSelect.innerHTML = "";
+    for (let i = 1; i <= currentSeasons; i++) {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = `Season ${i}`;
+      seasonSelect.appendChild(option);
+    }
+    
+    // Load episodes for season 1
+    await loadEpisodes(tvId, 1);
+    
+  } catch (err) {
+    console.error("Failed to load TV details:", err);
+  }
+}
+
+// Load episodes for a specific season
+async function loadEpisodes(tvId, season) {
+  try {
+    episodeSelect.innerHTML = "<option>Loading...</option>";
+    
+    const res = await fetch(`${BASE}/tv/${tvId}/season/${season}?api_key=${API_KEY}`);
+    const data = await res.json();
+    
+    episodeData[season] = data.episodes;
+    
+    // Populate episode dropdown
+    episodeSelect.innerHTML = "";
+    data.episodes.forEach((ep, index) => {
+      const option = document.createElement("option");
+      option.value = ep.episode_number;
+      option.textContent = `${ep.episode_number}. ${ep.name}`;
+      episodeSelect.appendChild(option);
+    });
+    
+    // Show first episode info
+    showEpisodeInfo(season, 1);
+    
+  } catch (err) {
+    console.error("Failed to load episodes:", err);
+    episodeSelect.innerHTML = "<option>Failed to load</option>";
+  }
+}
+
+// Show episode information
+function showEpisodeInfo(season, episodeNum) {
+  const episodes = episodeData[season];
+  if (!episodes) return;
+  
+  const episode = episodes.find(ep => ep.episode_number == episodeNum);
+  if (!episode) return;
+  
+  episodeInfo.classList.remove("hidden");
+  episodeTitle.textContent = episode.name;
+  episodeOverview.textContent = episode.overview || "No description available.";
+  episodeAirDate.textContent = episode.air_date ? `📅 ${episode.air_date}` : "";
+  episodeRating.textContent = episode.vote_average ? `⭐ ${episode.vote_average.toFixed(1)}` : "";
+}
+
+// Season change handler
+seasonSelect.onchange = async function() {
+  const season = parseInt(this.value);
+  
+  if (!episodeData[season]) {
+    await loadEpisodes(currentItemId, season);
+  } else {
+    // Populate from cache
+    episodeSelect.innerHTML = "";
+    episodeData[season].forEach((ep) => {
+      const option = document.createElement("option");
+      option.value = ep.episode_number;
+      option.textContent = `${ep.episode_number}. ${ep.name}`;
+      episodeSelect.appendChild(option);
+    });
+    showEpisodeInfo(season, 1);
+  }
+};
+
+// Episode change handler
+episodeSelect.onchange = function() {
+  const season = parseInt(seasonSelect.value);
+  const episode = parseInt(this.value);
+  showEpisodeInfo(season, episode);
+};
 
 // Play button click
 playButton.onclick = () => {
