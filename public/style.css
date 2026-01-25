@@ -36,7 +36,12 @@ header input {
   padding: 10px 14px; 
   border-radius: 10px; 
   width: 220px; 
-  outline: none; 
+  outline: none;
+  transition: border 0.3s;
+}
+
+header input:focus {
+  outline: 2px solid #7c7cff;
 }
 
 #tabs { 
@@ -141,11 +146,12 @@ main {
   left: 0; 
   width: 100%; 
   height: 100%; 
-  background: rgba(0,0,0,0.9); 
+  background: rgba(0,0,0,0.95); 
   display: flex; 
   justify-content: center; 
   align-items: center; 
-  z-index: 1000; 
+  z-index: 1000;
+  overflow-y: auto;
 }
 
 .overlay.hidden { 
@@ -155,12 +161,13 @@ main {
 .overlay-content { 
   background: #111; 
   padding: 30px; 
-  max-width: 900px; 
+  max-width: 1000px; 
   width: 90%; 
   display: flex; 
   gap: 30px; 
   border-radius: 12px; 
-  position: relative; 
+  position: relative;
+  margin: 20px;
 }
 
 .overlay-left { 
@@ -170,11 +177,13 @@ main {
 .overlay-left h2 { 
   margin-bottom: 16px; 
   font-size: 28px;
+  color: #fff;
 }
 
 .overlay-left p { 
   margin-bottom: 12px; 
   line-height: 1.6;
+  color: #ccc;
 }
 
 .overlay-right { 
@@ -184,6 +193,7 @@ main {
 .overlay-right img { 
   width: 100%; 
   border-radius: 8px; 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 
 #closeOverlay { 
@@ -194,6 +204,7 @@ main {
   cursor: pointer; 
   color: #fff;
   transition: color 0.2s;
+  z-index: 10;
 }
 
 #closeOverlay:hover {
@@ -202,78 +213,172 @@ main {
 
 /* TV Controls */
 .tv-controls {
-  display: flex;
-  gap: 20px;
   margin: 20px 0;
-  padding: 15px;
+  padding: 20px;
   background: #0a0a0a;
-  border-radius: 8px;
+  border-radius: 10px;
+  border: 1px solid #222;
 }
 
 .tv-controls.hidden {
   display: none;
 }
 
+.season-episode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
 .control-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
 }
 
 .control-group label {
-  font-size: 12px;
+  font-size: 13px;
   opacity: 0.8;
   font-weight: 600;
+  color: #7c7cff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.control-group input {
-  background: #222;
+.select-input {
+  background: #1a1a1a;
   border: 1px solid #333;
   color: #fff;
-  padding: 8px 12px;
-  border-radius: 6px;
-  width: 80px;
-  font-size: 16px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 15px;
   outline: none;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s;
 }
 
-.control-group input:focus {
+.select-input:hover {
+  border-color: #555;
+}
+
+.select-input:focus {
   border-color: #7c7cff;
+  box-shadow: 0 0 0 3px rgba(124,124,255,0.1);
+}
+
+.select-input option {
+  background: #1a1a1a;
+  color: #fff;
+  padding: 10px;
+}
+
+/* Episode Info Card */
+.episode-info {
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 3px solid #7c7cff;
+  margin-top: 10px;
+}
+
+.episode-info.hidden {
+  display: none;
+}
+
+.episode-details h4 {
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.episode-details p {
+  color: #bbb;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.episode-meta {
+  display: flex;
+  gap: 15px;
+  font-size: 12px;
+  color: #888;
+}
+
+.episode-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 /* Play Button */
 .play-button {
-  background: #7c7cff;
+  background: linear-gradient(135deg, #7c7cff 0%, #6b6bef 100%);
   color: #000;
   border: none;
-  padding: 15px 40px;
+  padding: 16px 50px;
   border-radius: 10px;
   font-size: 18px;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 0 20px rgba(124,124,255,0.6);
-  margin-top: 10px;
+  box-shadow: 0 4px 20px rgba(124,124,255,0.4);
+  margin-top: 20px;
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .play-button:hover {
-  background: #6b6bef;
-  transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(124,124,255,0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(124,124,255,0.6);
+}
+
+.play-button:active {
+  transform: translateY(0);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .overlay-content {
     flex-direction: column;
+    padding: 20px;
   }
   
-  .tv-controls {
+  .season-episode-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  header {
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
+    padding: 15px;
+  }
+  
+  header h1 {
+    font-size: 20px;
   }
   
   header input {
-    width: 150px;
+    width: 100%;
+  }
+  
+  main {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    padding: 15px;
+    gap: 12px;
+  }
+  
+  .overlay-left h2 {
+    font-size: 22px;
+  }
+  
+  .play-button {
+    padding: 14px 30px;
+    font-size: 16px;
   }
 }
+
