@@ -1,6 +1,5 @@
 {
-  "name": "aurababymediarebirth",
-  "type": "module",
+  "name": "aurababymedia",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
@@ -8,6 +7,6 @@
   },
   "dependencies": {
     "express": "^4.19.2",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^2.7.0"
   }
 }
