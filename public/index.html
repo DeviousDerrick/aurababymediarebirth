@@ -4,17 +4,21 @@
   <meta charset="UTF-8" />
   <title>AuraBaby Media</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="stars"></div>
+  <div class="stars2"></div>
+  <div class="stars3"></div>
+  
   <header>
     <h1>AuraBaby <span>Media</span></h1>
-    <input id="search" type="text" placeholder="Search..." />
+    <input id="search" type="text" placeholder="Search the galaxy..." />
   </header>
   <nav id="tabs">
-    <button class="tab active" data-type="movie">Movies</button>
-    <button class="tab" data-type="tv">Shows</button>
+    <button class="tab active" data-type="movie">🎬 MOVIES</button>
+    <button class="tab" data-type="tv">⛓️‍💥BROKEN/📺SHOWS📺/WORKING ON🛠️</button>
   </nav>
   <main id="movies"></main>
   
@@ -26,11 +30,15 @@
         <h2 id="overlayTitle"></h2>
         <p id="overlayDesc"></p>
         <p><strong>⭐ Rating:</strong> <span id="overlayRating"></span></p>
-        <p><strong>Release Date:</strong> <span id="overlayDate"></span></p>
-        <p><strong>Votes:</strong> <span id="overlayVotes"></span></p>
+        <p><strong>📅 Release Date:</strong> <span id="overlayDate"></span></p>
+        <p><strong>🗳️ Votes:</strong> <span id="overlayVotes"></span></p>
         
         <!-- TV Show Season/Episode Selector -->
         <div id="tvControls" class="tv-controls hidden">
+          <div class="broken-notice">
+            <h3>⚠️ TV SHOWS CURRENTLY BROKEN ⚠️</h3>
+            <p>We're working on fixing this! Check back soon.</p>
+          </div>
           <div class="season-episode-grid">
             <div class="control-group">
               <label for="seasonSelect">Season</label>
@@ -60,7 +68,7 @@
         </div>
         
         <!-- Play Button -->
-        <button id="playButton" class="play-button">▶ Play Now</button>
+        <button id="playButton" class="play-button">▶ PLAY NOW</button>
       </div>
       <div class="overlay-right">
         <img id="overlayPoster" src="" alt="Poster" />
