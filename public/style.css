@@ -5,98 +5,225 @@
 }
 
 body { 
-  font-family: 'Poppins', sans-serif; 
-  background: #000; 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  background: #000;
   color: #fff; 
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* GALAXY BACKGROUND WITH STARS */
+.stars,
+.stars2,
+.stars3 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.stars {
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(138, 43, 226, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(75, 0, 130, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(255, 20, 147, 0.2) 0%, transparent 50%);
+  animation: galaxyPulse 20s ease-in-out infinite;
+}
+
+@keyframes galaxyPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+.stars2 {
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+    radial-gradient(2px 2px at 60px 70px, #fff, transparent),
+    radial-gradient(1px 1px at 50px 50px, #ddd, transparent),
+    radial-gradient(1px 1px at 130px 80px, #fff, transparent),
+    radial-gradient(2px 2px at 90px 10px, #fff, transparent);
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  animation: twinkle 5s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+.stars3 {
+  background-image: 
+    radial-gradient(1px 1px at 10px 10px, #fff, transparent),
+    radial-gradient(1px 1px at 40px 70px, #fff, transparent),
+    radial-gradient(1px 1px at 80px 20px, #fff, transparent),
+    radial-gradient(1px 1px at 110px 90px, #fff, transparent);
+  background-repeat: repeat;
+  background-size: 150px 150px;
+  animation: twinkle 7s ease-in-out infinite reverse;
+  opacity: 0.5;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
 }
 
 header { 
   display: flex; 
   justify-content: space-between; 
   align-items: center; 
-  padding: 18px 22px; 
-  background: #0a0a0a; 
-  border-bottom: 1px solid #111; 
+  padding: 20px 30px; 
+  background: rgba(10, 10, 10, 0.8);
+  border-bottom: 2px solid #7c7cff;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(124, 124, 255, 0.3);
+  position: relative;
+  z-index: 100;
 }
 
 header h1 { 
-  font-weight: 800; 
-  font-size: 24px; 
+  font-weight: 800;
+  font-size: 28px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(124, 124, 255, 0.8),
+               0 0 40px rgba(124, 124, 255, 0.5);
 }
 
 header h1 span { 
   color: #7c7cff; 
-  text-shadow: 0 0 12px rgba(124,124,255,0.6); 
+  text-shadow: 0 0 30px rgba(124, 124, 255, 1),
+               0 0 60px rgba(124, 124, 255, 0.7);
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { 
+    text-shadow: 0 0 20px rgba(124, 124, 255, 0.8),
+                 0 0 40px rgba(124, 124, 255, 0.5);
+  }
+  50% { 
+    text-shadow: 0 0 30px rgba(124, 124, 255, 1),
+                 0 0 60px rgba(124, 124, 255, 0.9),
+                 0 0 80px rgba(124, 124, 255, 0.6);
+  }
 }
 
 header input { 
-  background: #111; 
-  border: none; 
+  background: rgba(26, 26, 26, 0.8);
+  border: 2px solid #7c7cff;
   color: #fff; 
-  padding: 10px 14px; 
-  border-radius: 10px; 
-  width: 220px; 
+  padding: 12px 18px; 
+  border-radius: 12px; 
+  width: 250px; 
   outline: none;
-  transition: border 0.3s;
+  transition: all 0.3s;
+  font-weight: 800;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 0 20px rgba(124, 124, 255, 0.3);
 }
 
 header input:focus {
-  outline: 2px solid #7c7cff;
+  border-color: #ff20ff;
+  box-shadow: 0 0 30px rgba(255, 32, 255, 0.6);
+}
+
+header input::placeholder {
+  color: #888;
+  font-weight: 800;
 }
 
 #tabs { 
   display: flex; 
   justify-content: center; 
-  gap: 16px; 
-  background: #0a0a0a; 
-  padding: 10px 0; 
-  border-bottom: 1px solid #111; 
+  gap: 20px; 
+  background: rgba(10, 10, 10, 0.8);
+  padding: 15px 0; 
+  border-bottom: 2px solid #7c7cff;
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 99;
 }
 
 #tabs .tab { 
-  background: #111; 
+  background: rgba(26, 26, 26, 0.8);
   color: #fff; 
-  border: none; 
-  padding: 8px 16px; 
-  border-radius: 8px; 
+  border: 2px solid #7c7cff;
+  padding: 12px 24px; 
+  border-radius: 12px; 
   cursor: pointer; 
-  font-weight: 700; 
-  transition: 0.2s; 
+  font-weight: 800;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  box-shadow: 0 0 15px rgba(124, 124, 255, 0.3);
+}
+
+#tabs .tab:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 25px rgba(124, 124, 255, 0.6);
 }
 
 #tabs .tab.active { 
-  background: #7c7cff; 
+  background: linear-gradient(135deg, #7c7cff 0%, #ff20ff 100%);
   color: #000; 
-  box-shadow: 0 0 12px rgba(124,124,255,0.6); 
+  border-color: #ff20ff;
+  box-shadow: 0 0 30px rgba(124, 124, 255, 0.8),
+              0 0 50px rgba(255, 32, 255, 0.6);
+  animation: tabGlow 2s ease-in-out infinite;
+}
+
+@keyframes tabGlow {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(124, 124, 255, 0.8),
+                0 0 50px rgba(255, 32, 255, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(124, 124, 255, 1),
+                0 0 70px rgba(255, 32, 255, 0.8);
+  }
 }
 
 main { 
   display: grid; 
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-  gap: 16px; 
-  padding: 20px; 
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+  gap: 20px; 
+  padding: 30px;
+  position: relative;
+  z-index: 1;
 }
 
 .movie { 
   cursor: pointer; 
-  transition: 0.2s; 
+  transition: all 0.3s;
+  position: relative;
 }
 
 .movie:hover { 
-  transform: scale(1.05); 
+  transform: scale(1.08) translateY(-5px);
+  filter: drop-shadow(0 0 25px rgba(124, 124, 255, 0.8));
 }
 
 .movie-poster {
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: border 0.3s;
+}
+
+.movie:hover .movie-poster {
+  border-color: #7c7cff;
+  box-shadow: 0 0 30px rgba(124, 124, 255, 0.6);
 }
 
 .movie img { 
   width: 100%; 
   display: block; 
   background: #000; 
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .play-overlay {
@@ -105,7 +232,7 @@ main {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.6);
+  background: radial-gradient(circle, rgba(124, 124, 255, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,25 +245,37 @@ main {
 }
 
 .play-icon {
-  font-size: 48px;
-  color: #7c7cff;
-  text-shadow: 0 0 20px rgba(124,124,255,0.8);
+  font-size: 56px;
+  color: #fff;
+  text-shadow: 0 0 30px rgba(124, 124, 255, 1),
+               0 0 60px rgba(255, 32, 255, 0.8);
+  animation: playPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes playPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
 }
 
 .movie-info { 
-  padding: 8px 0; 
+  padding: 10px 0;
+  text-align: center;
 }
 
 .movie-info h3 { 
-  font-size: 14px; 
+  font-size: 15px;
+  font-weight: 800;
   white-space: nowrap; 
   overflow: hidden; 
-  text-overflow: ellipsis; 
+  text-overflow: ellipsis;
+  text-shadow: 0 0 10px rgba(124, 124, 255, 0.5);
 }
 
 .movie-info span { 
-  font-size: 12px; 
-  opacity: 0.7; 
+  font-size: 13px;
+  font-weight: 800;
+  color: #7c7cff;
+  text-shadow: 0 0 10px rgba(124, 124, 255, 0.8);
 }
 
 .overlay { 
@@ -145,7 +284,8 @@ main {
   left: 0; 
   width: 100%; 
   height: 100%; 
-  background: rgba(0,0,0,0.95); 
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
   display: flex; 
   justify-content: center; 
   align-items: center; 
@@ -158,15 +298,18 @@ main {
 }
 
 .overlay-content { 
-  background: #111; 
-  padding: 30px; 
-  max-width: 1000px; 
+  background: rgba(20, 20, 20, 0.95);
+  border: 2px solid #7c7cff;
+  padding: 35px; 
+  max-width: 1100px; 
   width: 90%; 
   display: flex; 
-  gap: 30px; 
-  border-radius: 12px; 
+  gap: 35px; 
+  border-radius: 20px; 
   position: relative;
-  margin: 20px;
+  margin: 30px;
+  box-shadow: 0 0 50px rgba(124, 124, 255, 0.5),
+              inset 0 0 50px rgba(124, 124, 255, 0.1);
 }
 
 .overlay-left { 
@@ -174,15 +317,25 @@ main {
 }
 
 .overlay-left h2 { 
-  margin-bottom: 16px; 
-  font-size: 28px;
+  margin-bottom: 18px; 
+  font-size: 32px;
+  font-weight: 800;
   color: #fff;
+  text-shadow: 0 0 20px rgba(124, 124, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .overlay-left p { 
-  margin-bottom: 12px; 
-  line-height: 1.6;
+  margin-bottom: 14px; 
+  line-height: 1.8;
   color: #ccc;
+  font-weight: 800;
+}
+
+.overlay-left p strong {
+  color: #7c7cff;
+  text-shadow: 0 0 10px rgba(124, 124, 255, 0.6);
 }
 
 .overlay-right { 
@@ -191,93 +344,125 @@ main {
 
 .overlay-right img { 
   width: 100%; 
-  border-radius: 8px; 
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  border-radius: 12px; 
+  border: 2px solid #7c7cff;
+  box-shadow: 0 0 30px rgba(124, 124, 255, 0.6);
 }
 
 #closeOverlay { 
   position: absolute; 
-  top: 12px; 
-  right: 16px; 
-  font-size: 32px; 
+  top: 15px; 
+  right: 20px; 
+  font-size: 36px; 
   cursor: pointer; 
   color: #fff;
-  transition: color 0.2s;
+  transition: all 0.3s;
   z-index: 10;
+  font-weight: 800;
 }
 
 #closeOverlay:hover {
-  color: #7c7cff;
+  color: #ff20ff;
+  text-shadow: 0 0 20px rgba(255, 32, 255, 0.8);
+  transform: rotate(90deg);
 }
 
 .tv-controls {
-  margin: 20px 0;
-  padding: 20px;
-  background: #0a0a0a;
-  border-radius: 10px;
-  border: 1px solid #222;
+  margin: 25px 0;
+  padding: 25px;
+  background: rgba(10, 10, 10, 0.8);
+  border-radius: 12px;
+  border: 2px solid #7c7cff;
+  box-shadow: 0 0 20px rgba(124, 124, 255, 0.3);
 }
 
 .tv-controls.hidden {
   display: none;
 }
 
+.broken-notice {
+  background: rgba(255, 50, 50, 0.2);
+  border: 2px solid #ff3232;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.broken-notice h3 {
+  color: #ff6464;
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  text-shadow: 0 0 15px rgba(255, 50, 50, 0.8);
+}
+
+.broken-notice p {
+  color: #ffaaaa;
+  font-weight: 800;
+  font-size: 14px;
+}
+
 .season-episode-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 15px;
+  gap: 18px;
+  margin-bottom: 18px;
 }
 
 .control-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .control-group label {
-  font-size: 13px;
-  opacity: 0.8;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 800;
   color: #7c7cff;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(124, 124, 255, 0.6);
 }
 
 .select-input {
-  background: #1a1a1a;
-  border: 1px solid #333;
+  background: rgba(26, 26, 26, 0.9);
+  border: 2px solid #7c7cff;
   color: #fff;
-  padding: 12px 15px;
-  border-radius: 8px;
-  font-size: 15px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
   outline: none;
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
   transition: all 0.3s;
+  box-shadow: 0 0 15px rgba(124, 124, 255, 0.3);
 }
 
 .select-input:hover {
-  border-color: #555;
+  border-color: #ff20ff;
+  box-shadow: 0 0 25px rgba(255, 32, 255, 0.5);
 }
 
 .select-input:focus {
-  border-color: #7c7cff;
-  box-shadow: 0 0 0 3px rgba(124,124,255,0.1);
+  border-color: #ff20ff;
+  box-shadow: 0 0 30px rgba(255, 32, 255, 0.7);
 }
 
 .select-input option {
   background: #1a1a1a;
   color: #fff;
-  padding: 10px;
+  font-weight: 800;
 }
 
 .episode-info {
-  background: #1a1a1a;
-  padding: 15px;
-  border-radius: 8px;
-  border-left: 3px solid #7c7cff;
-  margin-top: 10px;
+  background: rgba(26, 26, 26, 0.9);
+  padding: 18px;
+  border-radius: 10px;
+  border-left: 4px solid #7c7cff;
+  margin-top: 12px;
+  box-shadow: 0 0 20px rgba(124, 124, 255, 0.3);
 }
 
 .episode-info.hidden {
@@ -286,61 +471,87 @@ main {
 
 .episode-details h4 {
   color: #fff;
-  font-size: 16px;
-  margin-bottom: 8px;
-  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: 800;
+  text-shadow: 0 0 10px rgba(124, 124, 255, 0.6);
 }
 
 .episode-details p {
   color: #bbb;
-  font-size: 13px;
-  line-height: 1.5;
-  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+  font-weight: 800;
 }
 
 .episode-meta {
   display: flex;
-  gap: 15px;
-  font-size: 12px;
-  color: #888;
+  gap: 18px;
+  font-size: 13px;
+  color: #7c7cff;
+  font-weight: 800;
 }
 
 .episode-meta span {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  text-shadow: 0 0 10px rgba(124, 124, 255, 0.6);
 }
 
 .play-button {
-  background: linear-gradient(135deg, #7c7cff 0%, #6b6bef 100%);
+  background: linear-gradient(135deg, #7c7cff 0%, #ff20ff 100%);
   color: #000;
   border: none;
-  padding: 16px 50px;
-  border-radius: 10px;
-  font-size: 18px;
+  padding: 20px 60px;
+  border-radius: 15px;
+  font-size: 20px;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 4px 20px rgba(124,124,255,0.4);
-  margin-top: 20px;
+  box-shadow: 0 0 30px rgba(124, 124, 255, 0.6),
+              0 0 50px rgba(255, 32, 255, 0.4);
+  margin-top: 25px;
   width: 100%;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.play-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.play-button:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .play-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 30px rgba(124,124,255,0.6);
+  transform: translateY(-5px);
+  box-shadow: 0 0 50px rgba(124, 124, 255, 1),
+              0 0 80px rgba(255, 32, 255, 0.8);
 }
 
 .play-button:active {
-  transform: translateY(0);
+  transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {
   .overlay-content {
     flex-direction: column;
-    padding: 20px;
+    padding: 25px;
   }
   
   .season-episode-grid {
@@ -349,12 +560,12 @@ main {
   
   header {
     flex-direction: column;
-    gap: 10px;
-    padding: 15px;
+    gap: 12px;
+    padding: 18px;
   }
   
   header h1 {
-    font-size: 20px;
+    font-size: 22px;
   }
   
   header input {
@@ -362,17 +573,22 @@ main {
   }
   
   main {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    padding: 15px;
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    padding: 20px;
+    gap: 15px;
   }
   
   .overlay-left h2 {
-    font-size: 22px;
+    font-size: 24px;
   }
   
   .play-button {
-    padding: 14px 30px;
-    font-size: 16px;
+    padding: 16px 40px;
+    font-size: 18px;
+  }
+  
+  #tabs .tab {
+    font-size: 11px;
+    padding: 10px 16px;
   }
 }
