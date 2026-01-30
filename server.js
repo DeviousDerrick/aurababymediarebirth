@@ -33,15 +33,19 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
   let rewritten = html;
   const origin = new URL(baseUrl).origin;
 
+  // Block service workers
   rewritten = rewritten.replace(/navigator\.serviceWorker/g, 'navigator.__blockedServiceWorker');
   rewritten = rewritten.replace(/'serviceWorker'/g, "'__blockedServiceWorker'");
   rewritten = rewritten.replace(/"serviceWorker"/g, '"__blockedServiceWorker"');
+  
+  // Remove security headers that might block embedding
   rewritten = rewritten.replace(/<meta http-equiv="Content-Security-Policy".*?>/gi, '');
   rewritten = rewritten.replace(/<meta.*?name="referrer".*?>/gi, '');
   rewritten = rewritten.replace(/integrity="[^"]*"/gi, '');
   rewritten = rewritten.replace(/crossorigin="[^"]*"/gi, '');
   rewritten = rewritten.replace(/\s+crossorigin/gi, '');
 
+  // Rewrite URLs in HTML
   rewritten = rewritten.replace(/(src|href)=["']([^"']+)["']/gi, (match, attr, url) => {
     if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('#') || url.startsWith('javascript:')) return match;
     if (url.includes('/ocho/')) return match;
@@ -70,6 +74,7 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
         const targetOrigin = '${origin}';
         const inFlight = new Set();
         
+        // Block service workers completely
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(regs => {
             regs.forEach(reg => reg.unregister());
@@ -82,10 +87,12 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
           });
         }
         
+        // Intercept fetch
         const origFetch = window.fetch;
-        window.fetch = function(url, opts) {
+        window.fetch = function(url, opts = {}) {
           let urlStr = typeof url === 'string' ? url : url.url;
           
+          // Don't proxy our own requests or special URLs
           if (urlStr.startsWith('/ocho/') || 
               urlStr.startsWith('data:') || 
               urlStr.startsWith('blob:') ||
@@ -93,6 +100,7 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
             return origFetch(url, opts);
           }
           
+          // Prevent infinite loops
           if (inFlight.has(urlStr)) {
             return Promise.reject(new Error('Loop prevented'));
           }
@@ -106,9 +114,15 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
           const proxied = currentOrigin + '/ocho/' + encoded;
           
           inFlight.add(urlStr);
-          return origFetch(proxied, opts).finally(() => inFlight.delete(urlStr));
+          
+          // Preserve headers but sanitize
+          const newOpts = { ...opts };
+          if (!newOpts.headers) newOpts.headers = {};
+          
+          return origFetch(proxied, newOpts).finally(() => inFlight.delete(urlStr));
         };
         
+        // Intercept XMLHttpRequest
         const origOpen = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function(method, url, ...args) {
           if (typeof url === 'string' && 
@@ -126,6 +140,7 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
           return origOpen.call(this, method, url, ...args);
         };
         
+        // Intercept link clicks
         document.addEventListener('click', function(e) {
           const link = e.target.closest('a');
           if (link && link.href) {
@@ -138,6 +153,12 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
             }
           }
         }, true);
+        
+        // Allow postMessage for iframe communication (Cinema OS may use this)
+        const origPostMessage = window.postMessage;
+        window.postMessage = function(message, targetOrigin, transfer) {
+          return origPostMessage.call(window, message, '*', transfer);
+        };
       })();
     </script>
   `;
@@ -149,7 +170,7 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
 async function doProxyRequest(targetUrl, req, res) {
   try {
     const headers = {
-      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Accept': req.headers.accept || '*/*',
       'Accept-Encoding': 'identity', 
       'Accept-Language': req.headers['accept-language'] || 'en-US,en;q=0.9',
@@ -158,13 +179,11 @@ async function doProxyRequest(targetUrl, req, res) {
 
     if (req.headers['content-type']) headers['Content-Type'] = req.headers['content-type'];
     if (req.headers.cookie) headers['Cookie'] = req.headers.cookie;
-    if (req.headers.referer) {
-      try {
-        headers['Referer'] = new URL(targetUrl).origin;
-      } catch (e) {
-        headers['Referer'] = targetUrl;
-      }
-    }
+    
+    // Set referer to target origin for Cinema OS
+    const targetOrigin = new URL(targetUrl).origin;
+    headers['Referer'] = targetOrigin;
+    headers['Origin'] = targetOrigin;
 
     const fetchOptions = {
       method: req.method,
@@ -181,8 +200,15 @@ async function doProxyRequest(targetUrl, req, res) {
     const contentLength = parseInt(response.headers.get('content-length') || '0');
     const MAX_SIZE = 50 * 1024 * 1024;
     
+    // For large files, stream directly
     if (contentLength > MAX_SIZE) {
-      res.set('Content-Type', response.headers.get('content-type'));
+      const contentType = response.headers.get('content-type');
+      res.set({
+        'Content-Type': contentType,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Headers': '*'
+      });
       return response.body.pipe(res);
     }
 
@@ -192,28 +218,38 @@ async function doProxyRequest(targetUrl, req, res) {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': '*',
       'Access-Control-Allow-Headers': '*',
+      'Access-Control-Expose-Headers': '*',
       'Content-Security-Policy': "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;",
       'X-Frame-Options': 'ALLOWALL',
+      'X-Content-Type-Options': 'nosniff',
       'Content-Type': contentType
     });
 
+    // Copy other relevant headers
+    if (response.headers.get('content-length')) {
+      res.set('Content-Length', response.headers.get('content-length'));
+    }
+
     res.status(response.status);
 
+    // Rewrite HTML pages
     if (contentType.includes('text/html') && contentLength < 5 * 1024 * 1024) {
       const text = await response.text();
       const rewritten = rewriteHtml(text, targetUrl, '/ocho/');
       res.send(rewritten);
     } else {
+      // Stream everything else
       response.body.pipe(res);
     }
   } catch (error) {
-    console.error(`Proxy error: ${error.message}`);
+    console.error(`Proxy error for ${targetUrl}:`, error.message);
     if (!res.headersSent) {
-      res.status(500).json({ error: 'Proxy error' });
+      res.status(500).json({ error: 'Proxy error', message: error.message });
     }
   }
 }
 
+// Service worker endpoint
 app.get('/sw.js', (req, res) => {
   res.set('Content-Type', 'application/javascript');
   res.send(`
@@ -223,18 +259,22 @@ app.get('/sw.js', (req, res) => {
   `);
 });
 
+// Main proxy route
 app.use('/ocho/:url(*)', (req, res) => {
   try {
     let targetUrl = decodeProxyUrl(req.params.url);
     const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
     if (queryString) targetUrl += queryString;
     
+    console.log(`Proxying: ${targetUrl}`);
     doProxyRequest(targetUrl, req, res);
   } catch (e) {
+    console.error('URL decode error:', e.message);
     res.status(400).send('Invalid URL');
   }
 });
 
+// Fallback for relative URLs from proxied pages
 app.all('*', (req, res) => {
   const referer = req.headers.referer;
   
@@ -246,14 +286,18 @@ app.all('*', (req, res) => {
         const encodedPart = parts[1].split('/')[0];
         const targetOrigin = new URL(decodeProxyUrl(encodedPart)).origin;
         const fixedUrl = targetOrigin + req.url;
+        console.log(`Fallback proxying: ${fixedUrl}`);
         return doProxyRequest(fixedUrl, req, res);
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('Fallback error:', e.message);
+    }
   }
   
   res.status(404).json({ error: 'Not Found' });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🎬 AuraBaby Media on port ${PORT}`);
+  console.log(`🎬 AuraBaby Media running on port ${PORT}`);
+  console.log(`📡 Proxy endpoint: http://localhost:${PORT}/ocho/`);
 });
