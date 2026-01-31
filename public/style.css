@@ -113,7 +113,6 @@ header h1 span {
   }
 }
 
-/* COSMIC SEARCH INPUT WITH SPACE TYPING EFFECT */
 header input { 
   background: rgba(10, 20, 40, 0.9);
   border: 2px solid #00bfff;
@@ -215,7 +214,6 @@ main {
   z-index: 1;
 }
 
-/* MOVIE CARD WITH STAR EXPLOSION EFFECT */
 .movie { 
   cursor: pointer; 
   transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -292,7 +290,6 @@ main {
               inset 0 0 30px rgba(0, 191, 255, 0.2);
 }
 
-/* STAR PARTICLES ON HOVER */
 .movie:hover .movie-poster::before,
 .movie:hover .movie-poster::after {
   content: '';
@@ -504,39 +501,6 @@ main {
 
 .tv-controls.hidden {
   display: none;
-}
-
-.broken-notice {
-  background: rgba(255, 50, 50, 0.2);
-  border: 2px solid #ff3232;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  text-align: center;
-  animation: warningPulse 2s ease-in-out infinite;
-}
-
-@keyframes warningPulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(255, 50, 50, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(255, 50, 50, 0.8);
-  }
-}
-
-.broken-notice h3 {
-  color: #ff6464;
-  font-size: 18px;
-  font-weight: 800;
-  margin-bottom: 8px;
-  text-shadow: 0 0 15px rgba(255, 50, 50, 0.8);
-}
-
-.broken-notice p {
-  color: #ffaaaa;
-  font-weight: 800;
-  font-size: 14px;
 }
 
 .season-episode-grid {
