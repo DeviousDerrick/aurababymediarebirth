@@ -18,7 +18,7 @@
       font-weight: 800;
       overflow: hidden;
     }
-    
+
     .player-header {
       background: rgba(10, 10, 10, 0.95);
       padding: 18px 25px;
@@ -29,7 +29,7 @@
       box-shadow: 0 0 30px rgba(0, 191, 255, 0.4);
       z-index: 1000;
     }
-    
+
     .player-header h1 {
       color: white;
       font-size: 20px;
@@ -39,7 +39,7 @@
       text-shadow: 0 0 15px rgba(0, 191, 255, 0.8);
       letter-spacing: 1px;
     }
-    
+
     .back-button {
       background: linear-gradient(135deg, #00bfff 0%, #fff 50%, #87ceeb 100%);
       color: black;
@@ -52,12 +52,12 @@
       text-transform: uppercase;
       box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
     }
-    
+
     .back-button:hover {
       transform: translateY(-3px);
       box-shadow: 0 0 30px rgba(0, 191, 255, 0.8);
     }
-    
+
     .player-container {
       flex: 1;
       position: relative;
@@ -67,7 +67,7 @@
       justify-content: center;
       overflow: hidden;
     }
-    
+
     iframe {
       position: absolute;
       top: 0;
@@ -77,7 +77,7 @@
       border: none;
       background: #000;
     }
-    
+
     .loading {
       position: absolute;
       top: 50%;
@@ -88,13 +88,13 @@
       text-align: center;
       font-weight: 800;
       z-index: 100;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 30px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 40px;
       border-radius: 15px;
       border: 2px solid #00bfff;
       box-shadow: 0 0 40px rgba(0, 191, 255, 0.6);
     }
-    
+
     .loading-spinner {
       border: 5px solid #333;
       border-top: 5px solid #00bfff;
@@ -105,10 +105,104 @@
       margin: 20px auto;
       box-shadow: 0 0 30px rgba(0, 191, 255, 0.6);
     }
-    
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    .loading p {
+      margin: 5px 0;
+      color: #ccc;
+    }
+
+    .loading p.sub {
+      font-size: 13px;
+      color: #00bfff;
+    }
+
+    .error-box {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(30, 10, 10, 0.95);
+      color: white;
+      padding: 35px;
+      border-radius: 15px;
+      text-align: center;
+      max-width: 480px;
+      width: 90%;
+      border: 2px solid #ff4444;
+      box-shadow: 0 0 40px rgba(255, 50, 50, 0.5);
+      z-index: 101;
+    }
+
+    .error-box h2 {
+      margin: 0 0 12px 0;
+      font-size: 22px;
+      color: #ff6666;
+    }
+
+    .error-box p {
+      margin: 8px 0;
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .error-box .error-detail {
+      background: rgba(255,50,50,0.1);
+      border: 1px solid #553333;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin: 12px 0;
+      font-size: 12px;
+      color: #ff9999;
+      text-align: left;
+      font-family: monospace;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    .btn-row {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .btn {
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+    }
+
+    .btn-retry {
+      background: linear-gradient(135deg, #00bfff, #fff);
+      color: #000;
+      box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+    }
+
+    .btn-retry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0, 191, 255, 0.8);
+    }
+
+    .btn-back {
+      background: rgba(40, 40, 40, 0.9);
+      color: #fff;
+      border: 2px solid #555;
+    }
+
+    .btn-back:hover {
+      background: rgba(60, 60, 60, 0.9);
     }
   </style>
 </head>
@@ -117,71 +211,117 @@
     <h1 id="playerTitle">Loading...</h1>
     <button class="back-button" onclick="window.history.back()">← BACK</button>
   </div>
-  
+
   <div class="player-container">
     <div class="loading" id="loading">
       <div class="loading-spinner"></div>
-      <p>Loading Cinema OS...</p>
-      <p style="font-size: 14px; margin-top: 10px; color: #00bfff;">Please wait</p>
+      <p>Loading player...</p>
+      <p class="sub">Connecting through proxy</p>
     </div>
-    
-    <iframe 
-      id="player" 
-      allowfullscreen 
-      allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
+
+    <div class="error-box" id="errorBox">
+      <h2>⚠️ Playback Error</h2>
+      <p id="errorText">Something went wrong.</p>
+      <div class="error-detail" id="errorDetail"></div>
+      <div class="btn-row">
+        <button class="btn btn-retry" onclick="location.reload()">🔄 Retry</button>
+        <button class="btn btn-back" onclick="window.history.back()">← Back</button>
+      </div>
+    </div>
+
+    <iframe
+      id="player"
+      allowfullscreen
+      allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
       sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals allow-orientation-lock allow-popups-to-escape-sandbox allow-presentation allow-top-navigation allow-top-navigation-by-user-activation"
     ></iframe>
   </div>
-  
+
   <script>
     const params = new URLSearchParams(window.location.search);
     const type = params.get("type");
     const id = params.get("id");
-    const season = params.get("season") || 1;
-    const episode = params.get("episode") || 1;
-    
+    const season = params.get("season") || "1";
+    const episode = params.get("episode") || "1";
+
     const titleEl = document.getElementById("playerTitle");
     const loadingEl = document.getElementById("loading");
+    const errorBox = document.getElementById("errorBox");
+    const errorText = document.getElementById("errorText");
+    const errorDetail = document.getElementById("errorDetail");
     const playerFrame = document.getElementById("player");
-    
-    // Update title
+
+    // Set title
     if (type === "tv") {
       titleEl.textContent = `📺 S${season}E${episode}`;
     } else {
-      titleEl.textContent = "🎬 MOVIE";
+      titleEl.textContent = "🎬 Movie";
     }
-    
-    // Construct Cinema OS URL
+
+    function showError(msg, detail) {
+      loadingEl.style.display = "none";
+      errorText.textContent = msg;
+      errorDetail.textContent = detail || "";
+      errorDetail.style.display = detail ? "block" : "none";
+      errorBox.style.display = "block";
+    }
+
+    // Build the Cinema OS target URL
     let targetUrl = "";
     if (type === "movie") {
       targetUrl = `https://cinemaos.tech/player/${id}`;
     } else if (type === "tv") {
       targetUrl = `https://cinemaos.tech/player/${id}/${season}/${episode}`;
+    } else {
+      showError("Invalid request", "No type or id parameter found.");
     }
-    
+
     if (targetUrl) {
-      // Encode URL for proxy
-      const encoded = btoa(targetUrl)
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=/g, '');
-      
-      const proxyUrl = `${window.location.origin}/ocho/${encoded}`;
-      
-      console.log('Loading:', targetUrl);
-      
-      // Set iframe source
-      playerFrame.src = proxyUrl;
-      
-      // Hide loading after timeout
-      setTimeout(() => {
-        loadingEl.style.display = 'none';
-      }, 10000);
-      
-      playerFrame.onload = () => {
-        setTimeout(() => loadingEl.style.display = 'none', 1000);
-      };
+      // Use the /api/encode endpoint exactly like Project Ocho's own index.html does
+      fetch(`/api/encode?url=${encodeURIComponent(targetUrl)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showError("Encoding failed", data.error);
+            return;
+          }
+
+          console.log("[Player] Target:", targetUrl);
+          console.log("[Player] Proxy URL:", data.proxyUrl);
+
+          // Load the proxied URL into the iframe
+          playerFrame.src = data.proxyUrl;
+
+          // Hide loading on iframe load
+          playerFrame.onload = () => {
+            setTimeout(() => {
+              loadingEl.style.display = "none";
+            }, 800);
+          };
+
+          playerFrame.onerror = () => {
+            showError("Failed to load player", "The iframe could not load the proxied page.");
+          };
+
+          // Fallback: hide loading after 12 seconds regardless
+          setTimeout(() => {
+            if (loadingEl.style.display !== "none") {
+              loadingEl.style.display = "none";
+            }
+          }, 12000);
+        })
+        .catch(err => {
+          showError("Proxy connection failed", err.message);
+        });
     }
+
+    // Listen for messages from the iframe
+    window.addEventListener("message", (event) => {
+      console.log("[Player] iframe message:", event.data);
+      if (event.data && event.data.type === "error") {
+        showError("Player error", event.data.message || "Unknown error from player.");
+      }
+    });
   </script>
 </body>
 </html>
