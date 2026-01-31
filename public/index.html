@@ -16,35 +16,10 @@
     <h1>AuraBaby <span>Media</span></h1>
     <input id="search" type="text" placeholder="Search the galaxy..." />
   </header>
-  
   <nav id="tabs">
     <button class="tab active" data-type="movie">🎬 MOVIES</button>
-    <button class="tab" data-type="tv">📺 SHOWS</button>
-    <button class="tab" data-type="continue">🔄 CONTINUE</button>
-    <button class="tab" data-type="watchlist">⭐ WATCHLIST</button>
+    <button class="tab" data-type="tv">📺SHOWS📺</button>
   </nav>
-  
-  <!-- Continue Watching Section -->
-  <section id="continueSection" class="list-section hidden">
-    <div class="section-header">
-      <h2>🔄 Continue Watching</h2>
-      <button id="clearContinue" class="clear-btn">🗑️ Clear All</button>
-    </div>
-    <div id="continueGrid" class="movies-grid"></div>
-    <p id="continueEmpty" class="empty-message hidden">No items to continue watching. Start watching something!</p>
-  </section>
-  
-  <!-- Watchlist Section -->
-  <section id="watchlistSection" class="list-section hidden">
-    <div class="section-header">
-      <h2>⭐ Your Watchlist</h2>
-      <button id="clearWatchlist" class="clear-btn">🗑️ Clear All</button>
-    </div>
-    <div id="watchlistGrid" class="movies-grid"></div>
-    <p id="watchlistEmpty" class="empty-message hidden">Your watchlist is empty. Add some movies or shows!</p>
-  </section>
-  
-  <!-- Main Content Grid -->
   <main id="movies"></main>
   
   <!-- Movie Detail Overlay -->
@@ -57,18 +32,6 @@
         <p><strong>⭐ Rating:</strong> <span id="overlayRating"></span></p>
         <p><strong>📅 Release Date:</strong> <span id="overlayDate"></span></p>
         <p><strong>🗳️ Votes:</strong> <span id="overlayVotes"></span></p>
-        
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-          <button id="addToWatchlist" class="action-btn">
-            <span class="btn-icon">⭐</span>
-            <span class="btn-text">Add to Watchlist</span>
-          </button>
-          <button id="removeFromWatchlist" class="action-btn hidden">
-            <span class="btn-icon">✓</span>
-            <span class="btn-text">In Watchlist</span>
-          </button>
-        </div>
         
         <!-- TV Show Season/Episode Selector -->
         <div id="tvControls" class="tv-controls hidden">
