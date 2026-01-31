@@ -15,8 +15,23 @@ app.use((req, res, next) => {
   next();
 });
 
-// Use raw body parser for POST requests
-app.use(express.raw({ type: '*/*', limit: '10mb' }));
+// Manual body reader — express.raw({ type: '*/*' }) silently SKIPS bodies when
+// Content-Type is missing. Cinema OS video API POSTs often have no Content-Type,
+// so the body was arriving empty and the video CDN returned 400.
+// This middleware reads the raw body for ALL POST/PUT/PATCH requests unconditionally.
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+    const chunks = [];
+    req.on('data', chunk => chunks.push(chunk));
+    req.on('end', () => {
+      req.body = chunks.length ? Buffer.concat(chunks) : Buffer.alloc(0);
+      next();
+    });
+    req.on('error', () => { req.body = Buffer.alloc(0); next(); });
+  } else {
+    next();
+  }
+});
 app.use(express.static('public'));
 
 // 2. HELPER FUNCTIONS
@@ -37,25 +52,21 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
   let rewritten = html;
   const origin = new URL(baseUrl).origin;
 
-  // Block Service Workers aggressively
+  // Block Service Workers
   rewritten = rewritten.replace(/navigator\.serviceWorker/g, 'navigator.__blockedServiceWorker');
   rewritten = rewritten.replace(/'serviceWorker'/g, "'__blockedServiceWorker'");
   rewritten = rewritten.replace(/"serviceWorker"/g, '"__blockedServiceWorker"');
 
-  // Strip ALL security-related meta tags
+  // Strip security meta tags
   rewritten = rewritten.replace(/<meta http-equiv="Content-Security-Policy".*?>/gi, '');
   rewritten = rewritten.replace(/<meta.*?name="referrer".*?>/gi, '');
   rewritten = rewritten.replace(/integrity="[^"]*"/gi, '');
   rewritten = rewritten.replace(/crossorigin="[^"]*"/gi, '');
-
-  // Remove CORB-triggering attributes
   rewritten = rewritten.replace(/\s+crossorigin/gi, '');
 
-  // Rewrite Links
+  // Rewrite src/href attributes
   rewritten = rewritten.replace(/(src|href)=["']([^"']+)["']/gi, (match, attr, url) => {
     if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('#') || url.startsWith('javascript:')) return match;
-    
-    // Skip if already proxied
     if (url.includes('/ocho/')) return match;
     
     let absoluteUrl = url;
@@ -71,12 +82,11 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
       const encoded = encodeProxyUrl(absoluteUrl);
       return `${attr}="${proxyPrefix}${encoded}"`;
     } catch (e) { 
-      console.error('URL rewrite error:', e, url);
       return match; 
     }
   });
 
-  // AGGRESSIVE proxy injection - must come FIRST
+  // Inject proxy interceptor script
   const proxyScript = `
     <script>
       (function() {
@@ -84,71 +94,54 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
         const targetOrigin = '${origin}';
         const inFlight = new Set();
         
-        console.log('[PROXY] Initializing for', targetOrigin);
-        
-        // KILL SERVICE WORKERS IMMEDIATELY
+        // KILL SERVICE WORKERS
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(regs => {
-            regs.forEach(reg => {
-              console.log('[PROXY] Unregistering SW:', reg.scope);
-              reg.unregister();
-            });
+            regs.forEach(reg => reg.unregister());
           });
-          
-          // Block future registrations
           delete navigator.serviceWorker;
           Object.defineProperty(navigator, 'serviceWorker', {
-            get: () => { 
-              console.warn('[PROXY] Service Worker blocked');
-              return undefined; 
-            },
+            get: () => undefined,
             configurable: false
           });
         }
         
-        // Override fetch BEFORE anything else loads
+        // Intercept fetch
         const origFetch = window.fetch;
         window.fetch = function(url, opts) {
           let urlStr = typeof url === 'string' ? url : url.url;
           
-          // Already proxied or special protocol
-          if (urlStr.startsWith('/ocho/') || urlStr.startsWith('data:') || urlStr.startsWith('blob:')) {
+          // Skip: already proxied, data/blob URIs, or requests to our own server
+          if (urlStr.startsWith('/ocho/') || urlStr.startsWith('data:') || urlStr.startsWith('blob:') || urlStr.startsWith(currentOrigin)) {
             return origFetch(url, opts);
           }
           
-          // Prevent loops
           if (inFlight.has(urlStr)) {
-            console.warn('[PROXY] Loop prevented:', urlStr);
             return Promise.reject(new Error('Loop prevented'));
           }
           
-          // Build full URL
           let fullUrl = urlStr;
           if (!urlStr.startsWith('http')) {
             fullUrl = urlStr.startsWith('/') ? targetOrigin + urlStr : targetOrigin + '/' + urlStr;
           }
           
-          // Encode and proxy
           const encoded = btoa(fullUrl).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');
           const proxied = currentOrigin + '/ocho/' + encoded;
-          
-          console.log('[PROXY] Fetch:', urlStr, '->', proxied);
           
           inFlight.add(urlStr);
           return origFetch(proxied, opts).finally(() => inFlight.delete(urlStr));
         };
         
-        // Override XHR
+        // Intercept XHR
         const origOpen = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function(method, url, ...args) {
-          if (typeof url === 'string' && !url.startsWith('/ocho/') && !url.startsWith('data:') && !url.startsWith('blob:')) {
+          if (typeof url === 'string' && !url.startsWith('/ocho/') && !url.startsWith('data:') && !url.startsWith('blob:') && !url.startsWith(currentOrigin)) {
             let fullUrl = url;
             if (!url.startsWith('http')) {
               fullUrl = url.startsWith('/') ? targetOrigin + url : targetOrigin + '/' + url;
             }
             const encoded = btoa(fullUrl).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');
             url = currentOrigin + '/ocho/' + encoded;
-            console.log('[PROXY] XHR:', method, url);
           }
           return origOpen.call(this, method, url, ...args);
         };
@@ -166,24 +159,19 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
             }
           }
         }, true);
-        
-        console.log('[PROXY] Initialization complete');
       })();
     </script>
   `;
 
-  // Inject at VERY start of head
   rewritten = rewritten.replace(/<head[^>]*>/i, (match) => match + proxyScript);
-
   return rewritten;
 }
 
-// CORE PROXY LOGIC (Shared by main route and catch-all)
+// 3. CORE PROXY LOGIC
 async function doProxyRequest(targetUrl, req, res) {
   console.log(`Proxying: ${req.method} ${targetUrl}`);
 
   try {
-    // Forward Request Headers
     const headers = {
       'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Accept': req.headers.accept || '*/*',
@@ -192,45 +180,64 @@ async function doProxyRequest(targetUrl, req, res) {
       'Connection': 'keep-alive'
     };
 
-    // Forward important headers
     if (req.headers['content-type']) headers['Content-Type'] = req.headers['content-type'];
     if (req.headers.cookie) headers['Cookie'] = req.headers.cookie;
+    if (req.headers.range) headers['Range'] = req.headers.range;
 
-    // Always set Origin + Referer to the target site (Cinema OS requires these)
+    // --- ORIGIN / REFERER: THE KEY FIX ---
+    // When Cinema OS player (cinemaos.tech) fetches video from a CDN (e.g. hobbism.com),
+    // that CDN checks Origin against the player site, NOT against itself.
+    // Our browser Referer looks like: https://ourserver.com/ocho/<base64 of cinemaos.tech/player/123>
+    // We decode that to recover cinemaos.tech and send it as Origin/Referer.
+    // This is what makes the CDN accept the request instead of returning 400/403.
     try {
       const targetOrigin = new URL(targetUrl).origin;
-      headers['Origin'] = targetOrigin;
-      headers['Referer'] = targetOrigin + '/';
-    } catch (e) {}
+      let originToSend = targetOrigin;
+      let refererToSend = targetOrigin + '/';
 
-    // Forward Range header for video seeking
-    if (req.headers.range) headers['Range'] = req.headers.range;
+      // If request came from a proxied page, extract the ORIGINAL page's origin
+      if (req.headers.referer && req.headers.referer.includes('/ocho/')) {
+        try {
+          const refUrl = new URL(req.headers.referer);
+          const ochoParts = refUrl.pathname.split('/ocho/');
+          if (ochoParts.length > 1) {
+            const encodedPart = ochoParts[1].split('/')[0].split('?')[0];
+            const decodedOrigUrl = decodeProxyUrl(encodedPart);
+            if (decodedOrigUrl.startsWith('http')) {
+              originToSend = new URL(decodedOrigUrl).origin;
+              refererToSend = decodedOrigUrl;
+              console.log(`[Origin] ${targetOrigin} <- using referring origin: ${originToSend}`);
+            }
+          }
+        } catch (e) { /* fall through */ }
+      }
+
+      headers['Origin'] = originToSend;
+      headers['Referer'] = refererToSend;
+    } catch (e) {}
 
     const fetchOptions = {
       method: req.method,
       headers: headers,
       redirect: 'follow',
-      signal: AbortSignal.timeout(60000) // Increased to 60 seconds
+      signal: AbortSignal.timeout(60000)
     };
 
-    // Forward Body for POST/PUT
-    if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body && Buffer.isBuffer(req.body)) {
+    if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body && req.body.length > 0) {
       fetchOptions.body = req.body;
+      console.log(`[Body] Forwarding ${req.body.length} bytes (Content-Type: ${req.headers['content-type'] || 'none'})`);
+    } else if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+      console.log(`[Body] WARNING: ${req.method} with no body (Content-Type: ${req.headers['content-type'] || 'none'})`);
     }
 
     const response = await fetch(targetUrl, fetchOptions);
 
-    // Get content length to check size
     const contentLength = parseInt(response.headers.get('content-length') || '0');
-    const MAX_SIZE = 50 * 1024 * 1024; // 50MB limit
+    const MAX_SIZE = 50 * 1024 * 1024;
     
     if (contentLength > MAX_SIZE) {
-      console.warn(`Response too large: ${contentLength} bytes, streaming directly`);
-      // For huge responses, just stream without rewriting
       res.set('Content-Type', response.headers.get('content-type'));
-      return response.body.pipe(res).on('finish', () => {
-        if (response.body.destroy) response.body.destroy();
-      });
+      return response.body.pipe(res);
     }
 
     const contentType = response.headers.get('content-type') || 'application/octet-stream';
@@ -245,7 +252,6 @@ async function doProxyRequest(targetUrl, req, res) {
       'Content-Type': contentType
     };
 
-    // Forward video streaming headers
     if (response.headers.get('content-length')) headersToSend['Content-Length'] = response.headers.get('content-length');
     if (response.headers.get('content-range')) headersToSend['Content-Range'] = response.headers.get('content-range');
     if (response.headers.get('accept-ranges')) headersToSend['Accept-Ranges'] = response.headers.get('accept-ranges');
@@ -256,91 +262,41 @@ async function doProxyRequest(targetUrl, req, res) {
     res.set(headersToSend);
     res.status(response.status);
 
-    // Only rewrite HTML, stream everything else
     if (contentType.includes('text/html') && contentLength < 5 * 1024 * 1024) {
-      // Only rewrite HTML smaller than 5MB
       const text = await response.text();
       const rewritten = rewriteHtml(text, targetUrl, '/ocho/');
-      const final = rewritten.toLowerCase().trim().startsWith('<!doctype') 
-        ? rewritten 
-        : '<!DOCTYPE html>\n' + rewritten;
-      res.send(final);
+      res.send(rewritten.toLowerCase().trim().startsWith('<!doctype') ? rewritten : '<!DOCTYPE html>\n' + rewritten);
     } else {
-      // Stream everything else to avoid loading into memory
       const stream = response.body.pipe(res);
-      
-      stream.on('finish', () => {
-        if (response.body.destroy) response.body.destroy();
-      });
-      
       stream.on('error', (err) => {
-        console.error('Stream error:', err.message);
         if (response.body.destroy) response.body.destroy();
         if (!res.headersSent) res.status(500).end();
       });
-      
-      // Handle client disconnect
       req.on('close', () => {
-        console.log('Client disconnected, aborting stream');
         if (response.body.destroy) response.body.destroy();
       });
     }
   } catch (error) {
     console.error(`Proxy Fail: ${targetUrl} - ${error.message}`);
-    
-    // Handle specific error types
-    if (error.name === 'AbortError' || error.message.includes('aborted')) {
-      console.log('Request timeout or aborted');
-      if (!res.headersSent) {
-        res.status(504).json({ 
-          error: 'Request timeout', 
-          message: 'The target server took too long to respond. Try a simpler page or refresh.' 
-        });
-      }
-    } else if (error.code === 'ECONNREFUSED') {
-      if (!res.headersSent) {
-        res.status(502).json({ error: 'Connection refused', message: 'Could not connect to target server' });
-      }
-    } else {
-      if (!res.headersSent) {
-        res.status(500).json({ error: 'Proxy error', message: error.message });
-      }
-    }
-  } finally {
-    if (global.gc) {
-      global.gc();
+    if (!res.headersSent) {
+      const status = error.name === 'AbortError' ? 504 : error.code === 'ECONNREFUSED' ? 502 : 500;
+      res.status(status).json({ error: 'Proxy error', message: error.message });
     }
   }
 }
 
-// 4. THE "KILLER" SERVICE WORKER - AGGRESSIVE VERSION
+// 4. KILLER SERVICE WORKER
 app.get('/sw.js', (req, res) => {
   res.set('Content-Type', 'application/javascript');
   res.send(`
-    // Aggressively kill any service worker
     self.addEventListener('install', (e) => {
       self.skipWaiting();
-      e.waitUntil(
-        caches.keys().then((names) => {
-          return Promise.all(names.map(name => caches.delete(name)));
-        })
-      );
+      e.waitUntil(caches.keys().then(names => Promise.all(names.map(name => caches.delete(name)))));
     });
-    
     self.addEventListener('activate', (e) => {
-      e.waitUntil(
-        self.registration.unregister().then(() => {
-          return self.clients.matchAll();
-        }).then((clients) => {
-          clients.forEach(client => client.navigate(client.url));
-        })
-      );
+      e.waitUntil(self.registration.unregister().then(() => self.clients.matchAll()).then(clients => clients.forEach(c => c.navigate(c.url))));
     });
-    
-    // Don't intercept ANY requests
-    self.addEventListener('fetch', (e) => {
-      e.respondWith(fetch(e.request));
-    });
+    self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));
   `);
 });
 
@@ -352,64 +308,44 @@ app.get('/api/encode', (req, res) => {
   res.json({ encoded: encodeProxyUrl(fullUrl), proxyUrl: `/ocho/${encodeProxyUrl(fullUrl)}` });
 });
 
-// 6. MAIN ROUTE
+// 6. MAIN PROXY ROUTE
 app.use('/ocho/:url(*)', (req, res) => {
   const encodedUrl = req.params.url;
   try {
     let targetUrl = decodeProxyUrl(encodedUrl);
     const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
     if (queryString) targetUrl += queryString;
-    
     doProxyRequest(targetUrl, req, res);
   } catch (e) {
     res.status(400).send('Invalid URL');
   }
 });
 
-// 7. ENHANCED CATCH-ALL - Handles leaked API requests
+// 7. CATCH-ALL for leaked relative requests
 app.all('*', (req, res) => {
   const referer = req.headers.referer;
   
-  console.log(`Catch-all hit: ${req.method} ${req.url}`);
-  console.log(`Referer: ${referer}`);
-  
-  // Try to fix leaked requests by reconstructing the target URL
-  if (referer) {
+  if (referer && referer.includes('/ocho/')) {
     try {
-      let targetOrigin = null;
-      
-      // Extract origin from referer
-      if (referer.includes('/ocho/')) {
-        const refPath = new URL(referer).pathname;
-        const parts = refPath.split('/ocho/');
-        if (parts.length > 1) {
-          const encodedPart = parts[1].split('/')[0].split('?')[0];
-          targetOrigin = new URL(decodeProxyUrl(encodedPart)).origin;
-        }
-      }
-      
-      // If we found a target origin, proxy the request
-      if (targetOrigin) {
+      const refPath = new URL(referer).pathname;
+      const parts = refPath.split('/ocho/');
+      if (parts.length > 1) {
+        const encodedPart = parts[1].split('/')[0].split('?')[0];
+        const targetOrigin = new URL(decodeProxyUrl(encodedPart)).origin;
         const fixedUrl = targetOrigin + req.url;
-        console.log(`✓ Catch-all proxying: ${req.url} -> ${fixedUrl}`);
+        console.log(`✓ Catch-all: ${req.url} -> ${fixedUrl}`);
         return doProxyRequest(fixedUrl, req, res);
       }
     } catch (e) {
-      console.error('Catch-all parsing error:', e.message);
+      console.error('Catch-all error:', e.message);
     }
   }
   
-  // If no referer or parsing failed, return 404
-  console.log(`✗ 404 Not Found: ${req.url}`);
-  res.status(404).json({ 
-    error: 'Not Found', 
-    path: req.url,
-    hint: 'This request could not be proxied. The page may need to be refreshed.'
-  });
+  res.status(404).json({ error: 'Not Found', path: req.url });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🎬 AuraBaby Media + Project Ocho running on port ${PORT}`);
+  console.log(`🎬 AuraBaby Media + Project Ocho on port ${PORT}`);
   console.log(`📡 Proxy: /ocho/`);
   console.log(`🔧 Encoder: /api/encode`);
 });
