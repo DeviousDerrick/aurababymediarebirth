@@ -59,17 +59,13 @@ async function load(url) {
     render(data.results);
   } catch (err) {
     console.error("Failed to fetch:", err);
-    grid.innerHTML = "<p style='color:red; padding:30px; text-align:center;'>Failed to load content. Check your connection.</p>";
+    grid.innerHTML = "<p style='color:red'>Failed to load content.</p>";
   }
 }
 
 // Render movies/shows
 function render(items) {
   grid.innerHTML = "";
-  if (!items || items.length === 0) {
-    grid.innerHTML = "<p style='color:#87ceeb; padding:30px; text-align:center; grid-column:1/-1;'>No results found.</p>";
-    return;
-  }
   items.forEach(item => {
     if (!item.poster_path) return;
     const title = item.title || item.name;
@@ -87,6 +83,7 @@ function render(items) {
         <span>⭐ ${item.vote_average.toFixed(1)}</span>
       </div>
     `;
+    
     card.onclick = () => showDetails(item);
     grid.appendChild(card);
   });
@@ -101,25 +98,25 @@ async function showDetails(item) {
   overlayDate.textContent = item.release_date || item.first_air_date || "N/A";
   overlayVotes.textContent = item.vote_count || 0;
   overlayPoster.src = IMG + item.poster_path;
-
+  
   if (currentType === "tv") {
     tvControls.classList.remove("hidden");
     await loadTVShowDetails(item.id);
   } else {
     tvControls.classList.add("hidden");
   }
-
+  
   overlay.classList.remove("hidden");
 }
 
-// Load TV show details (seasons)
+// Load TV show details
 async function loadTVShowDetails(tvId) {
   try {
     const res = await fetch(`${BASE}/tv/${tvId}?api_key=${API_KEY}`);
     const data = await res.json();
-
+    
     currentSeasons = data.number_of_seasons;
-
+    
     seasonSelect.innerHTML = "";
     for (let i = 1; i <= currentSeasons; i++) {
       const option = document.createElement("option");
@@ -127,9 +124,7 @@ async function loadTVShowDetails(tvId) {
       option.textContent = `Season ${i}`;
       seasonSelect.appendChild(option);
     }
-
-    // Reset episode data cache for this show
-    episodeData = {};
+    
     await loadEpisodes(tvId, 1);
   } catch (err) {
     console.error("Failed to load TV details:", err);
@@ -140,12 +135,12 @@ async function loadTVShowDetails(tvId) {
 async function loadEpisodes(tvId, season) {
   try {
     episodeSelect.innerHTML = "<option>Loading...</option>";
-
+    
     const res = await fetch(`${BASE}/tv/${tvId}/season/${season}?api_key=${API_KEY}`);
     const data = await res.json();
-
+    
     episodeData[season] = data.episodes;
-
+    
     episodeSelect.innerHTML = "";
     data.episodes.forEach((ep) => {
       const option = document.createElement("option");
@@ -153,22 +148,22 @@ async function loadEpisodes(tvId, season) {
       option.textContent = `${ep.episode_number}. ${ep.name}`;
       episodeSelect.appendChild(option);
     });
-
-    showEpisodeInfo(season, data.episodes[0]?.episode_number || 1);
+    
+    showEpisodeInfo(season, 1);
   } catch (err) {
     console.error("Failed to load episodes:", err);
     episodeSelect.innerHTML = "<option>Failed to load</option>";
   }
 }
 
-// Show episode info card
+// Show episode info
 function showEpisodeInfo(season, episodeNum) {
   const episodes = episodeData[season];
   if (!episodes) return;
-
+  
   const episode = episodes.find(ep => ep.episode_number == episodeNum);
   if (!episode) return;
-
+  
   episodeInfo.classList.remove("hidden");
   episodeTitle.textContent = episode.name;
   episodeOverview.textContent = episode.overview || "No description available.";
@@ -176,10 +171,10 @@ function showEpisodeInfo(season, episodeNum) {
   episodeRating.textContent = episode.vote_average ? `⭐ ${episode.vote_average.toFixed(1)}` : "";
 }
 
-// Season dropdown change
-seasonSelect.onchange = async function () {
+// Season change
+seasonSelect.onchange = async function() {
   const season = parseInt(this.value);
-
+  
   if (!episodeData[season]) {
     await loadEpisodes(currentItemId, season);
   } else {
@@ -190,27 +185,27 @@ seasonSelect.onchange = async function () {
       option.textContent = `${ep.episode_number}. ${ep.name}`;
       episodeSelect.appendChild(option);
     });
-    showEpisodeInfo(season, episodeData[season][0]?.episode_number || 1);
+    showEpisodeInfo(season, 1);
   }
 };
 
-// Episode dropdown change
-episodeSelect.onchange = function () {
+// Episode change
+episodeSelect.onchange = function() {
   const season = parseInt(seasonSelect.value);
   const episode = parseInt(this.value);
   showEpisodeInfo(season, episode);
 };
 
-// Play button — navigate to the player page
+// Play button
 playButton.onclick = () => {
   let playerUrl = `tvplayer.html?type=${currentType}&id=${currentItemId}`;
-
+  
   if (currentType === "tv") {
-    const season = seasonSelect.value || "1";
-    const episode = episodeSelect.value || "1";
+    const season = seasonSelect.value || 1;
+    const episode = episodeSelect.value || 1;
     playerUrl += `&season=${season}&episode=${episode}`;
   }
-
+  
   window.location.href = playerUrl;
 };
 
