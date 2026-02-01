@@ -76,16 +76,19 @@
       background: #000;
     }
 
-    .loading {
+    /* Centered content box (spinner or offline message) */
+    .center-box {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
       z-index: 100;
-      pointer-events: none;
+      width: 90%;
+      max-width: 420px;
     }
 
+    /* Spinner state */
     .spinner {
       border: 4px solid #222;
       border-top: 4px solid #00bfff;
@@ -101,10 +104,89 @@
       to { transform: rotate(360deg); }
     }
 
-    .loading p {
+    .spinner-text {
       color: #888;
       font-size: 14px;
-      margin: 0;
+    }
+
+    /* Offline message state */
+    .offline-box {
+      background: rgba(15, 15, 25, 0.95);
+      border: 2px solid #00bfff;
+      border-radius: 16px;
+      padding: 36px 30px;
+      box-shadow: 0 0 40px rgba(0, 191, 255, 0.4);
+      display: none;
+    }
+
+    .offline-box .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .offline-box h2 {
+      color: #fff;
+      font-size: 20px;
+      margin: 0 0 10px;
+      font-weight: 800;
+    }
+
+    .offline-box p {
+      color: #7aaccc;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 8px;
+    }
+
+    .offline-box .detail {
+      color: #555;
+      font-size: 12px;
+      font-family: monospace;
+      background: rgba(0,0,0,0.4);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin: 14px 0 20px;
+      text-align: left;
+      word-break: break-all;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .btn {
+      border: none;
+      padding: 11px 22px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-retry {
+      background: linear-gradient(135deg, #00bfff, #fff);
+      color: #000;
+      box-shadow: 0 0 18px rgba(0, 191, 255, 0.5);
+    }
+
+    .btn-retry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 28px rgba(0, 191, 255, 0.8);
+    }
+
+    .btn-back {
+      background: rgba(40, 40, 50, 0.9);
+      color: #fff;
+      border: 2px solid #444;
+    }
+
+    .btn-back:hover {
+      background: rgba(60, 60, 70, 0.9);
     }
   </style>
 </head>
@@ -115,9 +197,24 @@
   </div>
 
   <div class="player-container">
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-      <p>Loading...</p>
+    <div class="center-box" id="centerBox">
+      <!-- Spinner (shown first) -->
+      <div id="spinnerState">
+        <div class="spinner"></div>
+        <p class="spinner-text">Checking source...</p>
+      </div>
+
+      <!-- Offline message (shown if source is down) -->
+      <div class="offline-box" id="offlineBox">
+        <div class="icon">🛰️</div>
+        <h2>Source Offline</h2>
+        <p>The streaming source is currently down. This isn't a problem with your app — the upstream server needs to come back online.</p>
+        <div class="detail" id="offlineDetail"></div>
+        <div class="btn-row">
+          <button class="btn btn-retry" onclick="location.reload()">🔄 Retry</button>
+          <button class="btn btn-back" onclick="window.history.back()">← Back</button>
+        </div>
+      </div>
     </div>
 
     <iframe
@@ -135,11 +232,12 @@
     const season  = params.get('season')  || '1';
     const episode = params.get('episode') || '1';
 
-    const titleEl   = document.getElementById('playerTitle');
-    const loadingEl = document.getElementById('loading');
-    const iframe    = document.getElementById('player');
+    const titleEl      = document.getElementById('playerTitle');
+    const spinnerState = document.getElementById('spinnerState');
+    const offlineBox   = document.getElementById('offlineBox');
+    const offlineDetail= document.getElementById('offlineDetail');
+    const iframe       = document.getElementById('player');
 
-    // Title
     titleEl.textContent = type === 'tv' ? `📺 S${season}E${episode}` : '🎬 Movie';
 
     // Build Cinema OS URL
@@ -148,25 +246,57 @@
     else if (type === 'tv') targetUrl = `https://cinemaos.tech/player/${id}/${season}/${episode}`;
 
     if (!targetUrl) {
-      loadingEl.innerHTML = '<p style="color:#ff6666;">Invalid request — missing type or id.</p>';
+      spinnerState.innerHTML = '<p style="color:#ff6666;">Invalid request — missing type or id.</p>';
     } else {
-      // Use /api/encode to get the proxy URL — keeps encoding in sync with server
+      // Get proxy URL from server
       fetch(`/api/encode?url=${encodeURIComponent(targetUrl)}`)
         .then(r => r.json())
-        .then(data => {
-          iframe.src = data.proxyUrl;
+        .then(async data => {
+          const proxyUrl = data.proxyUrl;
 
-          // Hide spinner once iframe loads
-          iframe.onload = () => {
-            setTimeout(() => { loadingEl.style.display = 'none'; }, 500);
-          };
+          // --- Health check: fetch the proxied page with a 10s timeout ---
+          // If the upstream is dead (Render error page, 5xx, timeout),
+          // show the offline message immediately instead of loading a blank iframe.
+          try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 10000);
 
-          // Safety fallback: hide spinner after 8s no matter what
-          setTimeout(() => { loadingEl.style.display = 'none'; }, 8000);
+            const check = await fetch(proxyUrl, { signal: controller.signal });
+            clearTimeout(timeout);
+
+            // If we got a server error status back
+            if (check.status >= 500) {
+              throw new Error(`HTTP ${check.status}`);
+            }
+
+            // If status is OK but the body is Render's own error page
+            const html = await check.text();
+            if (html.includes('could not be served') || html.includes('App Platform dashboard')) {
+              throw new Error('Upstream returned error page');
+            }
+
+            // Source is alive — load it in the iframe
+            spinnerState.style.display = 'none';
+            iframe.src = proxyUrl;
+
+            // Hide any remaining spinner after iframe loads
+            iframe.onload = () => {
+              document.getElementById('centerBox').style.display = 'none';
+            };
+            // Fallback: hide after 12s
+            setTimeout(() => {
+              document.getElementById('centerBox').style.display = 'none';
+            }, 12000);
+
+          } catch (err) {
+            // Source is down — show offline message
+            spinnerState.style.display = 'none';
+            offlineDetail.textContent = `${targetUrl}  →  ${err.message}`;
+            offlineBox.style.display = 'block';
+          }
         })
         .catch(err => {
-          // Only fires if our OWN server is unreachable
-          loadingEl.innerHTML = `<p style="color:#ff6666;">Server error: ${err.message}</p>`;
+          spinnerState.innerHTML = `<p style="color:#ff6666;">Server error: ${err.message}</p>`;
         });
     }
   </script>
