@@ -18,54 +18,56 @@
       font-weight: 800;
       overflow: hidden;
     }
-
+    
     .player-header {
       background: rgba(10, 10, 10, 0.95);
-      padding: 14px 22px;
+      padding: 18px 25px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid #00bfff;
       box-shadow: 0 0 30px rgba(0, 191, 255, 0.4);
-      flex-shrink: 0;
+      z-index: 1000;
     }
-
+    
     .player-header h1 {
       color: white;
-      font-size: 18px;
+      font-size: 20px;
       margin: 0;
       font-weight: 800;
       text-transform: uppercase;
       text-shadow: 0 0 15px rgba(0, 191, 255, 0.8);
       letter-spacing: 1px;
     }
-
+    
     .back-button {
       background: linear-gradient(135deg, #00bfff 0%, #fff 50%, #87ceeb 100%);
       color: black;
       border: none;
-      padding: 9px 22px;
+      padding: 10px 25px;
       border-radius: 10px;
       font-weight: 800;
       cursor: pointer;
       transition: all 0.3s;
       text-transform: uppercase;
-      font-size: 13px;
       box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
     }
-
+    
     .back-button:hover {
-      transform: translateY(-2px);
+      transform: translateY(-3px);
       box-shadow: 0 0 30px rgba(0, 191, 255, 0.8);
     }
-
+    
     .player-container {
       flex: 1;
       position: relative;
       background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
     }
-
+    
     iframe {
       position: absolute;
       top: 0;
@@ -75,118 +77,97 @@
       border: none;
       background: #000;
     }
-
-    /* Centered content box (spinner or offline message) */
-    .center-box {
+    
+    .loading {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      text-align: center;
-      z-index: 100;
-      width: 90%;
-      max-width: 420px;
-    }
-
-    /* Spinner state */
-    .spinner {
-      border: 4px solid #222;
-      border-top: 4px solid #00bfff;
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 14px;
-      box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .spinner-text {
-      color: #888;
-      font-size: 14px;
-    }
-
-    /* Offline message state */
-    .offline-box {
-      background: rgba(15, 15, 25, 0.95);
-      border: 2px solid #00bfff;
-      border-radius: 16px;
-      padding: 36px 30px;
-      box-shadow: 0 0 40px rgba(0, 191, 255, 0.4);
-      display: none;
-    }
-
-    .offline-box .icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-
-    .offline-box h2 {
-      color: #fff;
+      color: white;
       font-size: 20px;
-      margin: 0 0 10px;
+      text-align: center;
       font-weight: 800;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 30px;
+      border-radius: 15px;
+      border: 2px solid #00bfff;
+      box-shadow: 0 0 40px rgba(0, 191, 255, 0.6);
     }
-
-    .offline-box p {
-      color: #7aaccc;
-      font-size: 14px;
+    
+    .loading-spinner {
+      border: 5px solid #333;
+      border-top: 5px solid #00bfff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      box-shadow: 0 0 30px rgba(0, 191, 255, 0.6);
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 50, 50, 0.95);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      max-width: 500px;
+      border: 2px solid #ff3232;
+      box-shadow: 0 0 40px rgba(255, 50, 50, 0.6);
+      z-index: 101;
+    }
+    
+    .error-message h2 {
+      margin: 0 0 15px 0;
+      font-size: 24px;
+    }
+    
+    .error-message p {
+      margin: 10px 0;
       line-height: 1.6;
-      margin: 0 0 8px;
+      font-size: 14px;
     }
-
-    .offline-box .detail {
-      color: #555;
-      font-size: 12px;
-      font-family: monospace;
-      background: rgba(0,0,0,0.4);
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin: 14px 0 20px;
-      text-align: left;
-      word-break: break-all;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .btn {
+    
+    .retry-button {
+      background: white;
+      color: black;
       border: none;
-      padding: 11px 22px;
+      padding: 12px 30px;
       border-radius: 10px;
       font-weight: 800;
-      font-size: 13px;
       cursor: pointer;
+      margin-top: 15px;
       transition: all 0.3s;
-      text-transform: uppercase;
-      font-family: 'Poppins', sans-serif;
     }
-
-    .btn-retry {
-      background: linear-gradient(135deg, #00bfff, #fff);
-      color: #000;
-      box-shadow: 0 0 18px rgba(0, 191, 255, 0.5);
+    
+    .retry-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
     }
-
-    .btn-retry:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 28px rgba(0, 191, 255, 0.8);
-    }
-
-    .btn-back {
-      background: rgba(40, 40, 50, 0.9);
-      color: #fff;
-      border: 2px solid #444;
-    }
-
-    .btn-back:hover {
-      background: rgba(60, 60, 70, 0.9);
+    
+    .debug-info {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #00bfff;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 10px;
+      max-width: 300px;
+      display: none;
+      z-index: 999;
     }
   </style>
 </head>
@@ -195,110 +176,202 @@
     <h1 id="playerTitle">Loading...</h1>
     <button class="back-button" onclick="window.history.back()">← BACK</button>
   </div>
-
+  
   <div class="player-container">
-    <div class="center-box" id="centerBox">
-      <!-- Spinner (shown first) -->
-      <div id="spinnerState">
-        <div class="spinner"></div>
-        <p class="spinner-text">Checking source...</p>
-      </div>
-
-      <!-- Offline message (shown if source is down) -->
-      <div class="offline-box" id="offlineBox">
-        <div class="icon">🛰️</div>
-        <h2>Source Offline</h2>
-        <p>The streaming source is currently down. This isn't a problem with your app — the upstream server needs to come back online.</p>
-        <div class="detail" id="offlineDetail"></div>
-        <div class="btn-row">
-          <button class="btn btn-retry" onclick="location.reload()">🔄 Retry</button>
-          <button class="btn btn-back" onclick="window.history.back()">← Back</button>
-        </div>
-      </div>
+    <div class="loading" id="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading Cinema OS Player...</p>
+      <p style="font-size: 14px; margin-top: 10px; color: #00bfff;">Please wait...</p>
     </div>
-
-    <iframe
-      id="player"
-      allowfullscreen
-      allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+    
+    <div class="error-message" id="errorMessage">
+      <h2>⚠️ Playback Error</h2>
+      <p id="errorText">Unable to load the video player.</p>
+      <p>Possible reasons:</p>
+      <ul style="text-align: left; font-size: 12px; margin: 10px 0;">
+        <li>Cinema OS servers might be temporarily down</li>
+        <li>The video source might be unavailable</li>
+        <li>Network restrictions blocking the content</li>
+      </ul>
+      <button class="retry-button" onclick="location.reload()">🔄 RETRY</button>
+      <button class="retry-button" onclick="window.history.back()" style="background: #00bfff; color: white; margin-left: 10px;">← GO BACK</button>
+    </div>
+    
+    <iframe 
+      id="player" 
+      allowfullscreen 
+      allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
       sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals allow-orientation-lock allow-popups-to-escape-sandbox allow-presentation allow-top-navigation allow-top-navigation-by-user-activation"
     ></iframe>
   </div>
-
+  
+  <div class="debug-info" id="debugInfo">
+    <strong>Debug Info:</strong><br>
+    <span id="debugText"></span>
+  </div>
+  
   <script>
-    const params  = new URLSearchParams(window.location.search);
-    const type    = params.get('type');
-    const id      = params.get('id');
-    const season  = params.get('season')  || '1';
-    const episode = params.get('episode') || '1';
-
-    const titleEl      = document.getElementById('playerTitle');
-    const spinnerState = document.getElementById('spinnerState');
-    const offlineBox   = document.getElementById('offlineBox');
-    const offlineDetail= document.getElementById('offlineDetail');
-    const iframe       = document.getElementById('player');
-
-    titleEl.textContent = type === 'tv' ? `📺 S${season}E${episode}` : '🎬 Movie';
-
-    // Build Cinema OS URL
-    let targetUrl = '';
-    if (type === 'movie') targetUrl = `https://cinemaos.tech/player/${id}`;
-    else if (type === 'tv') targetUrl = `https://cinemaos.tech/player/${id}/${season}/${episode}`;
-
-    if (!targetUrl) {
-      spinnerState.innerHTML = '<p style="color:#ff6666;">Invalid request — missing type or id.</p>';
-    } else {
-      // Get proxy URL from server
-      fetch(`/api/encode?url=${encodeURIComponent(targetUrl)}`)
-        .then(r => r.json())
-        .then(async data => {
-          const proxyUrl = data.proxyUrl;
-
-          // --- Health check: fetch the proxied page with a 10s timeout ---
-          // If the upstream is dead (Render error page, 5xx, timeout),
-          // show the offline message immediately instead of loading a blank iframe.
-          try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 10000);
-
-            const check = await fetch(proxyUrl, { signal: controller.signal });
-            clearTimeout(timeout);
-
-            // If we got a server error status back
-            if (check.status >= 500) {
-              throw new Error(`HTTP ${check.status}`);
-            }
-
-            // If status is OK but the body is Render's own error page
-            const html = await check.text();
-            if (html.includes('could not be served') || html.includes('App Platform dashboard')) {
-              throw new Error('Upstream returned error page');
-            }
-
-            // Source is alive — load it in the iframe
-            spinnerState.style.display = 'none';
-            iframe.src = proxyUrl;
-
-            // Hide any remaining spinner after iframe loads
-            iframe.onload = () => {
-              document.getElementById('centerBox').style.display = 'none';
-            };
-            // Fallback: hide after 12s
-            setTimeout(() => {
-              document.getElementById('centerBox').style.display = 'none';
-            }, 12000);
-
-          } catch (err) {
-            // Source is down — show offline message
-            spinnerState.style.display = 'none';
-            offlineDetail.textContent = `${targetUrl}  →  ${err.message}`;
-            offlineBox.style.display = 'block';
-          }
-        })
-        .catch(err => {
-          spinnerState.innerHTML = `<p style="color:#ff6666;">Server error: ${err.message}</p>`;
-        });
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get("type");
+    const id = params.get("id");
+    const season = params.get("season") || 1;
+    const episode = params.get("episode") || 1;
+    
+    const titleEl = document.getElementById("playerTitle");
+    const loadingEl = document.getElementById("loading");
+    const errorEl = document.getElementById("errorMessage");
+    const errorTextEl = document.getElementById("errorText");
+    const playerFrame = document.getElementById("player");
+    const debugInfo = document.getElementById("debugInfo");
+    const debugText = document.getElementById("debugText");
+    
+    // Enable debug mode with URL param ?debug=1
+    const debugMode = params.get("debug") === "1";
+    if (debugMode) {
+      debugInfo.style.display = 'block';
     }
+    
+    function log(msg) {
+      console.log(msg);
+      if (debugMode) {
+        debugText.innerHTML += msg + '<br>';
+      }
+    }
+    
+    // Update title
+    if (type === "tv") {
+      titleEl.textContent = `📺 TV SHOW - S${season}E${episode}`;
+      log(`Loading TV Show ID: ${id}, S${season}E${episode}`);
+    } else {
+      titleEl.textContent = "🎬 PLAYING MOVIE";
+      log(`Loading Movie ID: ${id}`);
+    }
+    
+    // Validate inputs
+    if (!type || !id) {
+      showError("Missing required parameters (type or id)");
+      log("ERROR: Missing type or id parameter");
+    } else {
+      initPlayer();
+    }
+    
+    function initPlayer() {
+      try {
+        // Construct Cinema OS URL
+        let targetUrl = "";
+        if (type === "movie") {
+          targetUrl = `https://cinemaos.tech/player/${id}`;
+        } else if (type === "tv") {
+          targetUrl = `https://cinemaos.tech/player/${id}/${season}/${episode}`;
+        } else {
+          throw new Error("Invalid media type");
+        }
+        
+        log(`Target URL: ${targetUrl}`);
+        
+        // Encode URL for proxy
+        const encoded = btoa(targetUrl)
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=/g, '');
+        
+        const proxyBase = window.location.origin;
+        const proxyUrl = `${proxyBase}/ocho/${encoded}`;
+        
+        log(`Proxy URL: ${proxyUrl}`);
+        
+        // Set iframe source
+        playerFrame.src = proxyUrl;
+        
+        // Track load state
+        let loaded = false;
+        
+        playerFrame.onload = () => {
+          log('Iframe loaded successfully');
+          loaded = true;
+          setTimeout(() => {
+            loadingEl.style.display = 'none';
+          }, 1000);
+        };
+        
+        playerFrame.onerror = (e) => {
+          log(`Iframe error: ${e.message || 'Unknown error'}`);
+          if (!loaded) {
+            showError("Failed to load Cinema OS player. The service might be down or blocked.");
+          }
+        };
+        
+        // Timeout fallback (10 seconds)
+        setTimeout(() => {
+          if (loadingEl.style.display !== 'none') {
+            log('Load timeout - hiding loading screen');
+            loadingEl.style.display = 'none';
+            
+            // If iframe is still blank after timeout, might be an issue
+            if (!loaded) {
+              log('WARNING: Iframe may not have loaded properly');
+            }
+          }
+        }, 10000);
+        
+      } catch (error) {
+        log(`Error: ${error.message}`);
+        showError("Failed to initialize player: " + error.message);
+      }
+    }
+    
+    function showError(message) {
+      log(`Showing error: ${message}`);
+      loadingEl.style.display = 'none';
+      errorTextEl.textContent = message;
+      errorEl.style.display = 'block';
+    }
+    
+    // Listen for messages from iframe
+    window.addEventListener('message', (event) => {
+      log(`Message from iframe: ${JSON.stringify(event.data)}`);
+      
+      // Handle error messages from Cinema OS
+      if (event.data && event.data.type === 'error') {
+        showError(event.data.message || 'Playback error occurred');
+      }
+      
+      // Handle ready messages
+      if (event.data && event.data.type === 'ready') {
+        log('Player ready');
+        loadingEl.style.display = 'none';
+      }
+    });
+    
+    // Prevent accidental navigation
+    let isNavigatingAway = false;
+    window.addEventListener('beforeunload', (e) => {
+      if (!isNavigatingAway && !playerFrame.src.includes('about:blank')) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+    
+    // Track navigation
+    window.addEventListener('unload', () => {
+      isNavigatingAway = true;
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      // ESC to go back
+      if (e.key === 'Escape') {
+        window.history.back();
+      }
+      // F to toggle fullscreen
+      if (e.key === 'f' || e.key === 'F') {
+        if (playerFrame.requestFullscreen) {
+          playerFrame.requestFullscreen();
+        }
+      }
+    });
+    
+    log('Player initialized');
   </script>
 </body>
 </html>
