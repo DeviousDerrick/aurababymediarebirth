@@ -17,11 +17,8 @@ app.use((req, res, next) => {
 });
 
 app.use(express.raw({ type: '*/*', limit: '10mb' }));
-
-// ADD THIS: Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rest of your code continues here...
 function encodeProxyUrl(url) {
   return Buffer.from(url).toString('base64')
     .replace(/\+/g, '-')
@@ -35,7 +32,6 @@ function decodeProxyUrl(encoded) {
     const padding = (4 - (base64.length % 4)) % 4;
     const decoded = Buffer.from(base64 + '='.repeat(padding), 'base64').toString('utf-8');
     
-    // Validate URL
     if (!decoded.startsWith('http://') && !decoded.startsWith('https://')) {
       throw new Error('Invalid URL scheme');
     }
@@ -50,19 +46,16 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
   let rewritten = html;
   const origin = new URL(baseUrl).origin;
 
-  // Block service workers
   rewritten = rewritten.replace(/navigator\.serviceWorker/g, 'navigator.__blockedServiceWorker');
   rewritten = rewritten.replace(/'serviceWorker'/g, "'__blockedServiceWorker'");
   rewritten = rewritten.replace(/"serviceWorker"/g, '"__blockedServiceWorker"');
   
-  // Remove security headers
   rewritten = rewritten.replace(/<meta http-equiv="Content-Security-Policy".*?>/gi, '');
   rewritten = rewritten.replace(/<meta.*?name="referrer".*?>/gi, '');
   rewritten = rewritten.replace(/integrity="[^"]*"/gi, '');
   rewritten = rewritten.replace(/crossorigin="[^"]*"/gi, '');
   rewritten = rewritten.replace(/\s+crossorigin/gi, '');
 
-  // Rewrite URLs
   rewritten = rewritten.replace(/(src|href)=["']([^"']+)["']/gi, (match, attr, url) => {
     if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('#') || url.startsWith('javascript:')) return match;
     if (url.includes('/ocho/')) return match;
@@ -91,7 +84,6 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
         const targetOrigin = '${origin}';
         const inFlight = new Set();
         
-        // Block service workers
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(regs => {
             regs.forEach(reg => reg.unregister());
@@ -104,7 +96,6 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
           });
         }
         
-        // Helper to safely encode URLs
         function safeEncodeUrl(url) {
           try {
             const encoded = btoa(url).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');
@@ -115,12 +106,10 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
           }
         }
         
-        // Intercept fetch
         const origFetch = window.fetch;
         window.fetch = function(url, opts = {}) {
           let urlStr = typeof url === 'string' ? url : url.url;
           
-          // Don't proxy our own requests
           if (urlStr.startsWith('/ocho/') || 
               urlStr.startsWith('data:') || 
               urlStr.startsWith('blob:') ||
@@ -128,7 +117,6 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
             return origFetch(url, opts);
           }
           
-          // Prevent loops
           if (inFlight.has(urlStr)) {
             console.warn('Preventing fetch loop for:', urlStr);
             return Promise.reject(new Error('Loop prevented'));
@@ -154,7 +142,6 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
             });
         };
         
-        // Intercept XMLHttpRequest
         const origOpen = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function(method, url, ...args) {
           if (typeof url === 'string' && 
@@ -174,7 +161,6 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
           return origOpen.call(this, method, url, ...args);
         };
         
-        // Intercept link clicks
         document.addEventListener('click', function(e) {
           const link = e.target.closest('a');
           if (link && link.href) {
@@ -204,7 +190,6 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
 
 async function doProxyRequest(targetUrl, req, res) {
   try {
-    // Validate URL
     const urlObj = new URL(targetUrl);
     
     const headers = {
@@ -219,26 +204,25 @@ async function doProxyRequest(targetUrl, req, res) {
     if (req.headers.cookie) headers['Cookie'] = req.headers.cookie;
     if (req.headers.range) headers['Range'] = req.headers.range;
     
-    // Set origin and referer for Cinema OS
     headers['Referer'] = urlObj.origin;
     headers['Origin'] = urlObj.origin;
 
     const fetchOptions = {
       method: req.method,
       headers: headers,
-      redirect: 'follow',
-      signal: AbortSignal.timeout(60000)
+      redirect: 'follow'
     };
 
     if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body && Buffer.isBuffer(req.body)) {
       fetchOptions.body = req.body;
     }
 
+    console.log('Proxying:', targetUrl);
     const response = await fetch(targetUrl, fetchOptions);
-    const contentLength = parseInt(response.headers.get('content-length') || '0');
-    const contentType = response.headers.get('content-type') || 'application/octet-stream';
     
-    // Set response headers
+    const contentType = response.headers.get('content-type') || 'application/octet-stream';
+    const contentLength = parseInt(response.headers.get('content-length') || '0');
+    
     res.set({
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': '*',
@@ -250,7 +234,6 @@ async function doProxyRequest(targetUrl, req, res) {
       'Content-Type': contentType
     });
 
-    // Copy content-length and range headers for video streaming
     if (response.headers.get('content-length')) {
       res.set('Content-Length', response.headers.get('content-length'));
     }
@@ -263,7 +246,6 @@ async function doProxyRequest(targetUrl, req, res) {
 
     res.status(response.status);
 
-    // Rewrite HTML, stream everything else
     if (contentType.includes('text/html') && contentLength < 5 * 1024 * 1024) {
       const text = await response.text();
       const rewritten = rewriteHtml(text, targetUrl, '/ocho/');
@@ -271,23 +253,23 @@ async function doProxyRequest(targetUrl, req, res) {
     } else if (contentType.includes('application/x-mpegURL') || 
                contentType.includes('application/vnd.apple.mpegurl') ||
                targetUrl.includes('.m3u8')) {
-      // Handle M3U8 playlists - rewrite URLs if needed
       const text = await response.text();
       res.send(text);
     } else {
-      // Stream binary content (videos, images, etc)
       response.body.pipe(res);
     }
   } catch (error) {
     console.error(`Proxy error for ${targetUrl}:`, error.message);
     if (!res.headersSent) {
-      res.status(error.message.includes('timeout') ? 504 : 500)
-         .json({ error: 'Proxy error', message: error.message });
+      res.status(500).json({ 
+        error: 'Proxy error', 
+        message: error.message,
+        url: targetUrl 
+      });
     }
   }
 }
 
-// Service worker
 app.get('/sw.js', (req, res) => {
   res.set('Content-Type', 'application/javascript');
   res.send(`
@@ -297,24 +279,21 @@ app.get('/sw.js', (req, res) => {
   `);
 });
 
-// Main proxy route
 app.use('/ocho/:url(*)', (req, res) => {
   try {
     let targetUrl = decodeProxyUrl(req.params.url);
     const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
     if (queryString) targetUrl += queryString;
     
-    console.log(`Proxying: ${targetUrl}`);
     doProxyRequest(targetUrl, req, res);
   } catch (e) {
     console.error('URL decode error:', e.message);
     if (!res.headersSent) {
-      res.status(400).send('Invalid URL encoding');
+      res.status(400).json({ error: 'Invalid URL encoding', message: e.message });
     }
   }
 });
 
-// Fallback for relative URLs
 app.all('*', (req, res) => {
   const referer = req.headers.referer;
   
@@ -326,7 +305,6 @@ app.all('*', (req, res) => {
         const encodedPart = parts[1].split('/')[0];
         const targetOrigin = new URL(decodeProxyUrl(encodedPart)).origin;
         const fixedUrl = targetOrigin + req.url;
-        console.log(`Fallback proxying: ${fixedUrl}`);
         return doProxyRequest(fixedUrl, req, res);
       }
     } catch (e) {
@@ -337,8 +315,12 @@ app.all('*', (req, res) => {
   res.status(404).json({ error: 'Not Found' });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🎬 AuraBaby Media running on port ${PORT}`);
-  console.log(`📡 Proxy endpoint: http://localhost:${PORT}/ocho/`);
-  console.log(`✅ Ready to stream!`);
-});
+// For Vercel serverless
+module.exports = app;
+
+// For local development
+if (require.main === module) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🎬 AuraBaby Media running on port ${PORT}`);
+  });
+}
