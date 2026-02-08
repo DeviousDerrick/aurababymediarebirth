@@ -1,6 +1,7 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const { URL } = require('url');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -16,8 +17,11 @@ app.use((req, res, next) => {
 });
 
 app.use(express.raw({ type: '*/*', limit: '10mb' }));
-app.use(express.static('public'));
 
+// ADD THIS: Serve static files from public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Rest of your code continues here...
 function encodeProxyUrl(url) {
   return Buffer.from(url).toString('base64')
     .replace(/\+/g, '-')
