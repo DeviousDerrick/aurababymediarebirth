@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "functions": {
-    "server.js": {
-      "maxDuration": 60
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
     }
-  },
-  "rewrites": [
-    { "source": "/ocho/:path*", "destination": "/server.js" },
-    { "source": "/(.*)", "destination": "/server.js" }
+  ],
+  "routes": [
+    { "src": "/ocho/(.*)", "dest": "/server.js" },
+    { "src": "/(.*)", "dest": "/server.js" }
   ]
 }
