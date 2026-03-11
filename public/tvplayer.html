@@ -7,57 +7,129 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap" rel="stylesheet">
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
       background: #000;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       font-family: 'Poppins', sans-serif;
       font-weight: 800;
       overflow: hidden;
     }
-    
+
     .player-header {
       background: rgba(10, 10, 10, 0.95);
-      padding: 18px 25px;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid #00bfff;
       box-shadow: 0 0 30px rgba(0, 191, 255, 0.4);
       z-index: 1000;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-    
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
     .player-header h1 {
       color: white;
-      font-size: 20px;
+      font-size: 17px;
       margin: 0;
       font-weight: 800;
       text-transform: uppercase;
       text-shadow: 0 0 15px rgba(0, 191, 255, 0.8);
       letter-spacing: 1px;
+      white-space: nowrap;
     }
-    
+
     .back-button {
       background: linear-gradient(135deg, #00bfff 0%, #fff 50%, #87ceeb 100%);
       color: black;
       border: none;
-      padding: 10px 25px;
+      padding: 9px 20px;
       border-radius: 10px;
       font-weight: 800;
       cursor: pointer;
       transition: all 0.3s;
       text-transform: uppercase;
       box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+      white-space: nowrap;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
     }
-    
+
     .back-button:hover {
-      transform: translateY(-3px);
+      transform: translateY(-2px);
       box-shadow: 0 0 30px rgba(0, 191, 255, 0.8);
     }
-    
+
+    /* SOURCE SELECTOR */
+    .source-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .source-label {
+      color: #00bfff;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      text-shadow: 0 0 8px rgba(0,191,255,0.6);
+    }
+
+    .source-btn {
+      background: rgba(10, 20, 40, 0.9);
+      color: #aaa;
+      border: 2px solid #333;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.25s;
+      white-space: nowrap;
+    }
+
+    .source-btn:hover {
+      border-color: #00bfff;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+    }
+
+    .source-btn.active {
+      background: linear-gradient(135deg, #00bfff 0%, #fff 50%, #87ceeb 100%);
+      color: #000;
+      border-color: #fff;
+      box-shadow: 0 0 20px rgba(0, 191, 255, 0.8),
+                  0 0 40px rgba(255,255,255,0.4);
+    }
+
+    .source-btn.failed {
+      border-color: #ff3232;
+      color: #ff6464;
+      opacity: 0.6;
+    }
+
+    .source-btn.loading-src {
+      border-color: #ffaa00;
+      color: #ffaa00;
+      animation: srcPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes srcPulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(255,170,0,0.4); }
+      50%       { box-shadow: 0 0 25px rgba(255,170,0,0.9); }
+    }
+
+    /* PLAYER */
     .player-container {
       flex: 1;
       position: relative;
@@ -67,311 +139,276 @@
       justify-content: center;
       overflow: hidden;
     }
-    
+
     iframe {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       border: none;
       background: #000;
     }
-    
+
     .loading {
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       color: white;
-      font-size: 20px;
+      font-size: 18px;
       text-align: center;
       font-weight: 800;
       z-index: 100;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 30px;
+      background: rgba(0,0,0,0.85);
+      padding: 30px 40px;
       border-radius: 15px;
       border: 2px solid #00bfff;
       box-shadow: 0 0 40px rgba(0, 191, 255, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    
+
     .loading-spinner {
       border: 5px solid #333;
       border-top: 5px solid #00bfff;
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
+      width: 50px; height: 50px;
       animation: spin 1s linear infinite;
-      margin: 20px auto;
+      margin: 15px auto;
       box-shadow: 0 0 30px rgba(0, 191, 255, 0.6);
     }
-    
+
     @keyframes spin {
-      0% { transform: rotate(0deg); }
+      0%   { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    
+
+    .loading p { margin: 5px 0; }
+    .loading .src-name { color: #00bfff; font-size: 14px; }
+
     .error-message {
       display: none;
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(255, 50, 50, 0.95);
+      background: rgba(20, 5, 5, 0.97);
       color: white;
       padding: 30px;
       border-radius: 15px;
       text-align: center;
-      max-width: 500px;
+      max-width: 480px;
+      width: 90%;
       border: 2px solid #ff3232;
       box-shadow: 0 0 40px rgba(255, 50, 50, 0.6);
       z-index: 101;
     }
-    
-    .error-message h2 {
-      margin: 0 0 15px 0;
-      font-size: 24px;
-    }
-    
-    .error-message p {
-      margin: 10px 0;
-      line-height: 1.6;
-      font-size: 14px;
-    }
-    
+
+    .error-message h2 { margin: 0 0 12px; font-size: 22px; }
+    .error-message p  { margin: 8px 0; line-height: 1.6; font-size: 14px; color: #ccc; }
+
     .retry-button {
-      background: white;
+      background: linear-gradient(135deg, #00bfff, #fff);
       color: black;
       border: none;
-      padding: 12px 30px;
+      padding: 11px 28px;
       border-radius: 10px;
       font-weight: 800;
+      font-family: 'Poppins', sans-serif;
       cursor: pointer;
-      margin-top: 15px;
+      margin-top: 14px;
       transition: all 0.3s;
+      font-size: 14px;
     }
-    
+
     .retry-button:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 20px rgba(0,191,255,0.8);
     }
-    
-    .debug-info {
+
+    .hint {
       position: fixed;
-      bottom: 10px;
-      right: 10px;
-      background: rgba(0, 0, 0, 0.8);
-      color: #00bfff;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 10px;
-      max-width: 300px;
-      display: none;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(0,191,255,0.5);
+      font-size: 11px;
+      pointer-events: none;
       z-index: 999;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 600px) {
+      .player-header { padding: 10px 12px; }
+      .player-header h1 { font-size: 13px; }
+      .source-btn { font-size: 11px; padding: 6px 10px; }
+      .source-label { display: none; }
     }
   </style>
 </head>
 <body>
+
   <div class="player-header">
-    <h1 id="playerTitle">Loading...</h1>
-    <button class="back-button" onclick="window.history.back()">← BACK</button>
+    <div class="header-left">
+      <button class="back-button" onclick="window.history.back()">← BACK</button>
+      <h1 id="playerTitle">Loading...</h1>
+    </div>
+
+    <div class="source-selector">
+      <span class="source-label">SOURCE:</span>
+      <button class="source-btn" data-index="0">vidsrc.to</button>
+      <button class="source-btn" data-index="1">embed.su</button>
+      <button class="source-btn" data-index="2">2embed.cc</button>
+      <button class="source-btn" data-index="3">vidsrc.me</button>
+    </div>
   </div>
-  
+
   <div class="player-container">
     <div class="loading" id="loading">
       <div class="loading-spinner"></div>
-      <p>Loading Cinema OS Player...</p>
-      <p style="font-size: 14px; margin-top: 10px; color: #00bfff;">Please wait...</p>
+      <p>Loading player...</p>
+      <p class="src-name" id="loadingSrcName"></p>
     </div>
-    
+
     <div class="error-message" id="errorMessage">
-      <h2>⚠️ Playback Error</h2>
-      <p id="errorText">Unable to load the video player.</p>
-      <p>Possible reasons:</p>
-      <ul style="text-align: left; font-size: 12px; margin: 10px 0;">
-        <li>Cinema OS servers might be temporarily down</li>
-        <li>The video source might be unavailable</li>
-        <li>Network restrictions blocking the content</li>
-      </ul>
-      <button class="retry-button" onclick="location.reload()">🔄 RETRY</button>
-      <button class="retry-button" onclick="window.history.back()" style="background: #00bfff; color: white; margin-left: 10px;">← GO BACK</button>
+      <h2>⚠️ All Sources Failed</h2>
+      <p id="errorText">Unable to load any video source.</p>
+      <p style="font-size:12px;">Try picking a different source above, or come back later.</p>
+      <button class="retry-button" onclick="tryProvider(0)">🔄 Try Again</button>
+      <button class="retry-button" onclick="window.history.back()" style="margin-left:8px; background: #333; color:#fff;">← Go Back</button>
     </div>
-    
-    <iframe 
-      id="player" 
-      allowfullscreen 
-      allow="autoplay; fullscreen; picture-in-picture; encrypted-media" 
+
+    <iframe
+      id="player"
+      allowfullscreen
+      allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
       sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals allow-orientation-lock allow-popups-to-escape-sandbox allow-presentation allow-top-navigation allow-top-navigation-by-user-activation"
     ></iframe>
   </div>
-  
-  <div class="debug-info" id="debugInfo">
-    <strong>Debug Info:</strong><br>
-    <span id="debugText"></span>
-  </div>
-  
+
+  <div class="hint">Press N for next source &nbsp;·&nbsp; F for fullscreen &nbsp;·&nbsp; ESC to go back</div>
+
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const type = params.get("type");
-    const id = params.get("id");
-    const season = params.get("season") || 1;
-    const episode = params.get("episode") || 1;
-    
-    const titleEl = document.getElementById("playerTitle");
-    const loadingEl = document.getElementById("loading");
-    const errorEl = document.getElementById("errorMessage");
-    const errorTextEl = document.getElementById("errorText");
-    const playerFrame = document.getElementById("player");
-    const debugInfo = document.getElementById("debugInfo");
-    const debugText = document.getElementById("debugText");
-    
-    // Enable debug mode with URL param ?debug=1
-    const debugMode = params.get("debug") === "1";
-    if (debugMode) {
-      debugInfo.style.display = 'block';
-    }
-    
-    function log(msg) {
-      console.log(msg);
-      if (debugMode) {
-        debugText.innerHTML += msg + '<br>';
+    const params   = new URLSearchParams(window.location.search);
+    const type     = params.get("type");
+    const id       = params.get("id");
+    const season   = params.get("season") || 1;
+    const episode  = params.get("episode") || 1;
+
+    const titleEl       = document.getElementById("playerTitle");
+    const loadingEl     = document.getElementById("loading");
+    const loadingSrcEl  = document.getElementById("loadingSrcName");
+    const errorEl       = document.getElementById("errorMessage");
+    const errorTextEl   = document.getElementById("errorText");
+    const playerFrame   = document.getElementById("player");
+    const sourceBtns    = document.querySelectorAll(".source-btn");
+
+    const PROVIDERS = [
+      {
+        name: "vidsrc.to",
+        url: () => type === "movie"
+          ? `https://vidsrc.to/embed/movie/${id}`
+          : `https://vidsrc.to/embed/tv/${id}/${season}/${episode}`
+      },
+      {
+        name: "embed.su",
+        url: () => type === "movie"
+          ? `https://embed.su/embed/movie/${id}`
+          : `https://embed.su/embed/tv/${id}/${season}/${episode}`
+      },
+      {
+        name: "2embed.cc",
+        url: () => type === "movie"
+          ? `https://www.2embed.cc/embed/${id}`
+          : `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}`
+      },
+      {
+        name: "vidsrc.me",
+        url: () => type === "movie"
+          ? `https://vidsrc.me/embed/movie?tmdb=${id}`
+          : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
       }
-    }
-    
-    // Update title
-    if (type === "tv") {
-      titleEl.textContent = `📺 TV SHOW - S${season}E${episode}`;
-      log(`Loading TV Show ID: ${id}, S${season}E${episode}`);
-    } else {
-      titleEl.textContent = "🎬 PLAYING MOVIE";
-      log(`Loading Movie ID: ${id}`);
-    }
-    
-    // Validate inputs
+    ];
+
+    let currentIndex = 0;
+    let loadTimer    = null;
+    const failed     = new Set();
+
+    titleEl.textContent = type === "tv"
+      ? `📺 S${season}E${episode}`
+      : "🎬 NOW PLAYING";
+
     if (!type || !id) {
-      showError("Missing required parameters (type or id)");
-      log("ERROR: Missing type or id parameter");
+      showError("Missing required parameters.");
     } else {
-      initPlayer();
+      tryProvider(0);
     }
-    
-    function initPlayer() {
-      try {
-        // Construct Cinema OS URL
-        let targetUrl = "";
-        if (type === "movie") {
-          targetUrl = `https://cinemaos.tech/player/${id}`;
-        } else if (type === "tv") {
-          targetUrl = `https://cinemaos.tech/player/${id}/${season}/${episode}`;
-        } else {
-          throw new Error("Invalid media type");
+
+    // Wire up manual source buttons
+    sourceBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        tryProvider(parseInt(btn.dataset.index));
+      });
+    });
+
+    function setButtonState(index, state) {
+      sourceBtns.forEach(b => {
+        b.classList.remove("active", "loading-src", "failed");
+        if (failed.has(parseInt(b.dataset.index))) b.classList.add("failed");
+      });
+      if (sourceBtns[index]) {
+        sourceBtns[index].classList.remove("failed"); // override if manually picked
+        sourceBtns[index].classList.add(state);
+      }
+    }
+
+    function tryProvider(index) {
+      if (index >= PROVIDERS.length) {
+        showError("All sources failed. Pick one manually above or try again later.");
+        setButtonState(-1, "");
+        return;
+      }
+
+      currentIndex = index;
+      const provider = PROVIDERS[index];
+
+      loadingEl.style.display   = "flex";
+      errorEl.style.display     = "none";
+      loadingSrcEl.textContent  = provider.name;
+
+      setButtonState(index, "loading-src");
+
+      if (loadTimer) clearTimeout(loadTimer);
+
+      let loaded = false;
+      playerFrame.src = provider.url();
+
+      playerFrame.onload = () => {
+        loaded = true;
+        clearTimeout(loadTimer);
+        setButtonState(index, "active");
+        setTimeout(() => loadingEl.style.display = "none", 700);
+      };
+
+      // Auto-advance after 12s
+      loadTimer = setTimeout(() => {
+        if (!loaded) {
+          failed.add(index);
+          setButtonState(index, "failed");
+          tryProvider(index + 1);
         }
-        
-        log(`Target URL: ${targetUrl}`);
-        
-        // Encode URL for proxy
-        const encoded = btoa(targetUrl)
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_')
-          .replace(/=/g, '');
-        
-        const proxyBase = window.location.origin;
-        const proxyUrl = `${proxyBase}/ocho/${encoded}`;
-        
-        log(`Proxy URL: ${proxyUrl}`);
-        
-        // Set iframe source
-        playerFrame.src = proxyUrl;
-        
-        // Track load state
-        let loaded = false;
-        
-        playerFrame.onload = () => {
-          log('Iframe loaded successfully');
-          loaded = true;
-          setTimeout(() => {
-            loadingEl.style.display = 'none';
-          }, 1000);
-        };
-        
-        playerFrame.onerror = (e) => {
-          log(`Iframe error: ${e.message || 'Unknown error'}`);
-          if (!loaded) {
-            showError("Failed to load Cinema OS player. The service might be down or blocked.");
-          }
-        };
-        
-        // Timeout fallback (10 seconds)
-        setTimeout(() => {
-          if (loadingEl.style.display !== 'none') {
-            log('Load timeout - hiding loading screen');
-            loadingEl.style.display = 'none';
-            
-            // If iframe is still blank after timeout, might be an issue
-            if (!loaded) {
-              log('WARNING: Iframe may not have loaded properly');
-            }
-          }
-        }, 10000);
-        
-      } catch (error) {
-        log(`Error: ${error.message}`);
-        showError("Failed to initialize player: " + error.message);
-      }
+      }, 12000);
     }
-    
-    function showError(message) {
-      log(`Showing error: ${message}`);
-      loadingEl.style.display = 'none';
-      errorTextEl.textContent = message;
-      errorEl.style.display = 'block';
+
+    function showError(msg) {
+      loadingEl.style.display = "none";
+      errorTextEl.textContent = msg;
+      errorEl.style.display   = "block";
     }
-    
-    // Listen for messages from iframe
-    window.addEventListener('message', (event) => {
-      log(`Message from iframe: ${JSON.stringify(event.data)}`);
-      
-      // Handle error messages from Cinema OS
-      if (event.data && event.data.type === 'error') {
-        showError(event.data.message || 'Playback error occurred');
-      }
-      
-      // Handle ready messages
-      if (event.data && event.data.type === 'ready') {
-        log('Player ready');
-        loadingEl.style.display = 'none';
-      }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") window.history.back();
+      if (e.key === "f" || e.key === "F") playerFrame.requestFullscreen?.();
+      if (e.key === "n" || e.key === "N") tryProvider(currentIndex + 1);
     });
-    
-    // Prevent accidental navigation
-    let isNavigatingAway = false;
-    window.addEventListener('beforeunload', (e) => {
-      if (!isNavigatingAway && !playerFrame.src.includes('about:blank')) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    });
-    
-    // Track navigation
-    window.addEventListener('unload', () => {
-      isNavigatingAway = true;
-    });
-    
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      // ESC to go back
-      if (e.key === 'Escape') {
-        window.history.back();
-      }
-      // F to toggle fullscreen
-      if (e.key === 'f' || e.key === 'F') {
-        if (playerFrame.requestFullscreen) {
-          playerFrame.requestFullscreen();
-        }
-      }
-    });
-    
-    log('Player initialized');
   </script>
 </body>
 </html>
