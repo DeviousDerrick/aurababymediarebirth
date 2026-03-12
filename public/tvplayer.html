@@ -254,11 +254,12 @@
 
     <div class="source-selector">
       <span class="source-label">SOURCE:</span>
-      <button class="source-btn" data-index="0">AutoEmbed</button>
-      <button class="source-btn" data-index="1">VidPlus</button>
-      <button class="source-btn" data-index="2">2Embed</button>
-      <button class="source-btn" data-index="3">vidsrc.to</button>
-      <button class="source-btn" data-index="4">embed.su</button>
+      <button class="source-btn" data-index="0">CinemaOS</button>
+      <button class="source-btn" data-index="1">AutoEmbed</button>
+      <button class="source-btn" data-index="2">VidPlus</button>
+      <button class="source-btn" data-index="3">2Embed</button>
+      <button class="source-btn" data-index="4">vidsrc.to</button>
+      <button class="source-btn" data-index="5">embed.su</button>
     </div>
   </div>
 
@@ -303,6 +304,13 @@
     const sourceBtns    = document.querySelectorAll(".source-btn");
 
     const PROVIDERS = [
+      {
+        // Original CinemaOS - best quality, routed through proxy
+        name: "CinemaOS",
+        url: () => type === "movie"
+          ? `https://cinemaos.tech/player/${id}`
+          : `https://cinemaos.tech/player/${id}/${season}/${episode}`
+      },
       {
         // Clean player, rarely has popups, great quality
         name: "AutoEmbed",
