@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>AuraBaby Media</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="cosmos">
+    <div class="cosmos-bg"></div>
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
+    <div class="nebula nebula-3"></div>
+    <div class="nebula nebula-4"></div>
+    <div class="stars-layer"></div>
+    <div class="stars-layer-2"></div>
+    <div class="planet planet-1"></div>
+    <div class="planet planet-2"></div>
+    <div class="planet planet-3"></div>
+    <div class="planet planet-4"></div>
+    <div class="planet planet-5"></div>
+    <div class="shooting-star shooting-star-1"></div>
+    <div class="shooting-star shooting-star-2"></div>
+    <div class="shooting-star shooting-star-3"></div>
+  </div>
+
+  <header>
+    <h1>AuraBaby <span>Media</span></h1>
+    <input id="search" type="text" placeholder="Search the galaxy..." />
+  </header>
+
+  <nav id="tabs">
+    <button class="tab active" data-type="movie">🎬 &nbsp;MOVIES</button>
+    <button class="tab" data-type="tv">📺 &nbsp;SHOWS</button>
+  </nav>
+
+  <main id="movies"></main>
+
+  <!-- Detail Overlay -->
+  <div id="overlay" class="overlay hidden">
+    <div class="overlay-content">
+      <span id="closeOverlay">&times;</span>
+      <div class="overlay-left">
+        <h2 id="overlayTitle"></h2>
+        <p id="overlayDesc"></p>
+        <p><strong>⭐ Rating:</strong> <span id="overlayRating"></span></p>
+        <p><strong>📅 Release Date:</strong> <span id="overlayDate"></span></p>
+        <p><strong>🗳️ Votes:</strong> <span id="overlayVotes"></span></p>
+
+        <div id="tvControls" class="tv-controls hidden">
+          <div class="season-episode-grid">
+            <div class="control-group">
+              <label for="seasonSelect">Season</label>
+              <select id="seasonSelect" class="select-input">
+                <option value="1">Season 1</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label for="episodeSelect">Episode</label>
+              <select id="episodeSelect" class="select-input">
+                <option value="1">Loading...</option>
+              </select>
+            </div>
+          </div>
+          <div id="episodeInfo" class="episode-info hidden">
+            <div class="episode-details">
+              <h4 id="episodeTitle">Episode Title</h4>
+              <p id="episodeOverview">Episode description...</p>
+              <div class="episode-meta">
+                <span id="episodeAirDate"></span>
+                <span id="episodeRating"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button id="playButton" class="play-button">▶ &nbsp;PLAY NOW</button>
+      </div>
+      <div class="overlay-right">
+        <img id="overlayPoster" src="" alt="Poster" />
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
