@@ -31,11 +31,9 @@ function decodeProxyUrl(encoded) {
     const base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
     const padding = (4 - (base64.length % 4)) % 4;
     const decoded = Buffer.from(base64 + '='.repeat(padding), 'base64').toString('utf-8');
-    
     if (!decoded.startsWith('http://') && !decoded.startsWith('https://')) {
       throw new Error('Invalid URL scheme');
     }
-    
     return decoded;
   } catch (e) {
     throw new Error(`Failed to decode URL: ${e.message}`);
@@ -46,10 +44,80 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
   let rewritten = html;
   const origin = new URL(baseUrl).origin;
 
+  // ── POPUP & AD BLOCKER ──────────────────────────────────────
+  // Remove common ad/popup script tags by src domain
+  rewritten = rewritten.replace(
+    /<script[^>]*src=["'][^"']*(googlesyndication|doubleclick|adnxs|outbrain|taboola|popads|popcash|exoclick|juicyads|trafficjunky|hilltopads|adsterra|propellerads|revcontent|mgid|clickadu|adcash|adskeeper|yllix|adspyglass|monetag|pushcrew|onesignal|popunder|onclick|onclickads|adfly|adf\.ly|shorte\.st|linkvertise)[^"']*["'][^>]*><\/script>/gi,
+    ''
+  );
+
+  // Remove inline scripts containing popup/ad keywords
+  rewritten = rewritten.replace(
+    /<script(?![^>]*src)[^>]*>[\s\S]*?(popunder|pop_under|adsbygoogle|googletag|ExoLoader|adProvider|trafficjunky)[\s\S]*?<\/script>/gi,
+    ''
+  );
+
+  // Neutralise window.open and document.write in remaining scripts
+  rewritten = rewritten.replace(/window\.open\s*\(/g, 'void(');
+  rewritten = rewritten.replace(/document\.write\s*\(/g, 'void(');
+
+  // Inject popup nuke script at top of <head> — runs before anything else
+  const popupNuke = `<script>
+(function(){
+  // Hard-block window.open
+  window.open = function(){ return { focus:function(){}, blur:function(){} }; };
+
+  // Block pop-under blur/focus tricks
+  window.addEventListener('blur', function(e){ e.stopImmediatePropagation(); }, true);
+
+  // Block top-level navigation redirects
+  try {
+    var _loc = window.location;
+    Object.defineProperty(window, 'location', {
+      get: function(){ return _loc; },
+      set: function(v){ if(String(v).includes(window.location.hostname)) _loc.href = v; },
+      configurable: false
+    });
+  } catch(e){}
+
+  // Continuously nuke high-z-index overlay / ad elements
+  var nukeCount = 0;
+  function nukeOverlays(){
+    var bad = [
+      '[id*="pop"]','[id*="overlay"]','[id*="modal"]:not(video)',
+      '[id*="interstitial"]','[id*="advert"]','[id*="banner-ad"]',
+      '[class*="pop"]','[class*="overlay"]:not(video)',
+      '[class*="interstitial"]','[class*="advert"]','[class*="ad-wrap"]'
+    ].join(',');
+    try {
+      document.querySelectorAll(bad).forEach(function(el){
+        var z = parseInt(window.getComputedStyle(el).zIndex) || 0;
+        if(z > 999) el.remove();
+      });
+    } catch(e){}
+    // Also remove any new <iframe> that points to known ad domains
+    document.querySelectorAll('iframe').forEach(function(f){
+      var s = (f.src||'').toLowerCase();
+      if(/(popads|popcash|exoclick|adsterra|propellerads|adnxs|doubleclick|googlesyndication|trafficjunky|monetag)/.test(s)){
+        f.remove();
+      }
+    });
+    if(nukeCount++ < 20) setTimeout(nukeOverlays, 600);
+  }
+  document.addEventListener('DOMContentLoaded', nukeOverlays);
+  setTimeout(nukeOverlays, 300);
+  setTimeout(nukeOverlays, 1500);
+  setTimeout(nukeOverlays, 4000);
+})();
+</script>`;
+
+  rewritten = rewritten.replace(/<head[^>]*>/i, function(m){ return m + popupNuke; });
+  // ── END POPUP BLOCKER ────────────────────────────────────────
+
   rewritten = rewritten.replace(/navigator\.serviceWorker/g, 'navigator.__blockedServiceWorker');
   rewritten = rewritten.replace(/'serviceWorker'/g, "'__blockedServiceWorker'");
   rewritten = rewritten.replace(/"serviceWorker"/g, '"__blockedServiceWorker"');
-  
+
   rewritten = rewritten.replace(/<meta http-equiv="Content-Security-Policy".*?>/gi, '');
   rewritten = rewritten.replace(/<meta.*?name="referrer".*?>/gi, '');
   rewritten = rewritten.replace(/integrity="[^"]*"/gi, '');
@@ -59,7 +127,7 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
   rewritten = rewritten.replace(/(src|href)=["']([^"']+)["']/gi, (match, attr, url) => {
     if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('#') || url.startsWith('javascript:')) return match;
     if (url.includes('/ocho/')) return match;
-    
+
     let absoluteUrl = url;
     try {
       if (url.startsWith('//')) absoluteUrl = 'https:' + url;
@@ -69,11 +137,10 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
         const basePath = baseUrlObj.pathname.substring(0, baseUrlObj.pathname.lastIndexOf('/') + 1);
         absoluteUrl = baseUrlObj.origin + basePath + url;
       }
-      
       const encoded = encodeProxyUrl(absoluteUrl);
       return `${attr}="${proxyPrefix}${encoded}"`;
-    } catch (e) { 
-      return match; 
+    } catch (e) {
+      return match;
     }
   });
 
@@ -83,19 +150,18 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
         const currentOrigin = window.location.origin;
         const targetOrigin = '${origin}';
         const inFlight = new Set();
-        
+
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(regs => {
             regs.forEach(reg => reg.unregister());
           });
-          
           delete navigator.serviceWorker;
           Object.defineProperty(navigator, 'serviceWorker', {
             get: () => undefined,
             configurable: false
           });
         }
-        
+
         function safeEncodeUrl(url) {
           try {
             const encoded = btoa(url).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');
@@ -105,48 +171,41 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
             return null;
           }
         }
-        
+
         const origFetch = window.fetch;
         window.fetch = function(url, opts = {}) {
           let urlStr = typeof url === 'string' ? url : url.url;
-          
-          if (urlStr.startsWith('/ocho/') || 
-              urlStr.startsWith('data:') || 
+
+          if (urlStr.startsWith('/ocho/') ||
+              urlStr.startsWith('data:') ||
               urlStr.startsWith('blob:') ||
               urlStr.includes(currentOrigin)) {
             return origFetch(url, opts);
           }
-          
+
           if (inFlight.has(urlStr)) {
-            console.warn('Preventing fetch loop for:', urlStr);
             return Promise.reject(new Error('Loop prevented'));
           }
-          
+
           let fullUrl = urlStr;
           if (!urlStr.startsWith('http')) {
             fullUrl = urlStr.startsWith('/') ? targetOrigin + urlStr : targetOrigin + '/' + urlStr;
           }
-          
+
           const proxied = safeEncodeUrl(fullUrl);
-          if (!proxied) {
-            return Promise.reject(new Error('Invalid URL'));
-          }
-          
+          if (!proxied) return Promise.reject(new Error('Invalid URL'));
+
           inFlight.add(urlStr);
-          
           return origFetch(proxied, opts)
             .finally(() => inFlight.delete(urlStr))
-            .catch(err => {
-              console.error('Fetch error for:', urlStr, err);
-              throw err;
-            });
+            .catch(err => { throw err; });
         };
-        
+
         const origOpen = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function(method, url, ...args) {
-          if (typeof url === 'string' && 
-              !url.startsWith('/ocho/') && 
-              !url.startsWith('data:') && 
+          if (typeof url === 'string' &&
+              !url.startsWith('/ocho/') &&
+              !url.startsWith('data:') &&
               !url.startsWith('blob:') &&
               !url.includes(currentOrigin)) {
             let fullUrl = url;
@@ -154,29 +213,25 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
               fullUrl = url.startsWith('/') ? targetOrigin + url : targetOrigin + '/' + url;
             }
             const proxied = safeEncodeUrl(fullUrl);
-            if (proxied) {
-              url = proxied;
-            }
+            if (proxied) url = proxied;
           }
           return origOpen.call(this, method, url, ...args);
         };
-        
+
         document.addEventListener('click', function(e) {
           const link = e.target.closest('a');
           if (link && link.href) {
             const url = link.href;
-            if (url.startsWith(targetOrigin) || 
-                (!url.startsWith(currentOrigin) && 
-                 !url.startsWith('javascript:') && 
-                 !url.startsWith('mailto:') && 
-                 !url.startsWith('tel:') && 
+            if (url.startsWith(targetOrigin) ||
+                (!url.startsWith(currentOrigin) &&
+                 !url.startsWith('javascript:') &&
+                 !url.startsWith('mailto:') &&
+                 !url.startsWith('tel:') &&
                  !url.startsWith('#'))) {
               e.preventDefault();
               const fullUrl = url.startsWith('http') ? url : targetOrigin + url;
               const proxied = safeEncodeUrl(fullUrl);
-              if (proxied) {
-                window.location.href = proxied;
-              }
+              if (proxied) window.location.href = proxied;
             }
           }
         }, true);
@@ -191,7 +246,7 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
 async function doProxyRequest(targetUrl, req, res) {
   try {
     const urlObj = new URL(targetUrl);
-    
+
     const headers = {
       'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Accept': req.headers.accept || '*/*',
@@ -203,7 +258,7 @@ async function doProxyRequest(targetUrl, req, res) {
     if (req.headers['content-type']) headers['Content-Type'] = req.headers['content-type'];
     if (req.headers.cookie) headers['Cookie'] = req.headers.cookie;
     if (req.headers.range) headers['Range'] = req.headers.range;
-    
+
     headers['Referer'] = urlObj.origin;
     headers['Origin'] = urlObj.origin;
 
@@ -219,10 +274,10 @@ async function doProxyRequest(targetUrl, req, res) {
 
     console.log('Proxying:', targetUrl);
     const response = await fetch(targetUrl, fetchOptions);
-    
+
     const contentType = response.headers.get('content-type') || 'application/octet-stream';
     const contentLength = parseInt(response.headers.get('content-length') || '0');
-    
+
     res.set({
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': '*',
@@ -234,15 +289,9 @@ async function doProxyRequest(targetUrl, req, res) {
       'Content-Type': contentType
     });
 
-    if (response.headers.get('content-length')) {
-      res.set('Content-Length', response.headers.get('content-length'));
-    }
-    if (response.headers.get('content-range')) {
-      res.set('Content-Range', response.headers.get('content-range'));
-    }
-    if (response.headers.get('accept-ranges')) {
-      res.set('Accept-Ranges', response.headers.get('accept-ranges'));
-    }
+    if (response.headers.get('content-length')) res.set('Content-Length', response.headers.get('content-length'));
+    if (response.headers.get('content-range')) res.set('Content-Range', response.headers.get('content-range'));
+    if (response.headers.get('accept-ranges')) res.set('Accept-Ranges', response.headers.get('accept-ranges'));
 
     res.status(response.status);
 
@@ -250,7 +299,7 @@ async function doProxyRequest(targetUrl, req, res) {
       const text = await response.text();
       const rewritten = rewriteHtml(text, targetUrl, '/ocho/');
       res.send(rewritten);
-    } else if (contentType.includes('application/x-mpegURL') || 
+    } else if (contentType.includes('application/x-mpegURL') ||
                contentType.includes('application/vnd.apple.mpegurl') ||
                targetUrl.includes('.m3u8')) {
       const text = await response.text();
@@ -261,11 +310,7 @@ async function doProxyRequest(targetUrl, req, res) {
   } catch (error) {
     console.error(`Proxy error for ${targetUrl}:`, error.message);
     if (!res.headersSent) {
-      res.status(500).json({ 
-        error: 'Proxy error', 
-        message: error.message,
-        url: targetUrl 
-      });
+      res.status(500).json({ error: 'Proxy error', message: error.message, url: targetUrl });
     }
   }
 }
@@ -284,7 +329,6 @@ app.use('/ocho/:url(*)', (req, res) => {
     let targetUrl = decodeProxyUrl(req.params.url);
     const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
     if (queryString) targetUrl += queryString;
-    
     doProxyRequest(targetUrl, req, res);
   } catch (e) {
     console.error('URL decode error:', e.message);
@@ -296,7 +340,7 @@ app.use('/ocho/:url(*)', (req, res) => {
 
 app.all('*', (req, res) => {
   const referer = req.headers.referer;
-  
+
   if (referer && referer.includes('/ocho/')) {
     try {
       const refPath = new URL(referer).pathname;
@@ -311,14 +355,12 @@ app.all('*', (req, res) => {
       console.error('Fallback error:', e.message);
     }
   }
-  
+
   res.status(404).json({ error: 'Not Found' });
 });
 
-// For Vercel serverless
 module.exports = app;
 
-// For local development
 if (require.main === module) {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🎬 AuraBaby Media running on port ${PORT}`);
