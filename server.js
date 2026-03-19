@@ -259,8 +259,11 @@ async function doProxyRequest(targetUrl, req, res) {
     if (req.headers.cookie) headers['Cookie'] = req.headers.cookie;
     if (req.headers.range) headers['Range'] = req.headers.range;
 
-    headers['Referer'] = urlObj.origin;
+    headers['Referer'] = urlObj.origin + '/';
     headers['Origin'] = urlObj.origin;
+    headers['Sec-Fetch-Dest'] = 'empty';
+    headers['Sec-Fetch-Mode'] = 'cors';
+    headers['Sec-Fetch-Site'] = 'same-site';
 
     const fetchOptions = {
       method: req.method,
@@ -278,7 +281,12 @@ async function doProxyRequest(targetUrl, req, res) {
     const contentType = response.headers.get('content-type') || 'application/octet-stream';
     const contentLength = parseInt(response.headers.get('content-length') || '0');
 
-    res.set({
+    // Forward useful headers but strip ones that cause issues
+    const forwardHeaders = [
+      'content-type','content-length','content-range',
+      'accept-ranges','cache-control','last-modified','etag'
+    ];
+    const responseHeaders = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': '*',
       'Access-Control-Allow-Headers': '*',
@@ -287,11 +295,14 @@ async function doProxyRequest(targetUrl, req, res) {
       'X-Frame-Options': 'ALLOWALL',
       'X-Content-Type-Options': 'nosniff',
       'Content-Type': contentType
+    };
+    forwardHeaders.forEach(h => {
+      const v = response.headers.get(h);
+      if (v) responseHeaders[h.split('-').map(w=>w[0].toUpperCase()+w.slice(1)).join('-')] = v;
     });
+    res.set(responseHeaders);
 
-    if (response.headers.get('content-length')) res.set('Content-Length', response.headers.get('content-length'));
-    if (response.headers.get('content-range')) res.set('Content-Range', response.headers.get('content-range'));
-    if (response.headers.get('accept-ranges')) res.set('Accept-Ranges', response.headers.get('accept-ranges'));
+    // (headers already set above)
 
     res.status(response.status);
 
@@ -302,8 +313,43 @@ async function doProxyRequest(targetUrl, req, res) {
     } else if (contentType.includes('application/x-mpegURL') ||
                contentType.includes('application/vnd.apple.mpegurl') ||
                targetUrl.includes('.m3u8')) {
+      // Rewrite every segment/sub-playlist URL inside m3u8 through the proxy
       const text = await response.text();
-      res.send(text);
+      const base = new URL(targetUrl);
+      const rewrittenM3u8 = text.split('\n').map(line => {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) return line;
+        try {
+          let abs = trimmed;
+          if (trimmed.startsWith('//'))       abs = 'https:' + trimmed;
+          else if (trimmed.startsWith('/'))   abs = base.origin + trimmed;
+          else if (!trimmed.startsWith('http')) {
+            const dir = base.pathname.substring(0, base.pathname.lastIndexOf('/') + 1);
+            abs = base.origin + dir + trimmed;
+          }
+          return '/ocho/' + encodeProxyUrl(abs);
+        } catch(e) { return line; }
+      }).join('\n');
+      res.send(rewrittenM3u8);
+
+    } else if (contentType.includes('application/json') ||
+               contentType.includes('text/javascript') ||
+               contentType.includes('application/javascript')) {
+      // Rewrite stream URLs buried inside JS/JSON responses
+      const text = await response.text();
+      const base = new URL(targetUrl);
+      // Proxy any absolute https:// URLs that look like media (m3u8, mp4, ts, key)
+      const rewrittenJs = text.replace(
+        /(["'`])(https?:\/\/[^"'`\s]+?\.(m3u8|mp4|ts|key|vtt|srt)[^"'`\s]*)(["'`])/gi,
+        (match, q1, url, ext, q2) => {
+          try {
+            return q1 + '/ocho/' + encodeProxyUrl(url) + q2;
+          } catch(e) { return match; }
+        }
+      );
+      res.set('Content-Type', contentType);
+      res.send(rewrittenJs);
+
     } else {
       response.body.pipe(res);
     }
