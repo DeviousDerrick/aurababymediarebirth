@@ -2,17 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>AuraBaby — Choose Server</title>
+  <title>AuraBaby Media</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Poppins', sans-serif;
       font-weight: 800;
-      background: #07000f;
-      color: #f0e6ff;
+      background: #000;
+      color: #fff;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -20,316 +19,290 @@
       justify-content: center;
       overflow: hidden;
     }
-
-    /* ── Cosmos ── */
-    .cosmos {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .cosmos-bg {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 110% 70% at 10% 15%, rgba(90,0,180,0.5) 0%, transparent 55%),
-        radial-gradient(ellipse 80% 60% at 90% 80%, rgba(130,0,110,0.4) 0%, transparent 55%),
-        linear-gradient(160deg, #04000c 0%, #0b001a 50%, #060010 100%);
-    }
-    .nebula {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      mix-blend-mode: screen;
-      animation: nebulaDrift 30s ease-in-out infinite;
-    }
-    .n1 { width:600px;height:500px;top:-80px;left:-80px;background:radial-gradient(ellipse,rgba(110,0,255,0.22) 0%,transparent 70%);animation-duration:38s; }
-    .n2 { width:500px;height:500px;bottom:-100px;right:-100px;background:radial-gradient(ellipse,rgba(190,0,140,0.18) 0%,transparent 70%);animation-duration:28s;animation-delay:-12s; }
-    @keyframes nebulaDrift {
-      0%,100%{transform:translate(0,0);opacity:.7}
-      50%{transform:translate(25px,-20px);opacity:1}
+    .stars,.stars2,.stars3 {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      pointer-events:none; z-index:0;
     }
     .stars {
-      position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(0,150,255,0.4) 0%,transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(135,206,250,0.3) 0%,transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(255,255,255,0.3) 0%,transparent 50%),
+        radial-gradient(circle at 60% 60%, rgba(100,200,255,0.2) 0%,transparent 50%);
+      animation: galaxyPulse 20s ease-in-out infinite;
+    }
+    @keyframes galaxyPulse { 0%,100%{opacity:.6} 50%{opacity:.9} }
+    .stars2 {
       background-image:
-        radial-gradient(1px 1px at 8% 12%, rgba(255,255,255,.9) 0%,transparent 100%),
-        radial-gradient(1px 1px at 18% 42%, rgba(200,180,255,.8) 0%,transparent 100%),
-        radial-gradient(1.5px 1.5px at 30% 22%, rgba(255,255,255,.7) 0%,transparent 100%),
-        radial-gradient(1px 1px at 45% 70%, rgba(255,255,255,.9) 0%,transparent 100%),
-        radial-gradient(1px 1px at 60% 15%, rgba(180,160,255,.8) 0%,transparent 100%),
-        radial-gradient(2px 2px at 72% 55%, rgba(255,255,255,.6) 0%,transparent 100%),
-        radial-gradient(1px 1px at 85% 30%, rgba(255,255,255,.9) 0%,transparent 100%),
-        radial-gradient(1px 1px at 93% 75%, rgba(200,180,255,.7) 0%,transparent 100%),
-        radial-gradient(1px 1px at 25% 88%, rgba(255,255,255,.8) 0%,transparent 100%),
-        radial-gradient(1px 1px at 55% 95%, rgba(180,160,255,.9) 0%,transparent 100%);
-      animation: twinkle 7s ease-in-out infinite;
+        radial-gradient(2px 2px at 20px 30px,#fff,transparent),
+        radial-gradient(2px 2px at 60px 70px,#add8e6,transparent),
+        radial-gradient(1px 1px at 50px 50px,#fff,transparent),
+        radial-gradient(1px 1px at 130px 80px,#87ceeb,transparent),
+        radial-gradient(2px 2px at 90px 10px,#fff,transparent),
+        radial-gradient(1px 1px at 150px 120px,#fff,transparent);
+      background-repeat:repeat; background-size:200px 200px;
+      animation:twinkle 5s ease-in-out infinite; opacity:.8;
     }
-    @keyframes twinkle {
-      0%,100%{opacity:.5} 50%{opacity:1}
+    .stars3 {
+      background-image:
+        radial-gradient(1px 1px at 10px 10px,#fff,transparent),
+        radial-gradient(1px 1px at 40px 70px,#add8e6,transparent),
+        radial-gradient(1px 1px at 80px 20px,#fff,transparent),
+        radial-gradient(1px 1px at 110px 90px,#87ceeb,transparent),
+        radial-gradient(2px 2px at 65px 45px,#fff,transparent);
+      background-repeat:repeat; background-size:150px 150px;
+      animation:twinkle 7s ease-in-out infinite reverse; opacity:.6;
     }
+    @keyframes twinkle { 0%,100%{opacity:.4} 50%{opacity:.9} }
 
-    /* ── Planets ── */
-    .planet { position:absolute; border-radius:50%; pointer-events:none; }
+    /* PLANETS */
+    .planet { position:fixed; border-radius:50%; pointer-events:none; z-index:1; }
 
-    .p1 {
-      width:120px;height:120px;top:30px;right:60px;
-      background:radial-gradient(circle at 32% 30%,#e080ff 0%,#9b30ff 35%,#50007a 70%,#1a0030 100%);
-      box-shadow:0 0 50px rgba(155,48,255,.6),inset -18px -14px 40px rgba(0,0,0,.65);
+    .planet-1 {
+      width:160px; height:160px; top:30px; right:60px;
+      background:radial-gradient(circle at 32% 30%,#80c8ff 0%,#1560cc 35%,#002870 70%,#000818 100%);
+      box-shadow:0 0 60px rgba(0,191,255,.65),0 0 120px rgba(0,191,255,.25),inset -22px -18px 45px rgba(0,0,0,.65);
       animation:pf 22s ease-in-out infinite;
     }
-    .p1::before {
-      content:'';position:absolute;width:230px;height:230px;top:50%;left:50%;
+    .planet-1::before {
+      content:''; position:absolute; width:310px; height:310px; top:50%; left:50%;
       transform:translate(-50%,-50%) rotateX(72deg) rotateZ(15deg);
-      border-radius:50%;border:11px solid rgba(255,255,255,.85);
-      box-shadow:0 0 0 3px rgba(255,255,255,.25),0 0 22px rgba(255,255,255,.5),0 0 45px rgba(180,120,255,.4);
+      border-radius:50%; border:13px solid rgba(255,255,255,.88);
+      box-shadow:0 0 0 3px rgba(255,255,255,.25),0 0 25px rgba(255,255,255,.55),0 0 50px rgba(0,191,255,.45);
       pointer-events:none;
     }
-    .p1::after {
-      content:'';position:absolute;inset:0;border-radius:50%;
+    .planet-1::after {
+      content:''; position:absolute; inset:0; border-radius:50%;
       background:radial-gradient(circle at 28% 22%,rgba(255,255,255,.2) 0%,transparent 45%);
     }
 
-    .p2 {
-      width:70px;height:70px;bottom:80px;left:50px;
-      background:radial-gradient(circle at 35% 30%,#80fff0 0%,#00b8a0 35%,#004a40 70%,#000f0c 100%);
-      box-shadow:0 0 40px rgba(0,200,180,.65),inset -10px -8px 22px rgba(0,0,0,.6);
-      animation:pf 16s ease-in-out infinite;animation-delay:-6s;
+    .planet-2 {
+      width:90px; height:90px; bottom:80px; left:60px;
+      background:radial-gradient(circle at 35% 30%,#aafff0 0%,#00c8a0 35%,#005040 70%,#000f0c 100%);
+      box-shadow:0 0 45px rgba(0,200,170,.65),0 0 90px rgba(0,200,170,.2),inset -13px -10px 28px rgba(0,0,0,.6);
+      animation:pf 17s ease-in-out infinite; animation-delay:-7s;
     }
-    .p2::before {
-      content:'';position:absolute;width:135px;height:135px;top:50%;left:50%;
-      transform:translate(-50%,-50%) rotateX(70deg) rotateZ(-20deg);
-      border-radius:50%;border:8px solid rgba(255,255,255,.8);
-      box-shadow:0 0 0 2px rgba(255,255,255,.2),0 0 16px rgba(255,255,255,.4),0 0 32px rgba(0,220,200,.4);
+    .planet-2::before {
+      content:''; position:absolute; width:175px; height:175px; top:50%; left:50%;
+      transform:translate(-50%,-50%) rotateX(70deg) rotateZ(-22deg);
+      border-radius:50%; border:10px solid rgba(255,255,255,.85);
+      box-shadow:0 0 0 3px rgba(255,255,255,.2),0 0 18px rgba(255,255,255,.45),0 0 35px rgba(0,220,190,.4);
       pointer-events:none;
     }
-    .p2::after {
-      content:'';position:absolute;inset:0;border-radius:50%;
+    .planet-2::after {
+      content:''; position:absolute; inset:0; border-radius:50%;
       background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.2) 0%,transparent 45%);
     }
 
-    .p3 {
-      width:40px;height:40px;top:20%;left:4%;
-      background:radial-gradient(circle at 38% 32%,#ffcc60 0%,#e06000 38%,#6a2000 72%,#1a0800 100%);
-      box-shadow:0 0 25px rgba(230,120,0,.65),inset -6px -5px 14px rgba(0,0,0,.55);
-      animation:pf 13s ease-in-out infinite;animation-delay:-4s;
+    .planet-3 {
+      width:52px; height:52px; top:40%; left:2%;
+      background:radial-gradient(circle at 38% 32%,#ffffff 0%,#a0d8ff 35%,#2060a0 70%,#000c1e 100%);
+      box-shadow:0 0 30px rgba(160,216,255,.7),0 0 60px rgba(0,191,255,.2),inset -8px -6px 18px rgba(0,0,0,.5);
+      animation:pf 14s ease-in-out infinite; animation-delay:-4s;
     }
-    .p3::before {
-      content:'';position:absolute;width:76px;height:76px;top:50%;left:50%;
-      transform:translate(-50%,-50%) rotateX(68deg) rotateZ(30deg);
-      border-radius:50%;border:5px solid rgba(255,255,255,.85);
-      box-shadow:0 0 12px rgba(255,255,255,.45),0 0 24px rgba(255,170,50,.4);
+    .planet-3::before {
+      content:''; position:absolute; width:98px; height:98px; top:50%; left:50%;
+      transform:translate(-50%,-50%) rotateX(68deg) rotateZ(28deg);
+      border-radius:50%; border:6px solid rgba(255,255,255,.88);
+      box-shadow:0 0 14px rgba(255,255,255,.5),0 0 28px rgba(0,191,255,.4);
+      pointer-events:none;
+    }
+    .planet-3::after {
+      content:''; position:absolute; inset:0; border-radius:50%;
+      background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.3) 0%,transparent 45%);
+    }
+
+    .planet-4 {
+      width:34px; height:34px; top:14%; left:30%;
+      background:radial-gradient(circle at 35% 30%,#60b0ff 0%,#0040cc 38%,#001060 72%,#000008 100%);
+      box-shadow:0 0 22px rgba(0,100,255,.7),inset -5px -4px 12px rgba(0,0,0,.55);
+      animation:pf 28s ease-in-out infinite; animation-delay:-14s;
+    }
+    .planet-4::before {
+      content:''; position:absolute; width:64px; height:64px; top:50%; left:50%;
+      transform:translate(-50%,-50%) rotateX(65deg) rotateZ(-10deg);
+      border-radius:50%; border:4px solid rgba(255,255,255,.85);
+      box-shadow:0 0 10px rgba(255,255,255,.4),0 0 20px rgba(0,150,255,.4);
       pointer-events:none;
     }
 
-    @keyframes pf {
-      0%,100%{transform:translateY(0)}
-      50%{transform:translateY(-16px)}
+    .planet-5 {
+      width:75px; height:75px; bottom:160px; right:4%;
+      background:radial-gradient(circle at 35% 30%,#ffaaee 0%,#cc0090 38%,#5a003a 72%,#150010 100%);
+      box-shadow:0 0 38px rgba(200,0,150,.65),0 0 75px rgba(200,0,150,.2),inset -11px -9px 24px rgba(0,0,0,.6);
+      animation:pf 19s ease-in-out infinite; animation-delay:-9s;
+    }
+    .planet-5::before {
+      content:''; position:absolute; width:145px; height:145px; top:50%; left:50%;
+      transform:translate(-50%,-50%) rotateX(73deg) rotateZ(22deg);
+      border-radius:50%; border:8px solid rgba(255,255,255,.82);
+      box-shadow:0 0 0 2px rgba(255,255,255,.2),0 0 18px rgba(255,255,255,.4),0 0 36px rgba(255,80,200,.4);
+      pointer-events:none;
+    }
+    .planet-5::after {
+      content:''; position:absolute; inset:0; border-radius:50%;
+      background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.2) 0%,transparent 45%);
     }
 
-    /* ── Content ── */
-    .content {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      padding: 40px 20px;
+    @keyframes pf { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+
+    /* SHOOTING STARS */
+    .shooting-star {
+      position:fixed; width:2px; height:2px; background:white;
+      border-radius:50%; opacity:0; pointer-events:none; z-index:1;
     }
+    .shooting-star::after {
+      content:''; position:absolute; right:0; top:50%;
+      width:90px; height:1px;
+      background:linear-gradient(to left,rgba(255,255,255,.8),transparent);
+      transform:translateY(-50%);
+    }
+    .ss1{top:8%;left:15%;animation:shoot 7s linear infinite;}
+    .ss2{top:22%;left:55%;animation:shoot 5s linear infinite;animation-delay:3s;}
+    .ss3{top:5%;left:75%;animation:shoot 9s linear infinite;animation-delay:6s;}
+    @keyframes shoot {
+      0%{transform:translateX(0) translateY(0) rotate(-20deg);opacity:0}
+      5%{opacity:1}
+      30%{transform:translateX(-280px) translateY(75px) rotate(-20deg);opacity:0}
+      100%{transform:translateX(-280px) translateY(75px) rotate(-20deg);opacity:0}
+    }
+
+    /* CONTENT */
+    .content { position:relative; z-index:10; text-align:center; padding:40px 20px; width:100%; }
 
     .logo {
-      font-size: 42px;
-      font-weight: 900;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #bf7fff 0%, #ffffff 45%, #ff3cac 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 25px rgba(155,48,255,.8));
-      animation: logoGlow 4s ease-in-out infinite;
+      font-size:44px; font-weight:900; letter-spacing:4px;
+      text-transform:uppercase; margin-bottom:8px;
+      text-shadow:0 0 20px rgba(0,191,255,.8),0 0 40px rgba(135,206,250,.6);
     }
-
-    @keyframes logoGlow {
-      0%,100%{filter:drop-shadow(0 0 18px rgba(155,48,255,.7))}
-      50%{filter:drop-shadow(0 0 40px rgba(155,48,255,1)) drop-shadow(0 0 70px rgba(255,60,172,.4))}
+    .logo span {
+      background:linear-gradient(135deg,#00bfff,#fff,#87ceeb);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      filter:drop-shadow(0 0 30px rgba(0,191,255,.8));
+      animation:glow 2s ease-in-out infinite;
     }
-
+    @keyframes glow {
+      0%,100%{filter:drop-shadow(0 0 20px rgba(0,191,255,.6))}
+      50%{filter:drop-shadow(0 0 40px rgba(0,191,255,1))}
+    }
     .subtitle {
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: rgba(180,140,255,.5);
-      margin-bottom: 60px;
+      font-size:12px; font-weight:800; letter-spacing:6px;
+      text-transform:uppercase; color:rgba(135,206,250,.45); margin-bottom:55px;
     }
 
-    .server-grid {
-      display: flex;
-      gap: 30px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+    /* CARDS */
+    .server-grid { display:flex; gap:28px; justify-content:center; flex-wrap:wrap; }
 
     .server-card {
-      width: 280px;
-      background: rgba(12, 0, 30, 0.85);
-      border: 1px solid rgba(155,48,255,.4);
-      border-radius: 20px;
-      padding: 36px 30px 30px;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), box-shadow 0.35s, border-color 0.3s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
+      width:270px;
+      background:rgba(10,20,40,0.9);
+      border:2px solid #00bfff;
+      border-radius:16px;
+      padding:34px 28px 28px;
+      cursor:pointer;
+      text-decoration:none;
+      color:#fff;
+      position:relative;
+      overflow:hidden;
+      transition:all .35s cubic-bezier(.34,1.56,.64,1);
+      display:flex; flex-direction:column; align-items:center; gap:14px;
+      box-shadow:0 0 20px rgba(0,191,255,.3);
+      backdrop-filter:blur(10px);
     }
-
     .server-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(180,100,255,.7), transparent);
+      content:''; position:absolute; top:0; left:10%; right:10%; height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,191,255,.8),transparent);
     }
-
+    .server-card::after {
+      content:''; position:absolute; top:50%; left:50%;
+      width:0; height:0; border-radius:50%;
+      background:rgba(0,191,255,.08);
+      transform:translate(-50%,-50%);
+      transition:width .6s,height .6s;
+    }
     .server-card:hover {
-      transform: translateY(-12px) scale(1.03);
-      border-color: rgba(155,48,255,.9);
-      box-shadow:
-        0 0 50px rgba(155,48,255,.4),
-        0 0 100px rgba(155,48,255,.15),
-        0 20px 60px rgba(0,0,0,.6);
+      transform:translateY(-14px) scale(1.04);
+      box-shadow:0 0 50px rgba(0,191,255,.7),0 0 90px rgba(255,255,255,.3),0 20px 50px rgba(0,0,0,.6);
+      border-color:#fff;
     }
-
-    /* CineHub card gets pink accent */
-    .server-card.cinehub {
-      border-color: rgba(255,60,172,.4);
-    }
-    .server-card.cinehub::before {
-      background: linear-gradient(90deg, transparent, rgba(255,60,172,.7), transparent);
-    }
-    .server-card.cinehub:hover {
-      border-color: rgba(255,60,172,.9);
-      box-shadow:
-        0 0 50px rgba(255,60,172,.35),
-        0 0 100px rgba(255,60,172,.12),
-        0 20px 60px rgba(0,0,0,.6);
-    }
+    .server-card:hover::after { width:500px; height:500px; }
 
     .server-icon {
-      font-size: 52px;
-      line-height: 1;
-      filter: drop-shadow(0 0 20px rgba(155,48,255,.8));
+      font-size:54px; line-height:1;
+      filter:drop-shadow(0 0 18px rgba(0,191,255,.9));
+      animation:iconPulse 2.5s ease-in-out infinite;
     }
-
-    .cinehub .server-icon {
-      filter: drop-shadow(0 0 20px rgba(255,60,172,.8));
+    @keyframes iconPulse {
+      0%,100%{filter:drop-shadow(0 0 14px rgba(0,191,255,.7))}
+      50%{filter:drop-shadow(0 0 30px rgba(0,191,255,1)) drop-shadow(0 0 50px rgba(255,255,255,.4))}
     }
-
     .server-name {
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, #e0b0ff, #fff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-size:20px; font-weight:900; letter-spacing:3px; text-transform:uppercase;
+      background:linear-gradient(135deg,#00bfff,#fff,#87ceeb);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
     }
-
-    .cinehub .server-name {
-      background: linear-gradient(135deg, #ff80cc, #fff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .server-desc {
-      font-size: 13px;
-      font-weight: 800;
-      color: rgba(180,150,220,.6);
-      text-align: center;
-      line-height: 1.6;
-    }
-
+    .server-desc { font-size:13px; font-weight:800; color:rgba(135,206,250,.6); text-align:center; line-height:1.7; }
     .server-badge {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      padding: 6px 16px;
-      border-radius: 30px;
-      margin-top: 4px;
+      font-size:11px; font-weight:800; letter-spacing:2px; text-transform:uppercase;
+      padding:6px 16px; border-radius:30px;
+      background:rgba(0,191,255,.15); border:1px solid rgba(0,191,255,.5); color:#00bfff;
+      margin-top:4px;
     }
-
-    .badge-purple {
-      background: rgba(155,48,255,.2);
-      border: 1px solid rgba(155,48,255,.5);
-      color: #bf7fff;
+    .arrow {
+      position:absolute; bottom:16px; right:18px;
+      font-size:18px; opacity:0; transform:translateX(-8px);
+      color:#00bfff; transition:all .3s; font-weight:800;
     }
+    .server-card:hover .arrow { opacity:1; transform:translateX(0); }
 
-    .badge-pink {
-      background: rgba(255,60,172,.15);
-      border: 1px solid rgba(255,60,172,.5);
-      color: #ff80cc;
-    }
-
-    .enter-arrow {
-      position: absolute;
-      bottom: 18px;
-      right: 20px;
-      font-size: 20px;
-      opacity: 0;
-      transform: translateX(-8px);
-      transition: all 0.3s;
-    }
-
-    .server-card:hover .enter-arrow {
-      opacity: 0.7;
-      transform: translateX(0);
+    @media(max-width:620px){
+      .logo{font-size:28px;}
+      .server-card{width:90%;max-width:320px;}
+      .planet-1{width:100px;height:100px;right:10px;}
+      .planet-2,.planet-5{display:none;}
     }
   </style>
 </head>
 <body>
-
-  <div class="cosmos">
-    <div class="cosmos-bg"></div>
-    <div class="nebula n1"></div>
-    <div class="nebula n2"></div>
-    <div class="stars"></div>
-    <div class="planet p1"></div>
-    <div class="planet p2"></div>
-    <div class="planet p3"></div>
-  </div>
+  <div class="stars"></div>
+  <div class="stars2"></div>
+  <div class="stars3"></div>
+  <div class="planet planet-1"></div>
+  <div class="planet planet-2"></div>
+  <div class="planet planet-3"></div>
+  <div class="planet planet-4"></div>
+  <div class="planet planet-5"></div>
+  <div class="shooting-star ss1"></div>
+  <div class="shooting-star ss2"></div>
+  <div class="shooting-star ss3"></div>
 
   <div class="content">
-    <div class="logo">AuraBaby Media</div>
+    <div class="logo">AuraBaby <span>Media</span></div>
     <div class="subtitle">Choose Your Server</div>
-
     <div class="server-grid">
 
-      <!-- Server 1: AuraBaby -->
-      <a class="server-card" href="index.html">
+      <a class="server-card" href="app.html">
         <div class="server-icon">🪐</div>
         <div class="server-name">AuraBaby</div>
-        <div class="server-desc">Full cosmic browser with<br>search, seasons & episodes</div>
-        <div class="server-badge badge-purple">Multi-Source Player</div>
-        <div class="enter-arrow">→</div>
+        <div class="server-desc">Search movies & shows,<br>multi-source cosmic player</div>
+        <div class="server-badge">Built-In Player</div>
+        <div class="arrow">→</div>
       </a>
 
-      <!-- Server 2: CineHub -->
-      <a class="server-card cinehub" href="https://www.cinehub.to" target="_blank" rel="noopener">
+      <a class="server-card" id="moviestvCard" href="#">
         <div class="server-icon">🎬</div>
-        <div class="server-name">CineHub</div>
-        <div class="server-desc">External streaming site<br>with its own player</div>
-        <div class="server-badge badge-pink">Opens New Tab</div>
-        <div class="enter-arrow">→</div>
+        <div class="server-name">MoviesTV</div>
+        <div class="server-desc">External site streamed<br>through the proxy</div>
+        <div class="server-badge">Via Proxy</div>
+        <div class="arrow">→</div>
       </a>
 
     </div>
   </div>
 
+  <script>
+    const encoded = btoa('https://moviestv.space').replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+    document.getElementById('moviestvCard').href = '/ocho/' + encoded;
+  </script>
 </body>
 </html>
