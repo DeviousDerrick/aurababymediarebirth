@@ -255,11 +255,11 @@
     <div class="source-selector">
       <span class="source-label">SOURCE:</span>
       <button class="source-btn" data-index="0">CinemaOS</button>
-      <button class="source-btn" data-index="1">AutoEmbed</button>
-      <button class="source-btn" data-index="2">VidPlus</button>
-      <button class="source-btn" data-index="3">2Embed</button>
-      <button class="source-btn" data-index="4">vidsrc.to</button>
-      <button class="source-btn" data-index="5">embed.su</button>
+      <button class="source-btn" data-index="1">VidSrc CC</button>
+      <button class="source-btn" data-index="2">VidSrc XYZ</button>
+      <button class="source-btn" data-index="3">MoviesAPI</button>
+      <button class="source-btn" data-index="4">VidLink</button>
+      <button class="source-btn" data-index="5">AutoEmbed</button>
     </div>
   </div>
 
@@ -305,44 +305,46 @@
 
     const PROVIDERS = [
       {
-        // Original CinemaOS - best quality, routed through proxy
+        // CinemaOS - premium quality multi-server player
         name: "CinemaOS",
         url: () => type === "movie"
           ? `https://cinemaos.tech/player/${id}`
           : `https://cinemaos.tech/player/${id}/${season}/${episode}`
       },
       {
-        // Clean player, rarely has popups, great quality
+        // vidsrc.cc - next gen, clean, multi-server, subtitles
+        name: "vidsrc.cc",
+        url: () => type === "movie"
+          ? `https://vidsrc.cc/v2/embed/movie/${id}`
+          : `https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}`
+      },
+      {
+        // vidsrc.xyz - reliable, tmdb-based, minimal ads
+        name: "vidsrc.xyz",
+        url: () => type === "movie"
+          ? `https://vidsrc.xyz/embed/movie?tmdb=${id}`
+          : `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
+      },
+      {
+        // moviesapi.club - very clean player, great coverage
+        name: "MoviesAPI",
+        url: () => type === "movie"
+          ? `https://moviesapi.club/movie/${id}`
+          : `https://moviesapi.club/tv/${id}-${season}-${episode}`
+      },
+      {
+        // vidlink.pro - clean modern UI, multi quality
+        name: "VidLink",
+        url: () => type === "movie"
+          ? `https://vidlink.pro/movie/${id}?autoplay=true&title=true`
+          : `https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=true&title=true`
+      },
+      {
+        // autoembed.co - solid fallback, good coverage
         name: "AutoEmbed",
         url: () => type === "movie"
           ? `https://autoembed.co/movie/tmdb/${id}`
           : `https://autoembed.co/tv/tmdb/${id}-${season}-${episode}`
-      },
-      {
-        // Highly customizable, very clean UI, no popups
-        name: "VidPlus",
-        url: () => type === "movie"
-          ? `https://player.vidplus.to/embed/movie/${id}?autoplay=true&primarycolor=00bfff`
-          : `https://player.vidplus.to/embed/tv/${id}/${season}/${episode}?autoplay=true&primarycolor=00bfff`
-      },
-      {
-        // 2embed newer cleaner domain
-        name: "2Embed",
-        url: () => type === "movie"
-          ? `https://www.2embed.stream/embed/movie/${id}`
-          : `https://www.2embed.stream/embed/tv/${id}/${season}/${episode}`
-      },
-      {
-        name: "vidsrc.to",
-        url: () => type === "movie"
-          ? `https://vidsrc.to/embed/movie/${id}`
-          : `https://vidsrc.to/embed/tv/${id}/${season}/${episode}`
-      },
-      {
-        name: "embed.su",
-        url: () => type === "movie"
-          ? `https://embed.su/embed/movie/${id}`
-          : `https://embed.su/embed/tv/${id}/${season}/${episode}`
       }
     ];
 
