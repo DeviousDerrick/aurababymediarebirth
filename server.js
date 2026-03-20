@@ -247,17 +247,33 @@ async function doProxyRequest(targetUrl, req, res) {
   try {
     const urlObj = new URL(targetUrl);
 
+    // Use a real Chrome UA to pass Cloudflare checks
+    const ua = req.headers['user-agent'] && req.headers['user-agent'].includes('Chrome')
+      ? req.headers['user-agent']
+      : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36';
+
     const headers = {
-      'User-Agent': req.headers['user-agent'] || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept': req.headers.accept || '*/*',
+      'User-Agent': ua,
+      'Accept': req.headers.accept || 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
       'Accept-Encoding': 'identity',
       'Accept-Language': req.headers['accept-language'] || 'en-US,en;q=0.9',
-      'Connection': 'keep-alive'
+      'Connection': 'keep-alive',
+      'Upgrade-Insecure-Requests': '1',
+      'Sec-CH-UA': '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+      'Sec-CH-UA-Mobile': '?0',
+      'Sec-CH-UA-Platform': '"Windows"',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Cache-Control': 'max-age=0'
     };
 
     if (req.headers['content-type']) headers['Content-Type'] = req.headers['content-type'];
     if (req.headers.cookie) headers['Cookie'] = req.headers.cookie;
     if (req.headers.range) headers['Range'] = req.headers.range;
+    // Pass through Cloudflare clearance cookies if present
+    if (req.headers['cf-clearance']) headers['cf-clearance'] = req.headers['cf-clearance'];
 
     headers['Referer'] = urlObj.origin + '/';
     headers['Origin'] = urlObj.origin;
