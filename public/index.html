@@ -291,7 +291,7 @@
 
       <a class="server-card" id="moviestvCard" href="#">
         <div class="server-icon">🎬</div>
-        <div class="server-name">VidBox</div>
+        <div class="server-name">vidsrc.cc</div>
         <div class="server-desc">External site streamed<br>through the proxy</div>
         <div class="server-badge">Via Proxy</div>
         <div class="arrow">→</div>
@@ -301,7 +301,7 @@
   </div>
 
   <script>
-    const encoded = btoa('https://vidbox.cc/home').replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+    const encoded = btoa('https://vidsrc.cc').replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
     document.getElementById('moviestvCard').href = '/ocho/' + encoded;
   </script>
 </body>
