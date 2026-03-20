@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>CineHub | AuraBaby</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      background: #000;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: rgba(10,20,40,0.95);
+      border-bottom: 2px solid #00bfff;
+      box-shadow: 0 0 30px rgba(0,191,255,0.4);
+      z-index: 100;
+      flex-shrink: 0;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .back-btn {
+      background: linear-gradient(135deg, #00bfff 0%, #fff 50%, #87ceeb 100%);
+      color: #000;
+      border: none;
+      padding: 9px 20px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(0,191,255,0.5);
+    }
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0,191,255,0.8);
+    }
+    .site-name {
+      font-size: 18px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, #00bfff, #fff, #87ceeb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 15px rgba(0,191,255,0.8));
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: rgba(0,191,255,0.15);
+      border: 1px solid rgba(0,191,255,0.5);
+      color: #00bfff;
+    }
+    .frame-wrap {
+      flex: 1;
+      position: relative;
+    }
+    iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      z-index: 10;
+      gap: 20px;
+    }
+    .spinner {
+      width: 50px; height: 50px;
+      border: 4px solid #111;
+      border-top: 4px solid #00bfff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      box-shadow: 0 0 20px rgba(0,191,255,0.5);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading p {
+      font-size: 14px;
+      font-weight: 800;
+      color: #00bfff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 15px rgba(0,191,255,0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="back-btn" href="index.html">← Back</a>
+      <span class="site-name">CineHub</span>
+    </div>
+    <span class="badge">🔒 Via Proxy</span>
+  </div>
+
+  <div class="frame-wrap">
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Loading CineHub...</p>
+    </div>
+    <iframe
+      id="flixframe"
+      allowfullscreen
+      allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+    ></iframe>
+  </div>
+
+  <script>
+    const encoded = btoa('https://cine-hub-blocked.netlify.app')
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    const frame = document.getElementById('flixframe');
+    frame.src = '/ocho/' + encoded;
+    frame.onload = () => {
+      setTimeout(() => {
+        document.getElementById('loading').style.display = 'none';
+      }, 800);
+    };
+    // Fallback hide loading after 8s regardless
+    setTimeout(() => {
+      document.getElementById('loading').style.display = 'none';
+    }, 8000);
+  </script>
+
+</body>
+</html>
