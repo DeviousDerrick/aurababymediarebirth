@@ -408,9 +408,22 @@ app.all('*', (req, res) => {
       const refPath = new URL(referer).pathname;
       const parts = refPath.split('/ocho/');
       if (parts.length > 1) {
-        const encodedPart = parts[1].split('/')[0];
-        const targetOrigin = new URL(decodeProxyUrl(encodedPart)).origin;
-        const fixedUrl = targetOrigin + req.url;
+        // Get the full referer target URL (not just origin) so relative paths resolve correctly
+        const encodedPart = parts[1].split('?')[0];
+        const targetRefUrl = decodeProxyUrl(encodedPart);
+        const targetRefObj = new URL(targetRefUrl);
+
+        let fixedUrl;
+        if (req.url.startsWith('/')) {
+          // Absolute path - use origin
+          fixedUrl = targetRefObj.origin + req.url;
+        } else {
+          // Relative path - resolve against full referer path
+          const basePath = targetRefObj.pathname.substring(0, targetRefObj.pathname.lastIndexOf('/') + 1);
+          fixedUrl = targetRefObj.origin + basePath + req.url;
+        }
+
+        console.log('Fallback resolving:', req.url, '->', fixedUrl);
         return doProxyRequest(fixedUrl, req, res);
       }
     } catch (e) {
