@@ -468,7 +468,73 @@
       🥚 AuraBaby <span class="egg">🥚</span> Media 🐰
     </div>
     <div class="subtitle">Easter Edition — Choose Your Server</div>
-
+<!-- 🥚 Aurababy Easter Egg Hunt | Code: SmoothStone | Pebble Egg | 🌿 Common -->
+<div id="aurababy_egg_SmoothStone" onclick="showAurababyEggSmoothStone()"
+  style="cursor:pointer;display:inline-block;transition:transform .2s;opacity:0.85;"
+  title="🥚 You found an Easter egg!">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 130" width="80" height="104"
+    style="filter:drop-shadow(0 3px 8px rgba(0,0,0,0.15));">
+    <defs>
+      <radialGradient id="g57" cx="38.5%" cy="34%">
+        <stop offset="0%" stop-color="#f3e5f5"/>
+        <stop offset="100%" stop-color="#c77dff"/>
+      </radialGradient>
+      <clipPath id="ec57">
+        <ellipse cx="50" cy="68" rx="42" ry="58"/>
+      </clipPath>
+    </defs>
+    <ellipse cx="50" cy="68" rx="42" ry="58" fill="url(#g57)"/>
+    <g clip-path="url(#ec57)"><ellipse cx="38" cy="50" rx="7" ry="11" fill="rgba(255,255,255,0.28)" transform="rotate(-30,38,50)"/><ellipse cx="62" cy="50" rx="7" ry="11" fill="rgba(255,255,255,0.28)" transform="rotate(30,62,50)"/><ellipse cx="32" cy="70" rx="7" ry="11" fill="rgba(255,255,255,0.28)" transform="rotate(-20,32,70)"/><ellipse cx="68" cy="70" rx="7" ry="11" fill="rgba(255,255,255,0.28)" transform="rotate(20,68,70)"/><ellipse cx="50" cy="88" rx="7" ry="11" fill="rgba(255,255,255,0.28)" transform="rotate(0,50,88)"/></g>
+  <circle cx="44.25" cy="89.06" r="4.99" fill="#4cc9f0" opacity="0.55"/>
+    <ellipse cx="36.0" cy="39.4" rx="9.7" ry="16.9" fill="rgba(255,255,255,0.18)"/>
+  </svg>
+</div>
+<script>
+function showAurababyEggSmoothStone() {
+  const overlay = document.createElement("div")
+  overlay.style = `
+    position:fixed;inset:0;background:rgba(27,67,50,.7);
+    z-index:9999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;
+  `
+  const box = document.createElement("div")
+  box.style = `
+    background:#fff;border-radius:20px;padding:28px 24px;
+    max-width:340px;width:90%;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,.3);
+  `
+  box.innerHTML = `
+    <div style="font-size:2.5em;margin-bottom:8px;">🥚</div>
+    <div style="font-family:serif;font-size:1.5em;font-weight:900;color:#1b4332;margin-bottom:6px;">
+      Pebble Egg
+    </div>
+    <div style="font-size:.8em;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:#c77dff;background:#c77dff22;padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px;">
+      🌿 Common
+    </div>
+    <div style="font-size:.9em;color:rgba(27,67,50,.6);margin-bottom:12px;">
+      Enter this code on the Aurababy Egg Hunt page!
+    </div>
+    <div id="ab_code_box_SmoothStone"
+      style="background:#f0f8f4;border:2px solid #52b788;border-radius:10px;padding:12px;font-family:monospace;font-size:1.3em;font-weight:900;letter-spacing:2px;color:#1b4332;margin-bottom:14px;">
+      SmoothStone
+    </div>
+    <button id="copyEggCode_SmoothStone"
+      style="width:100%;padding:11px;background:linear-gradient(135deg,#1b4332,#40916c);color:#fff;font-size:1em;font-weight:800;letter-spacing:2px;border:none;border-radius:12px;cursor:pointer;margin-bottom:8px;">
+      📋 Copy Code
+    </button>
+    <button id="closeEgg_SmoothStone"
+      style="width:100%;padding:9px;background:rgba(27,67,50,.08);color:#2d6a4f;font-size:.9em;font-weight:800;border:2px solid rgba(64,145,108,.3);border-radius:12px;cursor:pointer;">
+      ✕ Close
+    </button>
+  `
+  overlay.appendChild(box)
+  document.body.appendChild(overlay)
+  document.getElementById("copyEggCode_SmoothStone").onclick = () => {
+    navigator.clipboard.writeText("SmoothStone")
+    document.getElementById("copyEggCode_SmoothStone").textContent = "✅ Copied!"
+  }
+  document.getElementById("closeEgg_SmoothStone").onclick = () => overlay.remove()
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove() }
+}
+</script>
     <div class="server-grid">
       <a class="server-card" href="app.html">
         <div class="server-icon">🎬</div>
