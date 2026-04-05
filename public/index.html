@@ -2,304 +2,505 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>AuraBaby Media</title>
+  <title>🥚 AuraBaby Easter Media 🐰</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@800;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Poppins', sans-serif;
       font-weight: 800;
-      background: #000;
-      color: #fff;
+      background: linear-gradient(180deg, #87CEEB 0%, #b7e4f7 16%, #d8f3dc 42%, #a8d5a2 68%, #52b788 100%);
+      background-attachment: fixed;
+      color: #1a1a2e;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-    }
-    .stars,.stars2,.stars3 {
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      pointer-events:none; z-index:0;
-    }
-    .stars {
-      background:
-        radial-gradient(circle at 20% 50%, rgba(0,150,255,0.4) 0%,transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(135,206,250,0.3) 0%,transparent 50%),
-        radial-gradient(circle at 40% 20%, rgba(255,255,255,0.3) 0%,transparent 50%),
-        radial-gradient(circle at 60% 60%, rgba(100,200,255,0.2) 0%,transparent 50%);
-      animation: galaxyPulse 20s ease-in-out infinite;
-    }
-    @keyframes galaxyPulse { 0%,100%{opacity:.6} 50%{opacity:.9} }
-    .stars2 {
-      background-image:
-        radial-gradient(2px 2px at 20px 30px,#fff,transparent),
-        radial-gradient(2px 2px at 60px 70px,#add8e6,transparent),
-        radial-gradient(1px 1px at 50px 50px,#fff,transparent),
-        radial-gradient(1px 1px at 130px 80px,#87ceeb,transparent),
-        radial-gradient(2px 2px at 90px 10px,#fff,transparent),
-        radial-gradient(1px 1px at 150px 120px,#fff,transparent);
-      background-repeat:repeat; background-size:200px 200px;
-      animation:twinkle 5s ease-in-out infinite; opacity:.8;
-    }
-    .stars3 {
-      background-image:
-        radial-gradient(1px 1px at 10px 10px,#fff,transparent),
-        radial-gradient(1px 1px at 40px 70px,#add8e6,transparent),
-        radial-gradient(1px 1px at 80px 20px,#fff,transparent),
-        radial-gradient(1px 1px at 110px 90px,#87ceeb,transparent),
-        radial-gradient(2px 2px at 65px 45px,#fff,transparent);
-      background-repeat:repeat; background-size:150px 150px;
-      animation:twinkle 7s ease-in-out infinite reverse; opacity:.6;
-    }
-    @keyframes twinkle { 0%,100%{opacity:.4} 50%{opacity:.9} }
-
-    /* PLANETS */
-    .planet { position:fixed; border-radius:50%; pointer-events:none; z-index:1; }
-
-    .planet-1 {
-      width:160px; height:160px; top:30px; right:60px;
-      background:radial-gradient(circle at 32% 30%,#80c8ff 0%,#1560cc 35%,#002870 70%,#000818 100%);
-      box-shadow:0 0 60px rgba(0,191,255,.65),0 0 120px rgba(0,191,255,.25),inset -22px -18px 45px rgba(0,0,0,.65);
-      animation:pf 22s ease-in-out infinite;
-    }
-    .planet-1::before {
-      content:''; position:absolute; width:310px; height:310px; top:50%; left:50%;
-      transform:translate(-50%,-50%) rotateX(72deg) rotateZ(15deg);
-      border-radius:50%; border:13px solid rgba(255,255,255,.88);
-      box-shadow:0 0 0 3px rgba(255,255,255,.25),0 0 25px rgba(255,255,255,.55),0 0 50px rgba(0,191,255,.45);
-      pointer-events:none;
-    }
-    .planet-1::after {
-      content:''; position:absolute; inset:0; border-radius:50%;
-      background:radial-gradient(circle at 28% 22%,rgba(255,255,255,.2) 0%,transparent 45%);
+      overflow-x: hidden;
+      position: relative;
     }
 
-    .planet-2 {
-      width:90px; height:90px; bottom:80px; left:60px;
-      background:radial-gradient(circle at 35% 30%,#aafff0 0%,#00c8a0 35%,#005040 70%,#000f0c 100%);
-      box-shadow:0 0 45px rgba(0,200,170,.65),0 0 90px rgba(0,200,170,.2),inset -13px -10px 28px rgba(0,0,0,.6);
-      animation:pf 17s ease-in-out infinite; animation-delay:-7s;
-    }
-    .planet-2::before {
-      content:''; position:absolute; width:175px; height:175px; top:50%; left:50%;
-      transform:translate(-50%,-50%) rotateX(70deg) rotateZ(-22deg);
-      border-radius:50%; border:10px solid rgba(255,255,255,.85);
-      box-shadow:0 0 0 3px rgba(255,255,255,.2),0 0 18px rgba(255,255,255,.45),0 0 35px rgba(0,220,190,.4);
-      pointer-events:none;
-    }
-    .planet-2::after {
-      content:''; position:absolute; inset:0; border-radius:50%;
-      background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.2) 0%,transparent 45%);
-    }
-
-    .planet-3 {
-      width:52px; height:52px; top:40%; left:2%;
-      background:radial-gradient(circle at 38% 32%,#ffffff 0%,#a0d8ff 35%,#2060a0 70%,#000c1e 100%);
-      box-shadow:0 0 30px rgba(160,216,255,.7),0 0 60px rgba(0,191,255,.2),inset -8px -6px 18px rgba(0,0,0,.5);
-      animation:pf 14s ease-in-out infinite; animation-delay:-4s;
-    }
-    .planet-3::before {
-      content:''; position:absolute; width:98px; height:98px; top:50%; left:50%;
-      transform:translate(-50%,-50%) rotateX(68deg) rotateZ(28deg);
-      border-radius:50%; border:6px solid rgba(255,255,255,.88);
-      box-shadow:0 0 14px rgba(255,255,255,.5),0 0 28px rgba(0,191,255,.4);
-      pointer-events:none;
-    }
-    .planet-3::after {
-      content:''; position:absolute; inset:0; border-radius:50%;
-      background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.3) 0%,transparent 45%);
+    /* ────────────────────────────────────
+       EASTER NATURE ELEMENTS
+    ──────────────────────────────────── */
+    .sun {
+      position: fixed;
+      top: 30px;
+      right: 60px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fffde7 20%, #ffe566 55%, #ffcc00 100%);
+      box-shadow: 0 0 50px rgba(255, 220, 0, 0.6);
+      animation: sunPulse 4s ease-in-out infinite;
+      z-index: 5;
+      pointer-events: none;
     }
 
-    .planet-4 {
-      width:34px; height:34px; top:14%; left:30%;
-      background:radial-gradient(circle at 35% 30%,#60b0ff 0%,#0040cc 38%,#001060 72%,#000008 100%);
-      box-shadow:0 0 22px rgba(0,100,255,.7),inset -5px -4px 12px rgba(0,0,0,.55);
-      animation:pf 28s ease-in-out infinite; animation-delay:-14s;
-    }
-    .planet-4::before {
-      content:''; position:absolute; width:64px; height:64px; top:50%; left:50%;
-      transform:translate(-50%,-50%) rotateX(65deg) rotateZ(-10deg);
-      border-radius:50%; border:4px solid rgba(255,255,255,.85);
-      box-shadow:0 0 10px rgba(255,255,255,.4),0 0 20px rgba(0,150,255,.4);
-      pointer-events:none;
+    @keyframes sunPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
     }
 
-    .planet-5 {
-      width:75px; height:75px; bottom:160px; right:4%;
-      background:radial-gradient(circle at 35% 30%,#ffaaee 0%,#cc0090 38%,#5a003a 72%,#150010 100%);
-      box-shadow:0 0 38px rgba(200,0,150,.65),0 0 75px rgba(200,0,150,.2),inset -11px -9px 24px rgba(0,0,0,.6);
-      animation:pf 19s ease-in-out infinite; animation-delay:-9s;
-    }
-    .planet-5::before {
-      content:''; position:absolute; width:145px; height:145px; top:50%; left:50%;
-      transform:translate(-50%,-50%) rotateX(73deg) rotateZ(22deg);
-      border-radius:50%; border:8px solid rgba(255,255,255,.82);
-      box-shadow:0 0 0 2px rgba(255,255,255,.2),0 0 18px rgba(255,255,255,.4),0 0 36px rgba(255,80,200,.4);
-      pointer-events:none;
-    }
-    .planet-5::after {
-      content:''; position:absolute; inset:0; border-radius:50%;
-      background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.2) 0%,transparent 45%);
+    .cloud {
+      position: fixed;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.85);
+      pointer-events: none;
+      z-index: 4;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
     }
 
-    @keyframes pf { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
-
-    /* SHOOTING STARS */
-    .shooting-star {
-      position:fixed; width:2px; height:2px; background:white;
-      border-radius:50%; opacity:0; pointer-events:none; z-index:1;
-    }
-    .shooting-star::after {
-      content:''; position:absolute; right:0; top:50%;
-      width:90px; height:1px;
-      background:linear-gradient(to left,rgba(255,255,255,.8),transparent);
-      transform:translateY(-50%);
-    }
-    .ss1{top:8%;left:15%;animation:shoot 7s linear infinite;}
-    .ss2{top:22%;left:55%;animation:shoot 5s linear infinite;animation-delay:3s;}
-    .ss3{top:5%;left:75%;animation:shoot 9s linear infinite;animation-delay:6s;}
-    @keyframes shoot {
-      0%{transform:translateX(0) translateY(0) rotate(-20deg);opacity:0}
-      5%{opacity:1}
-      30%{transform:translateX(-280px) translateY(75px) rotate(-20deg);opacity:0}
-      100%{transform:translateX(-280px) translateY(75px) rotate(-20deg);opacity:0}
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
     }
 
-    /* CONTENT */
-    .content { position:relative; z-index:10; text-align:center; padding:40px 20px; width:100%; }
+    .c1 {
+      width: 150px;
+      height: 44px;
+      top: 50px;
+      left: 30px;
+      animation: drift 20s ease-in-out infinite;
+    }
+
+    .c1::before {
+      width: 76px;
+      height: 76px;
+      top: -36px;
+      left: 14px;
+    }
+
+    .c1::after {
+      width: 54px;
+      height: 54px;
+      top: -22px;
+      left: 78px;
+    }
+
+    .c2 {
+      width: 120px;
+      height: 36px;
+      top: 180px;
+      right: 40px;
+      animation: drift 24s ease-in-out infinite reverse;
+    }
+
+    .c2::before {
+      width: 62px;
+      height: 62px;
+      top: -28px;
+      left: 12px;
+    }
+
+    .c2::after {
+      width: 44px;
+      height: 44px;
+      top: -16px;
+      left: 62px;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(50px); }
+    }
+
+    /* Floating petals */
+    .petal {
+      position: fixed;
+      font-size: 1.5rem;
+      animation: fall var(--fd, 7s) linear infinite;
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-30px) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(100vh) rotate(540deg); opacity: 0; }
+    }
+
+    .pt1 { left: 5%; --fd: 7s; animation-delay: 0s; }
+    .pt2 { left: 15%; --fd: 8s; animation-delay: 1s; }
+    .pt3 { left: 30%; --fd: 6s; animation-delay: 2s; }
+    .pt4 { left: 50%; --fd: 9s; animation-delay: 0.5s; }
+    .pt5 { left: 70%; --fd: 7.5s; animation-delay: 1.5s; }
+    .pt6 { left: 85%; --fd: 8.5s; animation-delay: 0.8s; }
+
+    /* Bees */
+    .bee {
+      position: fixed;
+      font-size: 1.2rem;
+      animation: beeDrift var(--bc, 16s) linear infinite, beeBob 1.2s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    @keyframes beeDrift {
+      0% { left: -50px; top: var(--bt, 20%); opacity: 0; }
+      4% { opacity: 1; }
+      96% { opacity: 1; }
+      100% { left: calc(100vw + 50px); top: var(--bt, 20%); opacity: 0; }
+    }
+
+    @keyframes beeBob {
+      0%, 100% { transform: translateY(0) rotate(-5deg); }
+      50% { transform: translateY(-10px) rotate(5deg); }
+    }
+
+    .be1 { --bt: 15%; --bc: 18s; }
+    .be2 { --bt: 60%; --bc: 22s; animation-delay: 5s; }
+
+    /* Butterflies */
+    .butterfly {
+      position: fixed;
+      font-size: 1.4rem;
+      animation: flutterAround var(--flutter-dur, 8s) ease-in-out infinite;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    @keyframes flutterAround {
+      0% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -40px) scale(1.1) rotate(10deg); }
+      50% { transform: translate(0, -60px) scale(0.9); }
+      75% { transform: translate(-40px, -30px) scale(1.15) rotate(-15deg); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    .bf1 { top: 20%; left: 10%; --flutter-dur: 7s; }
+    .bf2 { top: 40%; right: 15%; --flutter-dur: 9s; animation-delay: 1s; }
+    .bf3 { bottom: 30%; left: 20%; --flutter-dur: 8s; animation-delay: 2s; }
+
+    /* ────────────────────────────────────
+       MAIN CONTENT
+    ──────────────────────────────────── */
+    .content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 40px 20px;
+      width: 100%;
+    }
 
     .logo {
-      font-size:44px; font-weight:900; letter-spacing:4px;
-      text-transform:uppercase; margin-bottom:8px;
-      text-shadow:0 0 20px rgba(0,191,255,.8),0 0 40px rgba(135,206,250,.6);
-    }
-    .logo span {
-      background:linear-gradient(135deg,#00bfff,#fff,#87ceeb);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-      filter:drop-shadow(0 0 30px rgba(0,191,255,.8));
-      animation:glow 2s ease-in-out infinite;
-    }
-    @keyframes glow {
-      0%,100%{filter:drop-shadow(0 0 20px rgba(0,191,255,.6))}
-      50%{filter:drop-shadow(0 0 40px rgba(0,191,255,1))}
-    }
-    .subtitle {
-      font-size:12px; font-weight:800; letter-spacing:6px;
-      text-transform:uppercase; color:rgba(135,206,250,.45); margin-bottom:55px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 56px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #1b4332;
+      text-shadow: 0 0 20px rgba(64, 145, 108, 0.6), 4px 4px 0 rgba(255, 255, 255, 0.7);
+      margin-bottom: 16px;
+      animation: titleBounce 2s ease-in-out infinite;
     }
 
-    /* CARDS */
-    .server-grid { display:flex; gap:28px; justify-content:center; flex-wrap:wrap; }
+    @keyframes titleBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .logo .egg {
+      font-size: 0.9em;
+      animation: eggSpin 3s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes eggSpin {
+      0%, 100% { transform: rotateZ(0deg); }
+      50% { transform: rotateZ(360deg); }
+    }
+
+    .subtitle {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(27, 67, 50, 0.65);
+      margin-bottom: 50px;
+    }
+
+    /* ────────────────────────────────────
+       SERVER CARDS
+    ──────────────────────────────────── */
+    .server-grid {
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 60px;
+    }
 
     .server-card {
-      width:270px;
-      background:rgba(10,20,40,0.9);
-      border:2px solid #00bfff;
-      border-radius:16px;
-      padding:34px 28px 28px;
-      cursor:pointer;
-      text-decoration:none;
-      color:#fff;
-      position:relative;
-      overflow:hidden;
-      transition:all .35s cubic-bezier(.34,1.56,.64,1);
-      display:flex; flex-direction:column; align-items:center; gap:14px;
-      box-shadow:0 0 20px rgba(0,191,255,.3);
-      backdrop-filter:blur(10px);
+      width: 280px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 3px solid #52b788;
+      border-radius: 20px;
+      padding: 32px 28px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #1a1a2e;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 6px 30px rgba(82, 183, 136, 0.25);
+      backdrop-filter: blur(10px);
     }
+
     .server-card::before {
-      content:''; position:absolute; top:0; left:10%; right:10%; height:1px;
-      background:linear-gradient(90deg,transparent,rgba(0,191,255,.8),transparent);
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #52b788, transparent);
     }
+
     .server-card::after {
-      content:''; position:absolute; top:50%; left:50%;
-      width:0; height:0; border-radius:50%;
-      background:rgba(0,191,255,.08);
-      transform:translate(-50%,-50%);
-      transition:width .6s,height .6s;
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(82, 183, 136, 0.08);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
     }
+
     .server-card:hover {
-      transform:translateY(-14px) scale(1.04);
-      box-shadow:0 0 50px rgba(0,191,255,.7),0 0 90px rgba(255,255,255,.3),0 20px 50px rgba(0,0,0,.6);
-      border-color:#fff;
+      transform: translateY(-14px) scale(1.05);
+      box-shadow: 0 12px 50px rgba(82, 183, 136, 0.5), 0 0 30px rgba(255, 200, 0, 0.3);
+      border-color: #f9c74f;
     }
-    .server-card:hover::after { width:500px; height:500px; }
+
+    .server-card:hover::after {
+      width: 500px;
+      height: 500px;
+    }
 
     .server-icon {
-      font-size:54px; line-height:1;
-      filter:drop-shadow(0 0 18px rgba(0,191,255,.9));
-      animation:iconPulse 2.5s ease-in-out infinite;
+      font-size: 64px;
+      line-height: 1;
+      filter: drop-shadow(0 0 15px rgba(82, 183, 136, 0.8));
+      animation: iconBounce 2.5s ease-in-out infinite;
     }
-    @keyframes iconPulse {
-      0%,100%{filter:drop-shadow(0 0 14px rgba(0,191,255,.7))}
-      50%{filter:drop-shadow(0 0 30px rgba(0,191,255,1)) drop-shadow(0 0 50px rgba(255,255,255,.4))}
-    }
-    .server-name {
-      font-size:20px; font-weight:900; letter-spacing:3px; text-transform:uppercase;
-      background:linear-gradient(135deg,#00bfff,#fff,#87ceeb);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
-    .server-desc { font-size:13px; font-weight:800; color:rgba(135,206,250,.6); text-align:center; line-height:1.7; }
-    .server-badge {
-      font-size:11px; font-weight:800; letter-spacing:2px; text-transform:uppercase;
-      padding:6px 16px; border-radius:30px;
-      background:rgba(0,191,255,.15); border:1px solid rgba(0,191,255,.5); color:#00bfff;
-      margin-top:4px;
-    }
-    .arrow {
-      position:absolute; bottom:16px; right:18px;
-      font-size:18px; opacity:0; transform:translateX(-8px);
-      color:#00bfff; transition:all .3s; font-weight:800;
-    }
-    .server-card:hover .arrow { opacity:1; transform:translateX(0); }
 
-    @media(max-width:620px){
-      .logo{font-size:28px;}
-      .server-card{width:90%;max-width:320px;}
-      .planet-1{width:100px;height:100px;right:10px;}
-      .planet-2,.planet-5{display:none;}
+    @keyframes iconBounce {
+      0%, 100% { filter: drop-shadow(0 0 15px rgba(82, 183, 136, 0.6)); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 30px rgba(82, 183, 136, 1)); transform: scale(1.1); }
+    }
+
+    .server-name {
+      font-family: 'Fredoka One', cursive;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #1b4332;
+    }
+
+    .server-desc {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(27, 67, 50, 0.6);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .server-badge {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 30px;
+      background: rgba(82, 183, 136, 0.15);
+      border: 1px solid rgba(82, 183, 136, 0.5);
+      color: #2d6a4f;
+      margin-top: 4px;
+    }
+
+    .arrow {
+      position: absolute;
+      bottom: 16px;
+      right: 18px;
+      font-size: 20px;
+      opacity: 0;
+      transform: translateX(-8px);
+      color: #52b788;
+      transition: all 0.3s;
+      font-weight: 900;
+    }
+
+    .server-card:hover .arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ────────────────────────────────────
+       EASTER EGG HUNT LINK
+    ──────────────────────────────────── */
+    .egg-hunt-link {
+      margin-top: 20px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #f9c74f, #f3722c);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 8px 25px rgba(249, 199, 79, 0.4);
+      text-decoration: none;
+      display: inline-block;
+      animation: eggPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes eggPulse {
+      0%, 100% { box-shadow: 0 8px 25px rgba(249, 199, 79, 0.4); }
+      50% { box-shadow: 0 12px 40px rgba(249, 199, 79, 0.8); }
+    }
+
+    .egg-hunt-link:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 15px 50px rgba(249, 199, 79, 0.9);
+    }
+
+    /* Grass at bottom */
+    .grass {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(to bottom, rgba(29, 53, 41, 0.3), #1b4332);
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .grass-flower {
+      position: absolute;
+      font-size: 2rem;
+      animation: sway 3s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+
+    @keyframes sway {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    .gf1 { bottom: 20px; left: 10%; animation-delay: 0s; }
+    .gf2 { bottom: 25px; left: 25%; animation-delay: 0.5s; }
+    .gf3 { bottom: 20px; left: 45%; animation-delay: 1s; }
+    .gf4 { bottom: 30px; left: 60%; animation-delay: 0.3s; }
+    .gf5 { bottom: 20px; left: 75%; animation-delay: 0.8s; }
+    .gf6 { bottom: 25px; right: 10%; animation-delay: 0.2s; }
+
+    .bunny {
+      position: fixed;
+      bottom: 45px;
+      font-size: 2.5rem;
+      animation: hopAround 5s ease-in-out infinite;
+      z-index: 3;
+      left: 50%;
+      margin-left: -20px;
+    }
+
+    @keyframes hopAround {
+      0% { transform: translateX(-100px) translateY(0); }
+      25% { transform: translateX(-50px) translateY(-30px); }
+      50% { transform: translateX(0) translateY(0); }
+      75% { transform: translateX(50px) translateY(-25px); }
+      100% { transform: translateX(100px) translateY(0); }
+    }
+
+    @media (max-width: 620px) {
+      .logo { font-size: 36px; }
+      .server-card { width: 90%; max-width: 320px; }
+      .c1 { display: none; }
+      .pt3, .pt4, .pt5 { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="stars"></div>
-  <div class="stars2"></div>
-  <div class="stars3"></div>
-  <div class="planet planet-1"></div>
-  <div class="planet planet-2"></div>
-  <div class="planet planet-3"></div>
-  <div class="planet planet-4"></div>
-  <div class="planet planet-5"></div>
-  <div class="shooting-star ss1"></div>
-  <div class="shooting-star ss2"></div>
-  <div class="shooting-star ss3"></div>
+  <!-- Easter Nature Elements -->
+  <div class="sun"></div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
 
+  <!-- Petals -->
+  <div class="petal pt1">🌸</div>
+  <div class="petal pt2">🌺</div>
+  <div class="petal pt3">🌼</div>
+  <div class="petal pt4">🌸</div>
+  <div class="petal pt5">����</div>
+  <div class="petal pt6">🌼</div>
+
+  <!-- Bees -->
+  <div class="bee be1">🐝</div>
+  <div class="bee be2">🐝</div>
+
+  <!-- Butterflies -->
+  <div class="butterfly bf1">🦋</div>
+  <div class="butterfly bf2">🦋</div>
+  <div class="butterfly bf3">🦋</div>
+
+  <!-- Main Content -->
   <div class="content">
-    <div class="logo">AuraBaby <span>Media</span></div>
-    <div class="subtitle">Choose Your Server</div>
-    <div class="server-grid">
+    <div class="logo">
+      🥚 AuraBaby <span class="egg">🥚</span> Media 🐰
+    </div>
+    <div class="subtitle">Easter Edition — Choose Your Server</div>
 
-      <a class="server-card" href="app.html">
-        <div class="server-icon">🪐</div>
-        <div class="server-name">AuraBaby</div>
-        <div class="server-desc">Search movies & shows,<br>multi-source cosmic player</div>
-        <div class="server-badge">Built-In Player</div>
+    <div class="server-grid">
+      <a class="server-card" href="easter_app.html">
+        <div class="server-icon">🎬</div>
+        <div class="server-name">Movie Mode</div>
+        <div class="server-desc">Search movies & shows<br>with egg hunt rewards</div>
+        <div class="server-badge">🥚 Built-In Player</div>
         <div class="arrow">→</div>
       </a>
 
-      <a class="server-card" id="moviestvCard" href="cinehub.html">
-        <div class="server-icon">🎬</div>
+      <a class="server-card" href="cinehub.html">
+        <div class="server-icon">🌟</div>
         <div class="server-name">CineHub ⭐</div>
         <div class="server-desc">Full streaming site<br>through the proxy</div>
-        <div class="server-badge" style="background:rgba(0,255,150,0.15);border-color:rgba(0,255,150,0.5);color:#00ff96;">⭐ Recommended</div>
+        <div class="server-badge">⭐ Recommended</div>
         <div class="arrow">→</div>
       </a>
-
     </div>
+
+    <a class="egg-hunt-link" href="../easter_egg_hunt.html" target="_blank">
+      🥚 Join the Egg Hunt! 🐰
+    </a>
   </div>
 
-
+  <!-- Grass & Flowers -->
+  <div class="grass">
+    <div class="grass-flower gf1">🌻</div>
+    <div class="grass-flower gf2">🌷</div>
+    <div class="grass-flower gf3">🌼</div>
+    <div class="grass-flower gf4">🌺</div>
+    <div class="grass-flower gf5">🌸</div>
+    <div class="grass-flower gf6">🌻</div>
+    <div class="bunny">🐰</div>
+  </div>
 </body>
 </html>
