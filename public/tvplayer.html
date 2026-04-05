@@ -3,27 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Player | AuraBaby</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@800&display=swap" rel="stylesheet">
+  <title>🥚 Player | AuraBaby Easter 🐰</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@800&display=swap" rel="stylesheet">
   <style>
     html, body {
-      margin: 0; padding: 0;
-      width: 100%; height: 100%;
-      background: #000;
-      display: flex; flex-direction: column;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #1a1a2e 0%, #0f3027 50%, #1b4332 100%);
+      display: flex;
+      flex-direction: column;
       font-family: 'Poppins', sans-serif;
       font-weight: 800;
       overflow: hidden;
     }
 
     .player-header {
-      background: rgba(10, 10, 10, 0.95);
+      background: rgba(27, 67, 50, 0.95);
       padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #00bfff;
-      box-shadow: 0 0 30px rgba(0, 191, 255, 0.4);
+      border-bottom: 3px solid #52b788;
+      box-shadow: 0 0 30px rgba(82, 183, 136, 0.4);
       z-index: 1000;
       flex-wrap: wrap;
       gap: 10px;
@@ -37,26 +40,27 @@
 
     .player-header h1 {
       color: white;
-      font-size: 17px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 18px;
       margin: 0;
-      font-weight: 800;
+      font-weight: 900;
       text-transform: uppercase;
-      text-shadow: 0 0 15px rgba(0, 191, 255, 0.8);
-      letter-spacing: 1px;
+      text-shadow: 0 0 15px rgba(82, 183, 136, 0.8);
+      letter-spacing: 2px;
       white-space: nowrap;
     }
 
     .back-button {
-      background: linear-gradient(135deg, #00bfff 0%, #fff 50%, #87ceeb 100%);
-      color: black;
+      background: linear-gradient(135deg, #52b788, #95d5b2);
+      color: white;
       border: none;
       padding: 9px 20px;
-      border-radius: 10px;
+      border-radius: 15px;
       font-weight: 800;
       cursor: pointer;
       transition: all 0.3s;
       text-transform: uppercase;
-      box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+      box-shadow: 0 0 20px rgba(82, 183, 136, 0.5);
       white-space: nowrap;
       font-family: 'Poppins', sans-serif;
       font-size: 13px;
@@ -64,10 +68,9 @@
 
     .back-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(0, 191, 255, 0.8);
+      box-shadow: 0 0 30px rgba(82, 183, 136, 0.8);
     }
 
-    /* SOURCE SELECTOR */
     .source-selector {
       display: flex;
       align-items: center;
@@ -76,20 +79,21 @@
     }
 
     .source-label {
-      color: #00bfff;
+      color: #95d5b2;
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 1px;
       white-space: nowrap;
-      text-shadow: 0 0 8px rgba(0,191,255,0.6);
+      text-shadow: 0 0 8px rgba(82, 183, 136, 0.6);
+      font-weight: 900;
     }
 
     .source-btn {
-      background: rgba(10, 20, 40, 0.9);
+      background: rgba(27, 67, 50, 0.9);
       color: #aaa;
-      border: 2px solid #333;
+      border: 2px solid #2d6a4f;
       padding: 7px 14px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: 800;
       font-family: 'Poppins', sans-serif;
       font-size: 12px;
@@ -99,17 +103,16 @@
     }
 
     .source-btn:hover {
-      border-color: #00bfff;
+      border-color: #52b788;
       color: #fff;
-      box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+      box-shadow: 0 0 15px rgba(82, 183, 136, 0.5);
     }
 
     .source-btn.active {
-      background: linear-gradient(135deg, #00bfff 0%, #fff 50%, #87ceeb 100%);
-      color: #000;
+      background: linear-gradient(135deg, #52b788, #95d5b2);
+      color: white;
       border-color: #fff;
-      box-shadow: 0 0 20px rgba(0, 191, 255, 0.8),
-                  0 0 40px rgba(255,255,255,0.4);
+      box-shadow: 0 0 20px rgba(82, 183, 136, 0.8);
     }
 
     .source-btn.failed {
@@ -119,17 +122,16 @@
     }
 
     .source-btn.loading-src {
-      border-color: #ffaa00;
-      color: #ffaa00;
+      border-color: #f9c74f;
+      color: #f9c74f;
       animation: srcPulse 1s ease-in-out infinite;
     }
 
     @keyframes srcPulse {
-      0%, 100% { box-shadow: 0 0 10px rgba(255,170,0,0.4); }
-      50%       { box-shadow: 0 0 25px rgba(255,170,0,0.9); }
+      0%, 100% { box-shadow: 0 0 10px rgba(249, 199, 79, 0.4); }
+      50% { box-shadow: 0 0 25px rgba(249, 199, 79, 0.9); }
     }
 
-    /* PLAYER */
     .player-container {
       flex: 1;
       position: relative;
@@ -142,86 +144,110 @@
 
     iframe {
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       border: none;
       background: #000;
     }
 
     .loading {
       position: absolute;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
       color: white;
       font-size: 18px;
       text-align: center;
       font-weight: 800;
       z-index: 100;
-      background: rgba(0,0,0,0.85);
+      background: rgba(27, 67, 50, 0.85);
       padding: 30px 40px;
       border-radius: 15px;
-      border: 2px solid #00bfff;
-      box-shadow: 0 0 40px rgba(0, 191, 255, 0.6);
+      border: 3px solid #52b788;
+      box-shadow: 0 0 40px rgba(82, 183, 136, 0.6);
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
     .loading-spinner {
-      border: 5px solid #333;
-      border-top: 5px solid #00bfff;
+      border: 5px solid #1b4332;
+      border-top: 5px solid #f9c74f;
       border-radius: 50%;
-      width: 50px; height: 50px;
+      width: 50px;
+      height: 50px;
       animation: spin 1s linear infinite;
       margin: 15px auto;
-      box-shadow: 0 0 30px rgba(0, 191, 255, 0.6);
+      box-shadow: 0 0 30px rgba(249, 199, 79, 0.6);
     }
 
     @keyframes spin {
-      0%   { transform: rotate(0deg); }
+      0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
-    .loading p { margin: 5px 0; }
-    .loading .src-name { color: #00bfff; font-size: 14px; }
+    .loading p {
+      margin: 5px 0;
+    }
+
+    .loading .src-name {
+      color: #95d5b2;
+      font-family: 'Fredoka One', cursive;
+      font-size: 14px;
+    }
 
     .error-message {
       display: none;
       position: absolute;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(20, 5, 5, 0.97);
+      background: rgba(27, 67, 50, 0.97);
       color: white;
       padding: 30px;
       border-radius: 15px;
       text-align: center;
       max-width: 480px;
       width: 90%;
-      border: 2px solid #ff3232;
-      box-shadow: 0 0 40px rgba(255, 50, 50, 0.6);
+      border: 3px solid #f3722c;
+      box-shadow: 0 0 40px rgba(243, 114, 44, 0.6);
       z-index: 101;
     }
 
-    .error-message h2 { margin: 0 0 12px; font-size: 22px; }
-    .error-message p  { margin: 8px 0; line-height: 1.6; font-size: 14px; color: #ccc; }
+    .error-message h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+      font-family: 'Fredoka One', cursive;
+    }
+
+    .error-message p {
+      margin: 8px 0;
+      line-height: 1.6;
+      font-size: 14px;
+      color: #ccc;
+    }
 
     .retry-button {
-      background: linear-gradient(135deg, #00bfff, #fff);
-      color: black;
+      background: linear-gradient(135deg, #52b788, #95d5b2);
+      color: white;
       border: none;
       padding: 11px 28px;
-      border-radius: 10px;
+      border-radius: 12px;
       font-weight: 800;
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Fredoka One', cursive;
       cursor: pointer;
       margin-top: 14px;
       transition: all 0.3s;
       font-size: 14px;
+      text-transform: uppercase;
+      box-shadow: 0 0 15px rgba(82, 183, 136, 0.4);
     }
 
     .retry-button:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(0,191,255,0.8);
+      box-shadow: 0 0 25px rgba(82, 183, 136, 0.8);
     }
 
     .hint {
@@ -229,18 +255,31 @@
       bottom: 12px;
       left: 50%;
       transform: translateX(-50%);
-      color: rgba(0,191,255,0.5);
+      color: rgba(149, 213, 178, 0.6);
       font-size: 11px;
       pointer-events: none;
       z-index: 999;
       letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(82, 183, 136, 0.3);
     }
 
     @media (max-width: 600px) {
-      .player-header { padding: 10px 12px; }
-      .player-header h1 { font-size: 13px; }
-      .source-btn { font-size: 11px; padding: 6px 10px; }
-      .source-label { display: none; }
+      .player-header {
+        padding: 10px 12px;
+      }
+
+      .player-header h1 {
+        font-size: 13px;
+      }
+
+      .source-btn {
+        font-size: 11px;
+        padding: 6px 10px;
+      }
+
+      .source-label {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -249,11 +288,11 @@
   <div class="player-header">
     <div class="header-left">
       <button class="back-button" onclick="window.history.back()">← BACK</button>
-      <h1 id="playerTitle">Loading...</h1>
+      <h1 id="playerTitle">🥚 Playing...</h1>
     </div>
 
     <div class="source-selector">
-      <span class="source-label">SOURCE:</span>
+      <span class="source-label">📡 SOURCE:</span>
       <button class="source-btn" data-index="0">CinemaOS</button>
       <button class="source-btn" data-index="1">VidSrc CC</button>
       <button class="source-btn" data-index="2">VidSrc XYZ</button>
@@ -266,27 +305,27 @@
   <div class="player-container">
     <div class="loading" id="loading">
       <div class="loading-spinner"></div>
-      <p>Loading player...</p>
+      <p>🥚 Loading your movie...</p>
       <p class="src-name" id="loadingSrcName"></p>
     </div>
 
     <div class="error-message" id="errorMessage">
       <h2>⚠️ All Sources Failed</h2>
       <p id="errorText">Unable to load any video source.</p>
-      <p style="font-size:12px;">Try picking a different source above, or come back later.</p>
+      <p style="font-size:12px;">Try picking a different source above, or come back later. 🐰</p>
       <button class="retry-button" onclick="tryProvider(0)">🔄 Try Again</button>
-      <button class="retry-button" onclick="window.history.back()" style="margin-left:8px; background: #333; color:#fff;">← Go Back</button>
+      <button class="retry-button" onclick="window.history.back()" style="margin-left:8px; background: rgba(82, 183, 136, 0.3);">← Go Back</button>
     </div>
 
     <iframe
       id="player"
       allowfullscreen
       allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-      sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals allow-orientation-lock allow-popups-to-escape-sandbox allow-presentation allow-top-navigation allow-top-navigation-by-user-activation"
+      sandbox="allow-same-origin allow-scripts allow-forms allow-pointer-lock allow-popups allow-modals allow-orientation-lock allow-popups-to-escape-sandbox allow-presentation allow-top-navigation"
     ></iframe>
   </div>
 
-  <div class="hint">Press N for next source &nbsp;·&nbsp; F for fullscreen &nbsp;·&nbsp; ESC to go back</div>
+  <div class="hint">🎬 N for next source &nbsp;·&nbsp; F for fullscreen &nbsp;·&nbsp; ESC to go back &nbsp;🥚</div>
 
   <script>
     const params   = new URLSearchParams(window.location.search);
@@ -305,42 +344,36 @@
 
     const PROVIDERS = [
       {
-        // CinemaOS - premium quality multi-server player
         name: "CinemaOS",
         url: () => type === "movie"
           ? `https://cinemaos.tech/player/${id}`
           : `https://cinemaos.tech/player/${id}/${season}/${episode}`
       },
       {
-        // vidsrc.cc - next gen, clean, multi-server, subtitles
         name: "vidsrc.cc",
         url: () => type === "movie"
           ? `https://vidsrc.cc/v2/embed/movie/${id}`
           : `https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}`
       },
       {
-        // vidsrc.xyz - reliable, tmdb-based, minimal ads
         name: "vidsrc.xyz",
         url: () => type === "movie"
           ? `https://vidsrc.xyz/embed/movie?tmdb=${id}`
           : `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
       },
       {
-        // moviesapi.club - very clean player, great coverage
         name: "MoviesAPI",
         url: () => type === "movie"
           ? `https://moviesapi.club/movie/${id}`
           : `https://moviesapi.club/tv/${id}-${season}-${episode}`
       },
       {
-        // vidlink.pro - clean modern UI, multi quality
         name: "VidLink",
         url: () => type === "movie"
           ? `https://vidlink.pro/movie/${id}?autoplay=true&title=true`
           : `https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=true&title=true`
       },
       {
-        // autoembed.co - solid fallback, good coverage
         name: "AutoEmbed",
         url: () => type === "movie"
           ? `https://autoembed.co/movie/tmdb/${id}`
@@ -353,8 +386,8 @@
     const failed     = new Set();
 
     titleEl.textContent = type === "tv"
-      ? `📺 S${season}E${episode}`
-      : "🎬 NOW PLAYING";
+      ? `🐰 S${season}E${episode} 🥚`
+      : "🎬 NOW PLAYING 🥚";
 
     if (!type || !id) {
       showError("Missing required parameters.");
@@ -362,7 +395,6 @@
       tryProvider(0);
     }
 
-    // Wire up manual source buttons
     sourceBtns.forEach(btn => {
       btn.addEventListener("click", () => {
         tryProvider(parseInt(btn.dataset.index));
@@ -375,14 +407,14 @@
         if (failed.has(parseInt(b.dataset.index))) b.classList.add("failed");
       });
       if (sourceBtns[index]) {
-        sourceBtns[index].classList.remove("failed"); // override if manually picked
+        sourceBtns[index].classList.remove("failed");
         sourceBtns[index].classList.add(state);
       }
     }
 
     function tryProvider(index) {
       if (index >= PROVIDERS.length) {
-        showError("All sources failed. Pick one manually above or try again later.");
+        showError("All sources failed. Pick one manually above or try again later. 🐰");
         setButtonState(-1, "");
         return;
       }
@@ -400,7 +432,6 @@
 
       let loaded = false;
 
-      // Route through proxy so school filters can't block the embed sites
       const rawUrl = provider.url();
       const encoded = btoa(rawUrl).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
       playerFrame.src = `/ocho/${encoded}`;
@@ -412,7 +443,6 @@
         setTimeout(() => loadingEl.style.display = "none", 700);
       };
 
-      // Auto-advance after 12s
       loadTimer = setTimeout(() => {
         if (!loaded) {
           failed.add(index);
