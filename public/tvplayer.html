@@ -14,56 +14,43 @@
       overflow: hidden;
     }
     .player-header {
-      background: rgba(27, 67, 50, 0.95);
-      padding: 10px 18px;
+      background: rgba(27, 67, 50, 0.95); padding: 10px 18px;
       display: flex; justify-content: space-between; align-items: center;
       border-bottom: 3px solid #52b788;
-      box-shadow: 0 0 30px rgba(82, 183, 136, 0.4);
+      box-shadow: 0 0 30px rgba(82,183,136,0.4);
       z-index: 1000; flex-wrap: wrap; gap: 8px;
     }
     .header-left { display: flex; align-items: center; gap: 12px; }
     .player-header h1 {
-      color: white; font-family: 'Fredoka One', cursive;
-      font-size: 16px; margin: 0; font-weight: 900;
-      text-transform: uppercase;
-      text-shadow: 0 0 15px rgba(82, 183, 136, 0.8);
-      letter-spacing: 2px; white-space: nowrap;
+      color: white; font-family: 'Fredoka One', cursive; font-size: 16px;
+      margin: 0; text-transform: uppercase;
+      text-shadow: 0 0 15px rgba(82,183,136,0.8); letter-spacing: 2px; white-space: nowrap;
     }
     .back-button {
-      background: linear-gradient(135deg, #52b788, #95d5b2);
-      color: white; border: none; padding: 8px 18px;
-      border-radius: 15px; font-weight: 800; cursor: pointer;
-      transition: all 0.3s; text-transform: uppercase;
-      box-shadow: 0 0 20px rgba(82, 183, 136, 0.5);
-      white-space: nowrap; font-family: 'Poppins', sans-serif; font-size: 12px;
+      background: linear-gradient(135deg, #52b788, #95d5b2); color: white;
+      border: none; padding: 8px 18px; border-radius: 15px; font-weight: 800;
+      cursor: pointer; transition: all 0.3s; text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(82,183,136,0.5); font-family: 'Poppins',sans-serif; font-size: 12px;
     }
-    .back-button:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(82, 183, 136, 0.8); }
+    .back-button:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(82,183,136,0.8); }
     .source-selector { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .source-label {
       color: #95d5b2; font-size: 10px; text-transform: uppercase;
-      letter-spacing: 1px; white-space: nowrap;
-      text-shadow: 0 0 8px rgba(82, 183, 136, 0.6); font-weight: 900;
+      letter-spacing: 1px; white-space: nowrap; font-weight: 900;
     }
     .source-btn {
-      background: rgba(27, 67, 50, 0.9); color: #aaa;
-      border: 2px solid #2d6a4f; padding: 6px 12px;
-      border-radius: 10px; font-weight: 800; font-family: 'Poppins', sans-serif;
-      font-size: 11px; cursor: pointer; transition: all 0.25s; white-space: nowrap;
-      position: relative;
+      background: rgba(27,67,50,0.9); color: #aaa; border: 2px solid #2d6a4f;
+      padding: 6px 12px; border-radius: 10px; font-weight: 800;
+      font-family: 'Poppins',sans-serif; font-size: 11px; cursor: pointer;
+      transition: all 0.25s; white-space: nowrap;
     }
-    .source-btn:hover { border-color: #52b788; color: #fff; box-shadow: 0 0 15px rgba(82, 183, 136, 0.5); }
-    .source-btn.active {
-      background: linear-gradient(135deg, #52b788, #95d5b2);
-      color: white; border-color: #fff; box-shadow: 0 0 20px rgba(82, 183, 136, 0.8);
-    }
+    .source-btn:hover { border-color: #52b788; color: #fff; box-shadow: 0 0 15px rgba(82,183,136,0.5); }
+    .source-btn.active { background: linear-gradient(135deg,#52b788,#95d5b2); color: white; border-color: #fff; box-shadow: 0 0 20px rgba(82,183,136,0.8); }
     .source-btn.failed { border-color: #ff3232; color: #ff6464; opacity: 0.6; }
-    .source-btn.loading-src {
-      border-color: #f9c74f; color: #f9c74f;
-      animation: srcPulse 1s ease-in-out infinite;
-    }
+    .source-btn.loading-src { border-color: #f9c74f; color: #f9c74f; animation: srcPulse 1s ease-in-out infinite; }
     @keyframes srcPulse {
-      0%, 100% { box-shadow: 0 0 10px rgba(249,199,79,0.4); }
-      50%       { box-shadow: 0 0 25px rgba(249,199,79,0.9); }
+      0%,100% { box-shadow: 0 0 10px rgba(249,199,79,0.4); }
+      50%      { box-shadow: 0 0 25px rgba(249,199,79,0.9); }
     }
     .player-container {
       flex: 1; position: relative; background: #000;
@@ -74,48 +61,44 @@
       width: 100%; height: 100%; border: none; background: #000;
     }
     .loading {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      color: white; text-align: center; font-weight: 800;
-      z-index: 100; background: rgba(27, 67, 50, 0.9);
-      padding: 28px 36px; border-radius: 15px;
-      border: 3px solid #52b788; box-shadow: 0 0 40px rgba(82, 183, 136, 0.6);
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      color: white; text-align: center; font-weight: 800; z-index: 100;
+      background: rgba(27,67,50,0.9); padding: 28px 36px; border-radius: 15px;
+      border: 3px solid #52b788; box-shadow: 0 0 40px rgba(82,183,136,0.6);
       display: flex; flex-direction: column; align-items: center; min-width: 260px;
     }
     .loading-spinner {
       border: 5px solid #1b4332; border-top: 5px solid #f9c74f;
       border-radius: 50%; width: 50px; height: 50px;
       animation: spin 1s linear infinite; margin: 14px auto;
-      box-shadow: 0 0 30px rgba(249, 199, 79, 0.6);
+      box-shadow: 0 0 30px rgba(249,199,79,0.6);
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .loading p { margin: 4px 0; font-size: 14px; }
-    .loading .src-name { color: #95d5b2; font-family: 'Fredoka One', cursive; font-size: 15px; }
-    .loading .try-count { color: rgba(149,213,178,0.55); font-size: 11px; margin-top: 6px; }
+    .loading .src-name { color: #95d5b2; font-family: 'Fredoka One',cursive; font-size: 15px; }
+    .loading .try-count { color: rgba(149,213,178,0.55); font-size: 11px; margin-top: 4px; }
+    .loading .sw-status { color: #f9c74f; font-size: 10px; letter-spacing: 1px; margin-top: 3px; }
     .error-message {
-      display: none; position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(27, 67, 50, 0.97); color: white;
-      padding: 28px; border-radius: 15px; text-align: center;
-      max-width: 480px; width: 90%;
-      border: 3px solid #f3722c; box-shadow: 0 0 40px rgba(243, 114, 44, 0.6); z-index: 101;
+      display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      background: rgba(27,67,50,0.97); color: white; padding: 28px; border-radius: 15px;
+      text-align: center; max-width: 480px; width: 90%;
+      border: 3px solid #f3722c; box-shadow: 0 0 40px rgba(243,114,44,0.6); z-index: 101;
     }
-    .error-message h2 { margin: 0 0 10px; font-size: 22px; font-family: 'Fredoka One', cursive; }
+    .error-message h2 { margin: 0 0 10px; font-size: 22px; font-family: 'Fredoka One',cursive; }
     .error-message p { margin: 8px 0; line-height: 1.6; font-size: 13px; color: #ccc; }
     .retry-button {
-      background: linear-gradient(135deg, #52b788, #95d5b2);
-      color: white; border: none; padding: 10px 24px;
-      border-radius: 12px; font-weight: 800; font-family: 'Fredoka One', cursive;
-      cursor: pointer; margin-top: 12px; transition: all 0.3s;
-      font-size: 13px; text-transform: uppercase;
+      background: linear-gradient(135deg,#52b788,#95d5b2); color: white; border: none;
+      padding: 10px 24px; border-radius: 12px; font-weight: 800;
+      font-family: 'Fredoka One',cursive; cursor: pointer; margin-top: 12px;
+      transition: all 0.3s; font-size: 13px; text-transform: uppercase;
     }
-    .retry-button:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(82, 183, 136, 0.8); }
+    .retry-button:hover { transform: scale(1.05); }
     .hint {
       position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
-      color: rgba(149, 213, 178, 0.55); font-size: 10px; pointer-events: none;
+      color: rgba(149,213,178,0.55); font-size: 10px; pointer-events: none;
       z-index: 999; letter-spacing: 1px; white-space: nowrap;
     }
-    @media (max-width: 600px) {
+    @media(max-width:600px){
       .player-header { padding: 8px 10px; }
       .player-header h1 { font-size: 12px; }
       .source-btn { font-size: 10px; padding: 5px 8px; }
@@ -140,11 +123,12 @@
       <p>🥚 Loading...</p>
       <p class="src-name"  id="loadingSrcName">Connecting...</p>
       <p class="try-count" id="tryCount"></p>
+      <p class="sw-status" id="swStatus"></p>
     </div>
     <div class="error-message" id="errorMessage">
       <h2>⚠️ All Sources Failed</h2>
       <p id="errorText">Unable to load any video source.</p>
-      <p style="font-size:12px;">Pick a source above manually, or try again. 🐰</p>
+      <p style="font-size:12px;">Try another source above or come back later. 🐰</p>
       <button class="retry-button" onclick="tryProvider(0)">🔄 Try Again</button>
       <button class="retry-button" onclick="window.history.back()" style="margin-left:8px;background:rgba(82,183,136,0.3);">← Go Back</button>
     </div>
@@ -162,137 +146,60 @@
     const params  = new URLSearchParams(window.location.search);
     const type    = params.get("type");
     const id      = params.get("id");
-    const season  = params.get("season") || 1;
+    const season  = params.get("season")  || 1;
     const episode = params.get("episode") || 1;
 
     function ochoProxy(rawUrl) {
-      const encoded = btoa(unescape(encodeURIComponent(rawUrl)))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-      return `/ocho/${encoded}`;
+      const enc = btoa(unescape(encodeURIComponent(rawUrl)))
+        .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+      return `/ocho/${enc}`;
     }
 
-    // ── PROVIDER LISTS ────────────────────────────────────────────────────────
-    //
-    // KEY INSIGHT:
-    //   CinemaOS uses HLS.js for TV shows. HLS.js makes its own XHR requests
-    //   for m3u8 segments internally — these bypass our /ocho/ intercept and
-    //   hit CORS errors. But CinemaOS's iframe still fires onload (page loaded),
-    //   so the player shows it as "working" while actually showing nothing.
-    //
-    //   For MOVIES: CinemaOS finds a direct MP4 → our video.src intercept
-    //   catches it → works great. CinemaOS goes FIRST for movies.
-    //
-    //   For TV SHOWS: Use embed providers that serve a simple iframe player
-    //   (no HLS.js involved) → these work fine through /ocho/. CinemaOS goes
-    //   LAST for TV so it's only a fallback.
-    //
-    const MOVIE_PROVIDERS = [
-      {
-        name: "CinemaOS",
-        url: () => `https://cinemaos.tech/player/${id}`
-      },
-      {
-        name: "VidSrc.me",
-        url: () => `https://vidsrc.me/embed/movie?tmdb=${id}`
-      },
-      {
-        name: "Embed.su",
-        url: () => `https://embed.su/embed/movie/${id}`
-      },
-      {
-        name: "VidLink",
-        url: () => `https://vidlink.pro/movie/${id}?autoplay=true&title=true`
-      },
-      {
-        name: "2Embed",
-        url: () => `https://www.2embed.cc/embed/${id}`
-      },
-      {
-        name: "VidSrc.icu",
-        url: () => `https://vidsrc.icu/embed/movie/${id}`
-      },
-      {
-        name: "SuperEmbed",
-        url: () => `https://multiembed.mov/?video_id=${id}&tmdb=1`
-      },
-      {
-        name: "AutoEmbed",
-        url: () => `https://autoembed.co/movie/tmdb/${id}`
-      },
-      {
-        name: "VidSrc.xyz",
-        url: () => `https://vidsrc.xyz/embed/movie?tmdb=${id}`
-      },
-      {
-        name: "MoviesAPI",
-        url: () => `https://moviesapi.club/movie/${id}`
-      }
+    // ── PROVIDERS ─────────────────────────────────────────────────────────────
+    // CinemaOS is FIRST for both movies and TV.
+    // For TV, HLS.js sub-requests are now intercepted by our Service Worker
+    // (/media-sw.js) which routes them through /ocho/ at the network layer —
+    // fixing the CORS errors that previously broke TV show playback.
+    const PROVIDERS = type === "movie" ? [
+      { name: "CinemaOS",   url: () => `https://cinemaos.tech/player/${id}` },
+      { name: "VidSrc.me",  url: () => `https://vidsrc.me/embed/movie?tmdb=${id}` },
+      { name: "Embed.su",   url: () => `https://embed.su/embed/movie/${id}` },
+      { name: "VidLink",    url: () => `https://vidlink.pro/movie/${id}?autoplay=true` },
+      { name: "2Embed",     url: () => `https://www.2embed.cc/embed/${id}` },
+      { name: "VidSrc.icu", url: () => `https://vidsrc.icu/embed/movie/${id}` },
+      { name: "SuperEmbed", url: () => `https://multiembed.mov/?video_id=${id}&tmdb=1` },
+      { name: "AutoEmbed",  url: () => `https://autoembed.co/movie/tmdb/${id}` },
+      { name: "VidSrc.xyz", url: () => `https://vidsrc.xyz/embed/movie?tmdb=${id}` },
+      { name: "MoviesAPI",  url: () => `https://moviesapi.club/movie/${id}` },
+    ] : [
+      { name: "CinemaOS",   url: () => `https://cinemaos.tech/player/${id}/${season}/${episode}` },
+      { name: "VidSrc.me",  url: () => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}` },
+      { name: "Embed.su",   url: () => `https://embed.su/embed/tv/${id}/${season}/${episode}` },
+      { name: "VidLink",    url: () => `https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=true` },
+      { name: "2Embed",     url: () => `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}` },
+      { name: "VidSrc.icu", url: () => `https://vidsrc.icu/embed/tv/${id}/${season}/${episode}` },
+      { name: "SuperEmbed", url: () => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}` },
+      { name: "AutoEmbed",  url: () => `https://autoembed.co/tv/tmdb/${id}-${season}-${episode}` },
+      { name: "VidSrc.xyz", url: () => `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}` },
+      { name: "MoviesAPI",  url: () => `https://moviesapi.club/tv/${id}-${season}-${episode}` },
     ];
-
-    const TV_PROVIDERS = [
-      // These use simple self-contained embed iframes — work great for TV through /ocho/
-      {
-        name: "VidSrc.me",
-        url: () => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
-      },
-      {
-        name: "Embed.su",
-        url: () => `https://embed.su/embed/tv/${id}/${season}/${episode}`
-      },
-      {
-        name: "VidLink",
-        url: () => `https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=true&title=true`
-      },
-      {
-        name: "2Embed",
-        url: () => `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}`
-      },
-      {
-        name: "VidSrc.icu",
-        url: () => `https://vidsrc.icu/embed/tv/${id}/${season}/${episode}`
-      },
-      {
-        name: "SuperEmbed",
-        url: () => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`
-      },
-      {
-        name: "AutoEmbed",
-        url: () => `https://autoembed.co/tv/tmdb/${id}-${season}-${episode}`
-      },
-      {
-        name: "VidSrc.xyz",
-        url: () => `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
-      },
-      {
-        name: "MoviesAPI",
-        url: () => `https://moviesapi.club/tv/${id}-${season}-${episode}`
-      },
-      // CinemaOS LAST for TV — HLS.js XHR bypass means it silently fails
-      // but stays as a last resort in case future fix lands
-      {
-        name: "CinemaOS",
-        url: () => `https://cinemaos.tech/player/${id}/${season}/${episode}`
-      }
-    ];
-
-    const PROVIDERS = type === "tv" ? TV_PROVIDERS : MOVIE_PROVIDERS;
 
     // ── DOM ───────────────────────────────────────────────────────────────────
     const titleEl      = document.getElementById("playerTitle");
     const loadingEl    = document.getElementById("loading");
     const loadingSrcEl = document.getElementById("loadingSrcName");
     const tryCountEl   = document.getElementById("tryCount");
+    const swStatusEl   = document.getElementById("swStatus");
     const errorEl      = document.getElementById("errorMessage");
     const errorTextEl  = document.getElementById("errorText");
     const playerFrame  = document.getElementById("player");
     const sourceBar    = document.querySelector(".source-selector");
 
-    // Build source buttons
     PROVIDERS.forEach((p, i) => {
       const btn = document.createElement("button");
-      btn.className    = "source-btn";
+      btn.className = "source-btn";
       btn.dataset.index = i;
-      btn.textContent  = p.name;
+      btn.textContent = p.name;
       btn.addEventListener("click", () => tryProvider(i));
       sourceBar.appendChild(btn);
     });
@@ -305,42 +212,84 @@
       ? `🐰 S${season}E${episode} 🥚`
       : "🎬 NOW PLAYING 🥚";
 
-    if (!type || !id) {
-      showError("Missing required parameters.");
-    } else {
-      tryProvider(0);
+    // ── REGISTER MEDIA SERVICE WORKER ─────────────────────────────────────────
+    // The SW intercepts ALL network requests from /ocho/ pages at the OS level,
+    // including HLS.js Web Worker threads — the REAL fix for TV show playback.
+    async function registerMediaSW() {
+      if (!('serviceWorker' in navigator)) {
+        swStatusEl.textContent = '⚠ SW not supported';
+        return false;
+      }
+      try {
+        swStatusEl.textContent = '🔄 Activating stream proxy...';
+        const reg = await navigator.serviceWorker.register('/media-sw.js', { scope: '/' });
+
+        // If already active, we're good
+        if (reg.active) {
+          swStatusEl.textContent = '✅ Stream proxy active';
+          return true;
+        }
+
+        // Wait for it to activate
+        return new Promise(resolve => {
+          const sw = reg.installing || reg.waiting;
+          if (!sw) { swStatusEl.textContent = '✅ Stream proxy active'; resolve(true); return; }
+          sw.addEventListener('statechange', function() {
+            if (this.state === 'activated') {
+              swStatusEl.textContent = '✅ Stream proxy active';
+              resolve(true);
+            }
+          });
+          // Don't block forever — proceed after 3s regardless
+          setTimeout(() => {
+            swStatusEl.textContent = '⚡ Starting...';
+            resolve(true);
+          }, 3000);
+        });
+      } catch(err) {
+        console.warn('Media SW failed:', err.message);
+        swStatusEl.textContent = '⚠ Proxy limited (no SW)';
+        return false;
+      }
     }
 
+    // ── INIT ──────────────────────────────────────────────────────────────────
+    (async function init() {
+      if (!type || !id) { showError("Missing required parameters."); return; }
+      // Register SW before playing — critical for TV show HLS interception
+      await registerMediaSW();
+      tryProvider(0);
+    })();
+
+    // ── PLAYER LOGIC ──────────────────────────────────────────────────────────
     function setButtonState(index, state) {
       document.querySelectorAll(".source-btn").forEach(b => {
         b.classList.remove("active", "loading-src", "failed");
         if (failed.has(parseInt(b.dataset.index))) b.classList.add("failed");
       });
-      const target = document.querySelector(`.source-btn[data-index="${index}"]`);
-      if (target) { target.classList.remove("failed"); target.classList.add(state); }
+      const t = document.querySelector(`.source-btn[data-index="${index}"]`);
+      if (t) { t.classList.remove("failed"); t.classList.add(state); }
     }
 
     function tryProvider(index) {
       if (index >= PROVIDERS.length) {
-        showError("All sources failed. Pick one manually above or try again. 🐰");
+        showError("All sources failed. Pick one above manually. 🐰");
         return;
       }
 
       currentIndex = index;
-      const provider = PROVIDERS[index];
-      const rawUrl   = provider.url();
-      const proxied  = ochoProxy(rawUrl);
+      const p = PROVIDERS[index];
 
       loadingEl.style.display  = "flex";
       errorEl.style.display    = "none";
-      loadingSrcEl.textContent = provider.name;
+      loadingSrcEl.textContent = p.name;
       tryCountEl.textContent   = `Source ${index + 1} of ${PROVIDERS.length}`;
 
       setButtonState(index, "loading-src");
       if (loadTimer) clearTimeout(loadTimer);
 
       let loaded = false;
-      playerFrame.src = proxied;
+      playerFrame.src = ochoProxy(p.url());
 
       playerFrame.onload = () => {
         loaded = true;
@@ -349,14 +298,15 @@
         setTimeout(() => { loadingEl.style.display = "none"; }, 600);
       };
 
-      // 12s timeout — if iframe hasn't loaded, try next
+      // Timeout — CinemaOS gets 20s (it loads slowly), others get 12s
+      const timeout = (p.name === "CinemaOS" && type === "tv") ? 20000 : 12000;
       loadTimer = setTimeout(() => {
         if (!loaded) {
           failed.add(index);
           setButtonState(index, "failed");
           tryProvider(index + 1);
         }
-      }, 12000);
+      }, timeout);
     }
 
     function showError(msg) {
