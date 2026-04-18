@@ -2,9 +2,23 @@ const express = require('express');
 const fetch = require('node-fetch');
 const { URL } = require('url');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+// ── ULTRAVIOLET SETUP ─────────────────────────────────────────────────────────
+// Resolve UV dist files from the installed package
+let uvDistPath = null;
+try {
+  // Try to find the UV package dist folder
+  const uvPkg = require.resolve('@titaniumnetwork-dev/ultraviolet/package.json');
+  uvDistPath = path.join(path.dirname(uvPkg), 'dist');
+  console.log('✅ Ultraviolet found at:', uvDistPath);
+} catch(e) {
+  console.warn('⚠️  Ultraviolet package not found — CinemaOS UV proxy disabled. Run: npm install');
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 // CORS middleware
 app.use((req, res, next) => {
@@ -17,6 +31,46 @@ app.use((req, res, next) => {
 });
 
 app.use(express.raw({ type: '*/*', limit: '10mb' }));
+
+// ── SERVE UV STATIC FILES ─────────────────────────────────────────────────────
+if (uvDistPath) {
+  // Serve uv.bundle.js, uv.sw.js, uv.handler.js etc. at /uv/
+  app.use('/uv', express.static(uvDistPath));
+
+  // uv.config.js — the UV configuration (served dynamically so we can set prefix)
+  app.get('/uv/uv.config.js', (req, res) => {
+    res.set('Content-Type', 'application/javascript');
+    res.send(`
+self.__uv$config = {
+  prefix: "/uv/service/",
+  encodeUrl: Ultraviolet.codec.xor.encode,
+  decodeUrl: Ultraviolet.codec.xor.decode,
+  handler: "/uv/uv.handler.js",
+  bundle:  "/uv/uv.bundle.js",
+  config:  "/uv/uv.config.js",
+  sw:      "/uv/uv.sw.js",
+};
+`);
+  });
+
+  // The service worker must be registered from /uv/uv.sw.js (already served above via static)
+  // But browsers need it at a path that gives it scope over the pages that use it.
+  // We also expose it at /uv.sw.js so tvplayer can register with scope '/'
+  app.get('/uv.sw.js', (req, res) => {
+    const swPath = path.join(uvDistPath, 'uv.sw.js');
+    if (fs.existsSync(swPath)) {
+      res.set('Content-Type', 'application/javascript');
+      res.set('Service-Worker-Allowed', '/');
+      res.sendFile(swPath);
+    } else {
+      res.status(404).send('// UV service worker not found');
+    }
+  });
+
+  console.log('✅ UV routes registered: /uv/, /uv/uv.config.js, /uv.sw.js');
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 function encodeProxyUrl(url) {
@@ -45,32 +99,23 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
   const origin = new URL(baseUrl).origin;
 
   // ── POPUP & AD BLOCKER ──────────────────────────────────────
-  // Remove common ad/popup script tags by src domain
   rewritten = rewritten.replace(
     /<script[^>]*src=["'][^"']*(googlesyndication|doubleclick|adnxs|outbrain|taboola|popads|popcash|exoclick|juicyads|trafficjunky|hilltopads|adsterra|propellerads|revcontent|mgid|clickadu|adcash|adskeeper|yllix|adspyglass|monetag|pushcrew|onesignal|popunder|onclick|onclickads|adfly|adf\.ly|shorte\.st|linkvertise)[^"']*["'][^>]*><\/script>/gi,
     ''
   );
 
-  // Remove inline scripts containing popup/ad keywords
   rewritten = rewritten.replace(
     /<script(?![^>]*src)[^>]*>[\s\S]*?(popunder|pop_under|adsbygoogle|googletag|ExoLoader|adProvider|trafficjunky)[\s\S]*?<\/script>/gi,
     ''
   );
 
-  // Neutralise window.open and document.write in remaining scripts
   rewritten = rewritten.replace(/window\.open\s*\(/g, 'void(');
   rewritten = rewritten.replace(/document\.write\s*\(/g, 'void(');
 
-  // Inject popup nuke script at top of <head> — runs before anything else
   const popupNuke = `<script>
 (function(){
-  // Hard-block window.open
   window.open = function(){ return { focus:function(){}, blur:function(){} }; };
-
-  // Block pop-under blur/focus tricks
   window.addEventListener('blur', function(e){ e.stopImmediatePropagation(); }, true);
-
-  // Block top-level navigation redirects
   try {
     var _loc = window.location;
     Object.defineProperty(window, 'location', {
@@ -79,8 +124,6 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
       configurable: false
     });
   } catch(e){}
-
-  // Continuously nuke high-z-index overlay / ad elements
   var nukeCount = 0;
   function nukeOverlays(){
     var bad = [
@@ -95,7 +138,6 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
         if(z > 999) el.remove();
       });
     } catch(e){}
-    // Also remove any new <iframe> that points to known ad domains
     document.querySelectorAll('iframe').forEach(function(f){
       var s = (f.src||'').toLowerCase();
       if(/(popads|popcash|exoclick|adsterra|propellerads|adnxs|doubleclick|googlesyndication|trafficjunky|monetag)/.test(s)){
@@ -167,7 +209,6 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
             const encoded = btoa(url).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=/g, '');
             return currentOrigin + '/ocho/' + encoded;
           } catch (e) {
-            console.error('Failed to encode URL:', url, e);
             return null;
           }
         }
@@ -175,39 +216,23 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
         const origFetch = window.fetch;
         window.fetch = function(url, opts = {}) {
           let urlStr = typeof url === 'string' ? url : url.url;
-
-          if (urlStr.startsWith('/ocho/') ||
-              urlStr.startsWith('data:') ||
-              urlStr.startsWith('blob:') ||
-              urlStr.includes(currentOrigin)) {
+          if (urlStr.startsWith('/ocho/') || urlStr.startsWith('data:') || urlStr.startsWith('blob:') || urlStr.includes(currentOrigin)) {
             return origFetch(url, opts);
           }
-
-          if (inFlight.has(urlStr)) {
-            return Promise.reject(new Error('Loop prevented'));
-          }
-
+          if (inFlight.has(urlStr)) return Promise.reject(new Error('Loop prevented'));
           let fullUrl = urlStr;
           if (!urlStr.startsWith('http')) {
             fullUrl = urlStr.startsWith('/') ? targetOrigin + urlStr : targetOrigin + '/' + urlStr;
           }
-
           const proxied = safeEncodeUrl(fullUrl);
           if (!proxied) return Promise.reject(new Error('Invalid URL'));
-
           inFlight.add(urlStr);
-          return origFetch(proxied, opts)
-            .finally(() => inFlight.delete(urlStr))
-            .catch(err => { throw err; });
+          return origFetch(proxied, opts).finally(() => inFlight.delete(urlStr)).catch(err => { throw err; });
         };
 
         const origOpen = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function(method, url, ...args) {
-          if (typeof url === 'string' &&
-              !url.startsWith('/ocho/') &&
-              !url.startsWith('data:') &&
-              !url.startsWith('blob:') &&
-              !url.includes(currentOrigin)) {
+          if (typeof url === 'string' && !url.startsWith('/ocho/') && !url.startsWith('data:') && !url.startsWith('blob:') && !url.includes(currentOrigin)) {
             let fullUrl = url;
             if (!url.startsWith('http')) {
               fullUrl = url.startsWith('/') ? targetOrigin + url : targetOrigin + '/' + url;
@@ -222,12 +247,7 @@ function rewriteHtml(html, baseUrl, proxyPrefix) {
           const link = e.target.closest('a');
           if (link && link.href) {
             const url = link.href;
-            if (url.startsWith(targetOrigin) ||
-                (!url.startsWith(currentOrigin) &&
-                 !url.startsWith('javascript:') &&
-                 !url.startsWith('mailto:') &&
-                 !url.startsWith('tel:') &&
-                 !url.startsWith('#'))) {
+            if (url.startsWith(targetOrigin) || (!url.startsWith(currentOrigin) && !url.startsWith('javascript:') && !url.startsWith('mailto:') && !url.startsWith('tel:') && !url.startsWith('#'))) {
               e.preventDefault();
               const fullUrl = url.startsWith('http') ? url : targetOrigin + url;
               const proxied = safeEncodeUrl(fullUrl);
@@ -247,7 +267,6 @@ async function doProxyRequest(targetUrl, req, res) {
   try {
     const urlObj = new URL(targetUrl);
 
-    // Use a real Chrome UA to pass Cloudflare checks
     const ua = req.headers['user-agent'] && req.headers['user-agent'].includes('Chrome')
       ? req.headers['user-agent']
       : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36';
@@ -272,7 +291,6 @@ async function doProxyRequest(targetUrl, req, res) {
     if (req.headers['content-type']) headers['Content-Type'] = req.headers['content-type'];
     if (req.headers.cookie) headers['Cookie'] = req.headers.cookie;
     if (req.headers.range) headers['Range'] = req.headers.range;
-    // Pass through Cloudflare clearance cookies if present
     if (req.headers['cf-clearance']) headers['cf-clearance'] = req.headers['cf-clearance'];
 
     headers['Referer'] = urlObj.origin + '/';
@@ -297,11 +315,7 @@ async function doProxyRequest(targetUrl, req, res) {
     const contentType = response.headers.get('content-type') || 'application/octet-stream';
     const contentLength = parseInt(response.headers.get('content-length') || '0');
 
-    // Forward useful headers but strip ones that cause issues
-    const forwardHeaders = [
-      'content-type','content-length','content-range',
-      'accept-ranges','cache-control','last-modified','etag'
-    ];
+    const forwardHeaders = ['content-type','content-length','content-range','accept-ranges','cache-control','last-modified','etag'];
     const responseHeaders = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': '*',
@@ -317,9 +331,6 @@ async function doProxyRequest(targetUrl, req, res) {
       if (v) responseHeaders[h.split('-').map(w=>w[0].toUpperCase()+w.slice(1)).join('-')] = v;
     });
     res.set(responseHeaders);
-
-    // (headers already set above)
-
     res.status(response.status);
 
     if (contentType.includes('text/html') && contentLength < 5 * 1024 * 1024) {
@@ -329,7 +340,6 @@ async function doProxyRequest(targetUrl, req, res) {
     } else if (contentType.includes('application/x-mpegURL') ||
                contentType.includes('application/vnd.apple.mpegurl') ||
                targetUrl.includes('.m3u8')) {
-      // Rewrite every segment/sub-playlist URL inside m3u8 through the proxy
       const text = await response.text();
       const base = new URL(targetUrl);
       const rewrittenM3u8 = text.split('\n').map(line => {
@@ -347,25 +357,18 @@ async function doProxyRequest(targetUrl, req, res) {
         } catch(e) { return line; }
       }).join('\n');
       res.send(rewrittenM3u8);
-
     } else if (contentType.includes('application/json') ||
                contentType.includes('text/javascript') ||
                contentType.includes('application/javascript')) {
-      // Rewrite stream URLs buried inside JS/JSON responses
       const text = await response.text();
-      const base = new URL(targetUrl);
-      // Proxy any absolute https:// URLs that look like media (m3u8, mp4, ts, key)
       const rewrittenJs = text.replace(
         /(["'`])(https?:\/\/[^"'`\s]+?\.(m3u8|mp4|ts|key|vtt|srt)[^"'`\s]*)(["'`])/gi,
         (match, q1, url, ext, q2) => {
-          try {
-            return q1 + '/ocho/' + encodeProxyUrl(url) + q2;
-          } catch(e) { return match; }
+          try { return q1 + '/ocho/' + encodeProxyUrl(url) + q2; } catch(e) { return match; }
         }
       );
       res.set('Content-Type', contentType);
       res.send(rewrittenJs);
-
     } else {
       response.body.pipe(res);
     }
@@ -377,6 +380,7 @@ async function doProxyRequest(targetUrl, req, res) {
   }
 }
 
+// Stub SW that immediately unregisters itself (keeps UV's SW clean)
 app.get('/sw.js', (req, res) => {
   res.set('Content-Type', 'application/javascript');
   res.send(`
@@ -386,6 +390,7 @@ app.get('/sw.js', (req, res) => {
   `);
 });
 
+// ── /ocho/ PROXY ROUTE ────────────────────────────────────────────────────────
 app.use('/ocho/:url(*)', (req, res) => {
   try {
     let targetUrl = decodeProxyUrl(req.params.url);
@@ -400,6 +405,7 @@ app.use('/ocho/:url(*)', (req, res) => {
   }
 });
 
+// Fallback — resolve relative URLs from referer
 app.all('*', (req, res) => {
   const referer = req.headers.referer;
 
@@ -408,17 +414,14 @@ app.all('*', (req, res) => {
       const refPath = new URL(referer).pathname;
       const parts = refPath.split('/ocho/');
       if (parts.length > 1) {
-        // Get the full referer target URL (not just origin) so relative paths resolve correctly
         const encodedPart = parts[1].split('?')[0];
         const targetRefUrl = decodeProxyUrl(encodedPart);
         const targetRefObj = new URL(targetRefUrl);
 
         let fixedUrl;
         if (req.url.startsWith('/')) {
-          // Absolute path - use origin
           fixedUrl = targetRefObj.origin + req.url;
         } else {
-          // Relative path - resolve against full referer path
           const basePath = targetRefObj.pathname.substring(0, targetRefObj.pathname.lastIndexOf('/') + 1);
           fixedUrl = targetRefObj.origin + basePath + req.url;
         }
@@ -439,5 +442,7 @@ module.exports = app;
 if (require.main === module) {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🎬 AuraBaby Media running on port ${PORT}`);
+    if (uvDistPath) console.log(`✅ Ultraviolet proxy active at /uv/service/`);
+    else console.log(`⚠️  Ultraviolet not installed — run: npm install`);
   });
 }
