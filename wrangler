@@ -1,0 +1,14 @@
+name = "aurababymedia"
+main = "worker.js"
+compatibility_date = "2024-04-01"
+
+# Workers Sites — bundles your /public folder into KV so the worker can serve static files
+[site]
+bucket = "./public"
+
+[build]
+command = "npm install"
+
+# Optional: Set environment variables here
+# [vars]
+# MY_VAR = "hello"
