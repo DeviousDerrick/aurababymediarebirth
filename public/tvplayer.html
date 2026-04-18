@@ -61,13 +61,6 @@
       border-color: #f9c74f; color: #f9c74f;
       animation: srcPulse 1s ease-in-out infinite;
     }
-    /* UV badge shown on CinemaOS button */
-    .uv-badge {
-      position: absolute; top: -7px; right: -5px;
-      font-size: 8px; background: #f9c74f; color: #000;
-      padding: 1px 4px; border-radius: 4px; font-weight: 900;
-      letter-spacing: 0.5px; pointer-events: none;
-    }
     @keyframes srcPulse {
       0%, 100% { box-shadow: 0 0 10px rgba(249,199,79,0.4); }
       50%       { box-shadow: 0 0 25px rgba(249,199,79,0.9); }
@@ -99,7 +92,6 @@
     .loading p { margin: 4px 0; font-size: 14px; }
     .loading .src-name { color: #95d5b2; font-family: 'Fredoka One', cursive; font-size: 15px; }
     .loading .try-count { color: rgba(149,213,178,0.55); font-size: 11px; margin-top: 6px; }
-    .loading .proxy-type { color: #f9c74f; font-size: 10px; letter-spacing: 1px; margin-top: 3px; }
     .error-message {
       display: none; position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
@@ -132,7 +124,6 @@
   </style>
 </head>
 <body>
-
   <div class="player-header">
     <div class="header-left">
       <button class="back-button" onclick="window.history.back()">← BACK</button>
@@ -140,19 +131,16 @@
     </div>
     <div class="source-selector">
       <span class="source-label">📡 SOURCE:</span>
-      <!-- Built by JS -->
     </div>
   </div>
 
   <div class="player-container">
     <div class="loading" id="loading">
       <div class="loading-spinner"></div>
-      <p>🥚 Loading your movie...</p>
+      <p>🥚 Loading...</p>
       <p class="src-name"  id="loadingSrcName">Connecting...</p>
       <p class="try-count" id="tryCount"></p>
-      <p class="proxy-type" id="proxyType"></p>
     </div>
-
     <div class="error-message" id="errorMessage">
       <h2>⚠️ All Sources Failed</h2>
       <p id="errorText">Unable to load any video source.</p>
@@ -160,7 +148,6 @@
       <button class="retry-button" onclick="tryProvider(0)">🔄 Try Again</button>
       <button class="retry-button" onclick="window.history.back()" style="margin-left:8px;background:rgba(82,183,136,0.3);">← Go Back</button>
     </div>
-
     <iframe
       id="player"
       allowfullscreen
@@ -171,137 +158,141 @@
 
   <div class="hint">🎬 N = next source &nbsp;·&nbsp; F = fullscreen &nbsp;·&nbsp; ESC = back 🥚</div>
 
-  <!--
-    UV scripts — served by server.js from node_modules/@titaniumnetwork-dev/ultraviolet/dist/
-    If UV isn't installed they 404 silently and we fall back to /ocho/ for all sources.
-  -->
-  <script src="/uv/uv.bundle.js" onerror="window.__uvMissing=true"></script>
-  <script src="/uv/uv.config.js" onerror="window.__uvMissing=true"></script>
-
   <script>
-    // ── URL PARAMS ────────────────────────────────────────────────────────────
     const params  = new URLSearchParams(window.location.search);
     const type    = params.get("type");
     const id      = params.get("id");
     const season  = params.get("season") || 1;
     const episode = params.get("episode") || 1;
 
-    // ── PROXY HELPERS ─────────────────────────────────────────────────────────
-    function uvProxy(rawUrl) {
-      // Use Ultraviolet — exactly how media.html proxies CinemaOS
-      try {
-        if (!window.__uvMissing && typeof __uv$config !== "undefined") {
-          return __uv$config.prefix + __uv$config.encodeUrl(rawUrl);
-        }
-      } catch(e) {}
-      return null; // UV not available
-    }
-
     function ochoProxy(rawUrl) {
-      // AuraBaby's own base64 proxy (always available, handles popup blocking)
-      const encoded = btoa(rawUrl).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      const encoded = btoa(unescape(encodeURIComponent(rawUrl)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
       return `/ocho/${encoded}`;
     }
 
-    // ── PROVIDERS ─────────────────────────────────────────────────────────────
-    // useUV: true  → uses UV proxy (like media.html) — needed for CinemaOS
-    // useUV: false → uses /ocho/ proxy — fine for other embed sites
-    const PROVIDERS = [
+    // ── PROVIDER LISTS ────────────────────────────────────────────────────────
+    //
+    // KEY INSIGHT:
+    //   CinemaOS uses HLS.js for TV shows. HLS.js makes its own XHR requests
+    //   for m3u8 segments internally — these bypass our /ocho/ intercept and
+    //   hit CORS errors. But CinemaOS's iframe still fires onload (page loaded),
+    //   so the player shows it as "working" while actually showing nothing.
+    //
+    //   For MOVIES: CinemaOS finds a direct MP4 → our video.src intercept
+    //   catches it → works great. CinemaOS goes FIRST for movies.
+    //
+    //   For TV SHOWS: Use embed providers that serve a simple iframe player
+    //   (no HLS.js involved) → these work fine through /ocho/. CinemaOS goes
+    //   LAST for TV so it's only a fallback.
+    //
+    const MOVIE_PROVIDERS = [
       {
         name: "CinemaOS",
-        useUV: true,
-        url: () => type === "movie"
-          ? `https://cinemaos.tech/player/${id}`
-          : `https://cinemaos.tech/player/${id}/${season}/${episode}`
+        url: () => `https://cinemaos.tech/player/${id}`
       },
       {
         name: "VidSrc.me",
-        useUV: false,
-        url: () => type === "movie"
-          ? `https://vidsrc.me/embed/movie?tmdb=${id}`
-          : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
-      },
-      {
-        name: "VidSrc.icu",
-        useUV: false,
-        url: () => type === "movie"
-          ? `https://vidsrc.icu/embed/movie/${id}`
-          : `https://vidsrc.icu/embed/tv/${id}/${season}/${episode}`
+        url: () => `https://vidsrc.me/embed/movie?tmdb=${id}`
       },
       {
         name: "Embed.su",
-        useUV: false,
-        url: () => type === "movie"
-          ? `https://embed.su/embed/movie/${id}`
-          : `https://embed.su/embed/tv/${id}/${season}/${episode}`
-      },
-      {
-        name: "2Embed",
-        useUV: false,
-        url: () => type === "movie"
-          ? `https://www.2embed.cc/embed/${id}`
-          : `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}`
+        url: () => `https://embed.su/embed/movie/${id}`
       },
       {
         name: "VidLink",
-        useUV: false,
-        url: () => type === "movie"
-          ? `https://vidlink.pro/movie/${id}?autoplay=true&title=true`
-          : `https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=true&title=true`
+        url: () => `https://vidlink.pro/movie/${id}?autoplay=true&title=true`
+      },
+      {
+        name: "2Embed",
+        url: () => `https://www.2embed.cc/embed/${id}`
+      },
+      {
+        name: "VidSrc.icu",
+        url: () => `https://vidsrc.icu/embed/movie/${id}`
       },
       {
         name: "SuperEmbed",
-        useUV: false,
-        url: () => type === "movie"
-          ? `https://multiembed.mov/?video_id=${id}&tmdb=1`
-          : `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`
+        url: () => `https://multiembed.mov/?video_id=${id}&tmdb=1`
       },
       {
         name: "AutoEmbed",
-        useUV: false,
-        url: () => type === "movie"
-          ? `https://autoembed.co/movie/tmdb/${id}`
-          : `https://autoembed.co/tv/tmdb/${id}-${season}-${episode}`
+        url: () => `https://autoembed.co/movie/tmdb/${id}`
       },
       {
         name: "VidSrc.xyz",
-        useUV: false,
-        url: () => type === "movie"
-          ? `https://vidsrc.xyz/embed/movie?tmdb=${id}`
-          : `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
+        url: () => `https://vidsrc.xyz/embed/movie?tmdb=${id}`
       },
       {
         name: "MoviesAPI",
-        useUV: false,
-        url: () => type === "movie"
-          ? `https://moviesapi.club/movie/${id}`
-          : `https://moviesapi.club/tv/${id}-${season}-${episode}`
+        url: () => `https://moviesapi.club/movie/${id}`
       }
     ];
 
-    // ── DOM REFS ──────────────────────────────────────────────────────────────
+    const TV_PROVIDERS = [
+      // These use simple self-contained embed iframes — work great for TV through /ocho/
+      {
+        name: "VidSrc.me",
+        url: () => `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
+      },
+      {
+        name: "Embed.su",
+        url: () => `https://embed.su/embed/tv/${id}/${season}/${episode}`
+      },
+      {
+        name: "VidLink",
+        url: () => `https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=true&title=true`
+      },
+      {
+        name: "2Embed",
+        url: () => `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}`
+      },
+      {
+        name: "VidSrc.icu",
+        url: () => `https://vidsrc.icu/embed/tv/${id}/${season}/${episode}`
+      },
+      {
+        name: "SuperEmbed",
+        url: () => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`
+      },
+      {
+        name: "AutoEmbed",
+        url: () => `https://autoembed.co/tv/tmdb/${id}-${season}-${episode}`
+      },
+      {
+        name: "VidSrc.xyz",
+        url: () => `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
+      },
+      {
+        name: "MoviesAPI",
+        url: () => `https://moviesapi.club/tv/${id}-${season}-${episode}`
+      },
+      // CinemaOS LAST for TV — HLS.js XHR bypass means it silently fails
+      // but stays as a last resort in case future fix lands
+      {
+        name: "CinemaOS",
+        url: () => `https://cinemaos.tech/player/${id}/${season}/${episode}`
+      }
+    ];
+
+    const PROVIDERS = type === "tv" ? TV_PROVIDERS : MOVIE_PROVIDERS;
+
+    // ── DOM ───────────────────────────────────────────────────────────────────
     const titleEl      = document.getElementById("playerTitle");
     const loadingEl    = document.getElementById("loading");
     const loadingSrcEl = document.getElementById("loadingSrcName");
     const tryCountEl   = document.getElementById("tryCount");
-    const proxyTypeEl  = document.getElementById("proxyType");
     const errorEl      = document.getElementById("errorMessage");
     const errorTextEl  = document.getElementById("errorText");
     const playerFrame  = document.getElementById("player");
     const sourceBar    = document.querySelector(".source-selector");
 
-    // Build buttons
+    // Build source buttons
     PROVIDERS.forEach((p, i) => {
       const btn = document.createElement("button");
-      btn.className = "source-btn";
+      btn.className    = "source-btn";
       btn.dataset.index = i;
-      btn.textContent = p.name;
-      if (p.useUV) {
-        const badge = document.createElement("span");
-        badge.className = "uv-badge";
-        badge.textContent = "UV";
-        btn.appendChild(badge);
-      }
+      btn.textContent  = p.name;
       btn.addEventListener("click", () => tryProvider(i));
       sourceBar.appendChild(btn);
     });
@@ -314,41 +305,12 @@
       ? `🐰 S${season}E${episode} 🥚`
       : "🎬 NOW PLAYING 🥚";
 
-    // ── REGISTER UV SERVICE WORKER ────────────────────────────────────────────
-    // The SW is what actually intercepts and proxies requests for UV to work.
-    // Without it, UV-encoded URLs just 404.
-    function registerUVServiceWorker() {
-      return new Promise((resolve) => {
-        if (window.__uvMissing || !('serviceWorker' in navigator)) {
-          console.warn('UV SW: not registering (UV not installed or no SW support)');
-          return resolve(false);
-        }
-        navigator.serviceWorker.register('/uv.sw.js', { scope: '/' })
-          .then(reg => {
-            console.log('✅ UV SW registered, scope:', reg.scope);
-            if (reg.active) return resolve(true);
-            const sw = reg.installing || reg.waiting;
-            if (!sw) return resolve(true);
-            sw.addEventListener('statechange', function() {
-              if (this.state === 'activated') resolve(true);
-            });
-            setTimeout(() => resolve(true), 3000); // don't block forever
-          })
-          .catch(err => {
-            console.warn('UV SW failed:', err.message);
-            resolve(false);
-          });
-      });
+    if (!type || !id) {
+      showError("Missing required parameters.");
+    } else {
+      tryProvider(0);
     }
 
-    // ── INIT ──────────────────────────────────────────────────────────────────
-    (async function init() {
-      if (!type || !id) { showError("Missing required parameters."); return; }
-      await registerUVServiceWorker();
-      tryProvider(0);
-    })();
-
-    // ── TRY PROVIDER ─────────────────────────────────────────────────────────
     function setButtonState(index, state) {
       document.querySelectorAll(".source-btn").forEach(b => {
         b.classList.remove("active", "loading-src", "failed");
@@ -360,58 +322,41 @@
 
     function tryProvider(index) {
       if (index >= PROVIDERS.length) {
-        showError("All sources failed. Pick one manually above or try again later. 🐰");
+        showError("All sources failed. Pick one manually above or try again. 🐰");
         return;
       }
 
       currentIndex = index;
       const provider = PROVIDERS[index];
       const rawUrl   = provider.url();
-
-      // Choose proxy
-      let proxiedUrl, proxyLabel;
-      if (provider.useUV) {
-        const uvUrl = uvProxy(rawUrl);
-        if (uvUrl) {
-          proxiedUrl = uvUrl;
-          proxyLabel = "🔵 UV Proxy (school bypass)";
-        } else {
-          // UV not available — fall back to /ocho/
-          proxiedUrl = ochoProxy(rawUrl);
-          proxyLabel = "🟡 /ocho/ Proxy (UV not installed)";
-        }
-      } else {
-        proxiedUrl = ochoProxy(rawUrl);
-        proxyLabel = "🟢 /ocho/ Proxy";
-      }
+      const proxied  = ochoProxy(rawUrl);
 
       loadingEl.style.display  = "flex";
       errorEl.style.display    = "none";
       loadingSrcEl.textContent = provider.name;
       tryCountEl.textContent   = `Source ${index + 1} of ${PROVIDERS.length}`;
-      proxyTypeEl.textContent  = proxyLabel;
 
       setButtonState(index, "loading-src");
       if (loadTimer) clearTimeout(loadTimer);
 
       let loaded = false;
-      playerFrame.src = proxiedUrl;
+      playerFrame.src = proxied;
 
       playerFrame.onload = () => {
         loaded = true;
         clearTimeout(loadTimer);
         setButtonState(index, "active");
-        setTimeout(() => { loadingEl.style.display = "none"; }, 700);
+        setTimeout(() => { loadingEl.style.display = "none"; }, 600);
       };
 
-      // 10s per source then auto-advance
+      // 12s timeout — if iframe hasn't loaded, try next
       loadTimer = setTimeout(() => {
         if (!loaded) {
           failed.add(index);
           setButtonState(index, "failed");
           tryProvider(index + 1);
         }
-      }, 10000);
+      }, 12000);
     }
 
     function showError(msg) {
@@ -420,7 +365,7 @@
       errorEl.style.display   = "block";
     }
 
-    document.addEventListener("keydown", (e) => {
+    document.addEventListener("keydown", e => {
       if (e.key === "Escape") window.history.back();
       if (e.key === "f" || e.key === "F") playerFrame.requestFullscreen?.();
       if (e.key === "n" || e.key === "N") tryProvider(currentIndex + 1);
