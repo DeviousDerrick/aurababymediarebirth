@@ -1,17 +1,16 @@
 {
   "name": "aurababymedia",
   "version": "2.0.0",
-  "description": "AuraBaby Media - Movie & TV streaming with proxy support",
-  "main": "server.js",
+  "description": "AuraBaby Media - Cloudflare Workers",
+  "main": "worker.js",
   "scripts": {
-    "start": "node server.js"
+    "dev":    "wrangler dev",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "node-fetch": "^2.7.0",
-    "@titaniumnetwork-dev/ultraviolet": "^3.2.7"
+    "@cloudflare/kv-asset-handler": "^0.3.4"
   },
-  "engines": {
-    "node": "24.x"
+  "devDependencies": {
+    "wrangler": "^3.0.0"
   }
 }
