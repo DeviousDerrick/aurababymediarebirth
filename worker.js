@@ -205,21 +205,55 @@ async function rewriteJs(text) {
   );
 }
 
+// ── CINEMAOS DOMAIN DETECTION ─────────────────────────────────────────────────
+// CinemaOS uses its own proxy workers to fetch video streams.
+// Those requests need to look like they come from cinemaos.tech or the
+// streaming site embedded in the URL's ?referer= param — otherwise they 403/429.
+function getCinemaOsSpoofHeaders(urlObj) {
+  const host = urlObj.hostname.toLowerCase();
+  const isCinemaProxy = host.includes('cinemaos') || host.includes('huhululu');
+  if (!isCinemaProxy) return null;
+
+  // If the URL has a ?referer= param, use that as the spoofed origin
+  // e.g. ?referer=https://goodstream.cc/  →  Origin: https://goodstream.cc
+  const refererParam = urlObj.searchParams.get('referer') || urlObj.searchParams.get('ref');
+  const originParam  = urlObj.searchParams.get('origin');
+
+  if (refererParam) {
+    try {
+      const refOrigin = new URL(refererParam).origin;
+      return { referer: refererParam, origin: refOrigin };
+    } catch(e) {}
+  }
+  if (originParam) {
+    try {
+      return { referer: originParam + '/', origin: originParam };
+    } catch(e) {}
+  }
+  // Default: pretend we're cinemaos.tech itself
+  return { referer: 'https://cinemaos.tech/', origin: 'https://cinemaos.tech' };
+}
+
 // ── MAIN PROXY HANDLER ────────────────────────────────────────────────────────
 async function handleProxy(targetUrl, request) {
   try {
     const urlObj = new URL(targetUrl);
+
+    // Check if we need to spoof headers for CinemaOS proxy domains
+    const cinemaSpoof = getCinemaOsSpoofHeaders(urlObj);
+    const spoofReferer = cinemaSpoof ? cinemaSpoof.referer : urlObj.origin + '/';
+    const spoofOrigin  = cinemaSpoof ? cinemaSpoof.origin  : urlObj.origin;
 
     const headers = new Headers({
       'User-Agent':                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
       'Accept':                    'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
       'Accept-Language':           'en-US,en;q=0.9',
       'Accept-Encoding':           'identity',
-      'Referer':                   urlObj.origin + '/',
-      'Origin':                    urlObj.origin,
-      'Sec-Fetch-Dest':            'empty',
-      'Sec-Fetch-Mode':            'cors',
-      'Sec-Fetch-Site':            'same-site',
+      'Referer':                   spoofReferer,
+      'Origin':                    spoofOrigin,
+      'Sec-Fetch-Dest':            cinemaSpoof ? 'empty' : 'document',
+      'Sec-Fetch-Mode':            cinemaSpoof ? 'cors'  : 'navigate',
+      'Sec-Fetch-Site':            cinemaSpoof ? 'cross-site' : 'none',
       'Upgrade-Insecure-Requests': '1',
       'Sec-CH-UA':                 '"Google Chrome";v="123", "Not:A-Brand";v="8"',
       'Sec-CH-UA-Mobile':          '?0',
@@ -247,12 +281,15 @@ async function handleProxy(targetUrl, request) {
 
     // Build clean response headers
     const resHeaders = new Headers({
-      'Access-Control-Allow-Origin':  '*',
-      'Access-Control-Allow-Methods': '*',
-      'Access-Control-Allow-Headers': '*',
-      'Content-Security-Policy':      "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;",
-      'X-Frame-Options':              'ALLOWALL',
-      'Content-Type':                 ct,
+      'Access-Control-Allow-Origin':      '*',
+      'Access-Control-Allow-Methods':     '*',
+      'Access-Control-Allow-Headers':     '*',
+      'Access-Control-Expose-Headers':    '*',
+      'Cross-Origin-Resource-Policy':     'cross-origin',
+      'Cross-Origin-Embedder-Policy':     'unsafe-none',
+      'Content-Security-Policy':          "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;",
+      'X-Frame-Options':                  'ALLOWALL',
+      'Content-Type':                     ct,
     });
 
     // Forward useful headers
