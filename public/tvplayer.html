@@ -7,279 +7,127 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@800&display=swap" rel="stylesheet">
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
+      margin: 0; padding: 0; width: 100%; height: 100%;
       background: linear-gradient(180deg, #1a1a2e 0%, #0f3027 50%, #1b4332 100%);
-      display: flex;
-      flex-direction: column;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 800;
+      display: flex; flex-direction: column;
+      font-family: 'Poppins', sans-serif; font-weight: 800;
       overflow: hidden;
     }
-
     .player-header {
       background: rgba(27, 67, 50, 0.95);
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 10px 18px;
+      display: flex; justify-content: space-between; align-items: center;
       border-bottom: 3px solid #52b788;
       box-shadow: 0 0 30px rgba(82, 183, 136, 0.4);
-      z-index: 1000;
-      flex-wrap: wrap;
-      gap: 10px;
+      z-index: 1000; flex-wrap: wrap; gap: 8px;
     }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
+    .header-left { display: flex; align-items: center; gap: 12px; }
     .player-header h1 {
-      color: white;
-      font-family: 'Fredoka One', cursive;
-      font-size: 18px;
-      margin: 0;
-      font-weight: 900;
+      color: white; font-family: 'Fredoka One', cursive;
+      font-size: 16px; margin: 0; font-weight: 900;
       text-transform: uppercase;
       text-shadow: 0 0 15px rgba(82, 183, 136, 0.8);
-      letter-spacing: 2px;
-      white-space: nowrap;
+      letter-spacing: 2px; white-space: nowrap;
     }
-
     .back-button {
       background: linear-gradient(135deg, #52b788, #95d5b2);
-      color: white;
-      border: none;
-      padding: 9px 20px;
-      border-radius: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-transform: uppercase;
+      color: white; border: none; padding: 8px 18px;
+      border-radius: 15px; font-weight: 800; cursor: pointer;
+      transition: all 0.3s; text-transform: uppercase;
       box-shadow: 0 0 20px rgba(82, 183, 136, 0.5);
-      white-space: nowrap;
-      font-family: 'Poppins', sans-serif;
-      font-size: 13px;
+      white-space: nowrap; font-family: 'Poppins', sans-serif; font-size: 12px;
     }
-
-    .back-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(82, 183, 136, 0.8);
-    }
-
-    .source-selector {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
+    .back-button:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(82, 183, 136, 0.8); }
+    .source-selector { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .source-label {
-      color: #95d5b2;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      white-space: nowrap;
-      text-shadow: 0 0 8px rgba(82, 183, 136, 0.6);
-      font-weight: 900;
+      color: #95d5b2; font-size: 10px; text-transform: uppercase;
+      letter-spacing: 1px; white-space: nowrap;
+      text-shadow: 0 0 8px rgba(82, 183, 136, 0.6); font-weight: 900;
     }
-
     .source-btn {
-      background: rgba(27, 67, 50, 0.9);
-      color: #aaa;
-      border: 2px solid #2d6a4f;
-      padding: 7px 14px;
-      border-radius: 10px;
-      font-weight: 800;
-      font-family: 'Poppins', sans-serif;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.25s;
-      white-space: nowrap;
+      background: rgba(27, 67, 50, 0.9); color: #aaa;
+      border: 2px solid #2d6a4f; padding: 6px 12px;
+      border-radius: 10px; font-weight: 800; font-family: 'Poppins', sans-serif;
+      font-size: 11px; cursor: pointer; transition: all 0.25s; white-space: nowrap;
+      position: relative;
     }
-
-    .source-btn:hover {
-      border-color: #52b788;
-      color: #fff;
-      box-shadow: 0 0 15px rgba(82, 183, 136, 0.5);
-    }
-
+    .source-btn:hover { border-color: #52b788; color: #fff; box-shadow: 0 0 15px rgba(82, 183, 136, 0.5); }
     .source-btn.active {
       background: linear-gradient(135deg, #52b788, #95d5b2);
-      color: white;
-      border-color: #fff;
-      box-shadow: 0 0 20px rgba(82, 183, 136, 0.8);
+      color: white; border-color: #fff; box-shadow: 0 0 20px rgba(82, 183, 136, 0.8);
     }
-
-    .source-btn.failed {
-      border-color: #ff3232;
-      color: #ff6464;
-      opacity: 0.6;
-    }
-
+    .source-btn.failed { border-color: #ff3232; color: #ff6464; opacity: 0.6; }
     .source-btn.loading-src {
-      border-color: #f9c74f;
-      color: #f9c74f;
+      border-color: #f9c74f; color: #f9c74f;
       animation: srcPulse 1s ease-in-out infinite;
     }
-
+    /* UV badge shown on CinemaOS button */
+    .uv-badge {
+      position: absolute; top: -7px; right: -5px;
+      font-size: 8px; background: #f9c74f; color: #000;
+      padding: 1px 4px; border-radius: 4px; font-weight: 900;
+      letter-spacing: 0.5px; pointer-events: none;
+    }
     @keyframes srcPulse {
-      0%, 100% { box-shadow: 0 0 10px rgba(249, 199, 79, 0.4); }
-      50% { box-shadow: 0 0 25px rgba(249, 199, 79, 0.9); }
+      0%, 100% { box-shadow: 0 0 10px rgba(249,199,79,0.4); }
+      50%       { box-shadow: 0 0 25px rgba(249,199,79,0.9); }
     }
-
     .player-container {
-      flex: 1;
-      position: relative;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      flex: 1; position: relative; background: #000;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
     }
-
     iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #000;
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%; border: none; background: #000;
     }
-
     .loading {
-      position: absolute;
-      top: 50%;
-      left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      color: white;
-      font-size: 18px;
-      text-align: center;
-      font-weight: 800;
-      z-index: 100;
-      background: rgba(27, 67, 50, 0.85);
-      padding: 30px 40px;
-      border-radius: 15px;
-      border: 3px solid #52b788;
-      box-shadow: 0 0 40px rgba(82, 183, 136, 0.6);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      color: white; text-align: center; font-weight: 800;
+      z-index: 100; background: rgba(27, 67, 50, 0.9);
+      padding: 28px 36px; border-radius: 15px;
+      border: 3px solid #52b788; box-shadow: 0 0 40px rgba(82, 183, 136, 0.6);
+      display: flex; flex-direction: column; align-items: center; min-width: 260px;
     }
-
     .loading-spinner {
-      border: 5px solid #1b4332;
-      border-top: 5px solid #f9c74f;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin: 15px auto;
+      border: 5px solid #1b4332; border-top: 5px solid #f9c74f;
+      border-radius: 50%; width: 50px; height: 50px;
+      animation: spin 1s linear infinite; margin: 14px auto;
       box-shadow: 0 0 30px rgba(249, 199, 79, 0.6);
     }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .loading p {
-      margin: 5px 0;
-    }
-
-    .loading .src-name {
-      color: #95d5b2;
-      font-family: 'Fredoka One', cursive;
-      font-size: 14px;
-    }
-
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading p { margin: 4px 0; font-size: 14px; }
+    .loading .src-name { color: #95d5b2; font-family: 'Fredoka One', cursive; font-size: 15px; }
+    .loading .try-count { color: rgba(149,213,178,0.55); font-size: 11px; margin-top: 6px; }
+    .loading .proxy-type { color: #f9c74f; font-size: 10px; letter-spacing: 1px; margin-top: 3px; }
     .error-message {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
+      display: none; position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(27, 67, 50, 0.97);
-      color: white;
-      padding: 30px;
-      border-radius: 15px;
-      text-align: center;
-      max-width: 480px;
-      width: 90%;
-      border: 3px solid #f3722c;
-      box-shadow: 0 0 40px rgba(243, 114, 44, 0.6);
-      z-index: 101;
+      background: rgba(27, 67, 50, 0.97); color: white;
+      padding: 28px; border-radius: 15px; text-align: center;
+      max-width: 480px; width: 90%;
+      border: 3px solid #f3722c; box-shadow: 0 0 40px rgba(243, 114, 44, 0.6); z-index: 101;
     }
-
-    .error-message h2 {
-      margin: 0 0 12px;
-      font-size: 22px;
-      font-family: 'Fredoka One', cursive;
-    }
-
-    .error-message p {
-      margin: 8px 0;
-      line-height: 1.6;
-      font-size: 14px;
-      color: #ccc;
-    }
-
+    .error-message h2 { margin: 0 0 10px; font-size: 22px; font-family: 'Fredoka One', cursive; }
+    .error-message p { margin: 8px 0; line-height: 1.6; font-size: 13px; color: #ccc; }
     .retry-button {
       background: linear-gradient(135deg, #52b788, #95d5b2);
-      color: white;
-      border: none;
-      padding: 11px 28px;
-      border-radius: 12px;
-      font-weight: 800;
-      font-family: 'Fredoka One', cursive;
-      cursor: pointer;
-      margin-top: 14px;
-      transition: all 0.3s;
-      font-size: 14px;
-      text-transform: uppercase;
-      box-shadow: 0 0 15px rgba(82, 183, 136, 0.4);
+      color: white; border: none; padding: 10px 24px;
+      border-radius: 12px; font-weight: 800; font-family: 'Fredoka One', cursive;
+      cursor: pointer; margin-top: 12px; transition: all 0.3s;
+      font-size: 13px; text-transform: uppercase;
     }
-
-    .retry-button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 25px rgba(82, 183, 136, 0.8);
-    }
-
+    .retry-button:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(82, 183, 136, 0.8); }
     .hint {
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: rgba(149, 213, 178, 0.6);
-      font-size: 11px;
-      pointer-events: none;
-      z-index: 999;
-      letter-spacing: 1px;
-      text-shadow: 0 0 10px rgba(82, 183, 136, 0.3);
+      position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+      color: rgba(149, 213, 178, 0.55); font-size: 10px; pointer-events: none;
+      z-index: 999; letter-spacing: 1px; white-space: nowrap;
     }
-
     @media (max-width: 600px) {
-      .player-header {
-        padding: 10px 12px;
-      }
-
-      .player-header h1 {
-        font-size: 13px;
-      }
-
-      .source-btn {
-        font-size: 11px;
-        padding: 6px 10px;
-      }
-
-      .source-label {
-        display: none;
-      }
+      .player-header { padding: 8px 10px; }
+      .player-header h1 { font-size: 12px; }
+      .source-btn { font-size: 10px; padding: 5px 8px; }
+      .source-label { display: none; }
     }
   </style>
 </head>
@@ -290,15 +138,9 @@
       <button class="back-button" onclick="window.history.back()">← BACK</button>
       <h1 id="playerTitle">🥚 Playing...</h1>
     </div>
-
     <div class="source-selector">
       <span class="source-label">📡 SOURCE:</span>
-      <button class="source-btn" data-index="0">CinemaOS</button>
-      <button class="source-btn" data-index="1">VidSrc CC</button>
-      <button class="source-btn" data-index="2">VidSrc XYZ</button>
-      <button class="source-btn" data-index="3">MoviesAPI</button>
-      <button class="source-btn" data-index="4">VidLink</button>
-      <button class="source-btn" data-index="5">AutoEmbed</button>
+      <!-- Built by JS -->
     </div>
   </div>
 
@@ -306,15 +148,17 @@
     <div class="loading" id="loading">
       <div class="loading-spinner"></div>
       <p>🥚 Loading your movie...</p>
-      <p class="src-name" id="loadingSrcName"></p>
+      <p class="src-name"  id="loadingSrcName">Connecting...</p>
+      <p class="try-count" id="tryCount"></p>
+      <p class="proxy-type" id="proxyType"></p>
     </div>
 
     <div class="error-message" id="errorMessage">
       <h2>⚠️ All Sources Failed</h2>
       <p id="errorText">Unable to load any video source.</p>
-      <p style="font-size:12px;">Try picking a different source above, or come back later. 🐰</p>
+      <p style="font-size:12px;">Pick a source above manually, or try again. 🐰</p>
       <button class="retry-button" onclick="tryProvider(0)">🔄 Try Again</button>
-      <button class="retry-button" onclick="window.history.back()" style="margin-left:8px; background: rgba(82, 183, 136, 0.3);">← Go Back</button>
+      <button class="retry-button" onclick="window.history.back()" style="margin-left:8px;background:rgba(82,183,136,0.3);">← Go Back</button>
     </div>
 
     <iframe
@@ -325,61 +169,142 @@
     ></iframe>
   </div>
 
-  <div class="hint">🎬 N for next source &nbsp;·&nbsp; F for fullscreen &nbsp;·&nbsp; ESC to go back &nbsp;🥚</div>
+  <div class="hint">🎬 N = next source &nbsp;·&nbsp; F = fullscreen &nbsp;·&nbsp; ESC = back 🥚</div>
+
+  <!--
+    UV scripts — served by server.js from node_modules/@titaniumnetwork-dev/ultraviolet/dist/
+    If UV isn't installed they 404 silently and we fall back to /ocho/ for all sources.
+  -->
+  <script src="/uv/uv.bundle.js" onerror="window.__uvMissing=true"></script>
+  <script src="/uv/uv.config.js" onerror="window.__uvMissing=true"></script>
 
   <script>
-    const params   = new URLSearchParams(window.location.search);
-    const type     = params.get("type");
-    const id       = params.get("id");
-    const season   = params.get("season") || 1;
-    const episode  = params.get("episode") || 1;
+    // ── URL PARAMS ────────────────────────────────────────────────────────────
+    const params  = new URLSearchParams(window.location.search);
+    const type    = params.get("type");
+    const id      = params.get("id");
+    const season  = params.get("season") || 1;
+    const episode = params.get("episode") || 1;
 
-    const titleEl       = document.getElementById("playerTitle");
-    const loadingEl     = document.getElementById("loading");
-    const loadingSrcEl  = document.getElementById("loadingSrcName");
-    const errorEl       = document.getElementById("errorMessage");
-    const errorTextEl   = document.getElementById("errorText");
-    const playerFrame   = document.getElementById("player");
-    const sourceBtns    = document.querySelectorAll(".source-btn");
+    // ── PROXY HELPERS ─────────────────────────────────────────────────────────
+    function uvProxy(rawUrl) {
+      // Use Ultraviolet — exactly how media.html proxies CinemaOS
+      try {
+        if (!window.__uvMissing && typeof __uv$config !== "undefined") {
+          return __uv$config.prefix + __uv$config.encodeUrl(rawUrl);
+        }
+      } catch(e) {}
+      return null; // UV not available
+    }
 
+    function ochoProxy(rawUrl) {
+      // AuraBaby's own base64 proxy (always available, handles popup blocking)
+      const encoded = btoa(rawUrl).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      return `/ocho/${encoded}`;
+    }
+
+    // ── PROVIDERS ─────────────────────────────────────────────────────────────
+    // useUV: true  → uses UV proxy (like media.html) — needed for CinemaOS
+    // useUV: false → uses /ocho/ proxy — fine for other embed sites
     const PROVIDERS = [
       {
         name: "CinemaOS",
+        useUV: true,
         url: () => type === "movie"
           ? `https://cinemaos.tech/player/${id}`
           : `https://cinemaos.tech/player/${id}/${season}/${episode}`
       },
       {
-        name: "vidsrc.cc",
+        name: "VidSrc.me",
+        useUV: false,
         url: () => type === "movie"
-          ? `https://vidsrc.cc/v2/embed/movie/${id}`
-          : `https://vidsrc.cc/v2/embed/tv/${id}/${season}/${episode}`
+          ? `https://vidsrc.me/embed/movie?tmdb=${id}`
+          : `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
       },
       {
-        name: "vidsrc.xyz",
+        name: "VidSrc.icu",
+        useUV: false,
+        url: () => type === "movie"
+          ? `https://vidsrc.icu/embed/movie/${id}`
+          : `https://vidsrc.icu/embed/tv/${id}/${season}/${episode}`
+      },
+      {
+        name: "Embed.su",
+        useUV: false,
+        url: () => type === "movie"
+          ? `https://embed.su/embed/movie/${id}`
+          : `https://embed.su/embed/tv/${id}/${season}/${episode}`
+      },
+      {
+        name: "2Embed",
+        useUV: false,
+        url: () => type === "movie"
+          ? `https://www.2embed.cc/embed/${id}`
+          : `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode}`
+      },
+      {
+        name: "VidLink",
+        useUV: false,
+        url: () => type === "movie"
+          ? `https://vidlink.pro/movie/${id}?autoplay=true&title=true`
+          : `https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=true&title=true`
+      },
+      {
+        name: "SuperEmbed",
+        useUV: false,
+        url: () => type === "movie"
+          ? `https://multiembed.mov/?video_id=${id}&tmdb=1`
+          : `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${season}&e=${episode}`
+      },
+      {
+        name: "AutoEmbed",
+        useUV: false,
+        url: () => type === "movie"
+          ? `https://autoembed.co/movie/tmdb/${id}`
+          : `https://autoembed.co/tv/tmdb/${id}-${season}-${episode}`
+      },
+      {
+        name: "VidSrc.xyz",
+        useUV: false,
         url: () => type === "movie"
           ? `https://vidsrc.xyz/embed/movie?tmdb=${id}`
           : `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${season}&episode=${episode}`
       },
       {
         name: "MoviesAPI",
+        useUV: false,
         url: () => type === "movie"
           ? `https://moviesapi.club/movie/${id}`
           : `https://moviesapi.club/tv/${id}-${season}-${episode}`
-      },
-      {
-        name: "VidLink",
-        url: () => type === "movie"
-          ? `https://vidlink.pro/movie/${id}?autoplay=true&title=true`
-          : `https://vidlink.pro/tv/${id}/${season}/${episode}?autoplay=true&title=true`
-      },
-      {
-        name: "AutoEmbed",
-        url: () => type === "movie"
-          ? `https://autoembed.co/movie/tmdb/${id}`
-          : `https://autoembed.co/tv/tmdb/${id}-${season}-${episode}`
       }
     ];
+
+    // ── DOM REFS ──────────────────────────────────────────────────────────────
+    const titleEl      = document.getElementById("playerTitle");
+    const loadingEl    = document.getElementById("loading");
+    const loadingSrcEl = document.getElementById("loadingSrcName");
+    const tryCountEl   = document.getElementById("tryCount");
+    const proxyTypeEl  = document.getElementById("proxyType");
+    const errorEl      = document.getElementById("errorMessage");
+    const errorTextEl  = document.getElementById("errorText");
+    const playerFrame  = document.getElementById("player");
+    const sourceBar    = document.querySelector(".source-selector");
+
+    // Build buttons
+    PROVIDERS.forEach((p, i) => {
+      const btn = document.createElement("button");
+      btn.className = "source-btn";
+      btn.dataset.index = i;
+      btn.textContent = p.name;
+      if (p.useUV) {
+        const badge = document.createElement("span");
+        badge.className = "uv-badge";
+        badge.textContent = "UV";
+        btn.appendChild(badge);
+      }
+      btn.addEventListener("click", () => tryProvider(i));
+      sourceBar.appendChild(btn);
+    });
 
     let currentIndex = 0;
     let loadTimer    = null;
@@ -389,67 +314,104 @@
       ? `🐰 S${season}E${episode} 🥚`
       : "🎬 NOW PLAYING 🥚";
 
-    if (!type || !id) {
-      showError("Missing required parameters.");
-    } else {
-      tryProvider(0);
+    // ── REGISTER UV SERVICE WORKER ────────────────────────────────────────────
+    // The SW is what actually intercepts and proxies requests for UV to work.
+    // Without it, UV-encoded URLs just 404.
+    function registerUVServiceWorker() {
+      return new Promise((resolve) => {
+        if (window.__uvMissing || !('serviceWorker' in navigator)) {
+          console.warn('UV SW: not registering (UV not installed or no SW support)');
+          return resolve(false);
+        }
+        navigator.serviceWorker.register('/uv.sw.js', { scope: '/' })
+          .then(reg => {
+            console.log('✅ UV SW registered, scope:', reg.scope);
+            if (reg.active) return resolve(true);
+            const sw = reg.installing || reg.waiting;
+            if (!sw) return resolve(true);
+            sw.addEventListener('statechange', function() {
+              if (this.state === 'activated') resolve(true);
+            });
+            setTimeout(() => resolve(true), 3000); // don't block forever
+          })
+          .catch(err => {
+            console.warn('UV SW failed:', err.message);
+            resolve(false);
+          });
+      });
     }
 
-    sourceBtns.forEach(btn => {
-      btn.addEventListener("click", () => {
-        tryProvider(parseInt(btn.dataset.index));
-      });
-    });
+    // ── INIT ──────────────────────────────────────────────────────────────────
+    (async function init() {
+      if (!type || !id) { showError("Missing required parameters."); return; }
+      await registerUVServiceWorker();
+      tryProvider(0);
+    })();
 
+    // ── TRY PROVIDER ─────────────────────────────────────────────────────────
     function setButtonState(index, state) {
-      sourceBtns.forEach(b => {
+      document.querySelectorAll(".source-btn").forEach(b => {
         b.classList.remove("active", "loading-src", "failed");
         if (failed.has(parseInt(b.dataset.index))) b.classList.add("failed");
       });
-      if (sourceBtns[index]) {
-        sourceBtns[index].classList.remove("failed");
-        sourceBtns[index].classList.add(state);
-      }
+      const target = document.querySelector(`.source-btn[data-index="${index}"]`);
+      if (target) { target.classList.remove("failed"); target.classList.add(state); }
     }
 
     function tryProvider(index) {
       if (index >= PROVIDERS.length) {
         showError("All sources failed. Pick one manually above or try again later. 🐰");
-        setButtonState(-1, "");
         return;
       }
 
       currentIndex = index;
       const provider = PROVIDERS[index];
+      const rawUrl   = provider.url();
 
-      loadingEl.style.display   = "flex";
-      errorEl.style.display     = "none";
-      loadingSrcEl.textContent  = provider.name;
+      // Choose proxy
+      let proxiedUrl, proxyLabel;
+      if (provider.useUV) {
+        const uvUrl = uvProxy(rawUrl);
+        if (uvUrl) {
+          proxiedUrl = uvUrl;
+          proxyLabel = "🔵 UV Proxy (school bypass)";
+        } else {
+          // UV not available — fall back to /ocho/
+          proxiedUrl = ochoProxy(rawUrl);
+          proxyLabel = "🟡 /ocho/ Proxy (UV not installed)";
+        }
+      } else {
+        proxiedUrl = ochoProxy(rawUrl);
+        proxyLabel = "🟢 /ocho/ Proxy";
+      }
+
+      loadingEl.style.display  = "flex";
+      errorEl.style.display    = "none";
+      loadingSrcEl.textContent = provider.name;
+      tryCountEl.textContent   = `Source ${index + 1} of ${PROVIDERS.length}`;
+      proxyTypeEl.textContent  = proxyLabel;
 
       setButtonState(index, "loading-src");
-
       if (loadTimer) clearTimeout(loadTimer);
 
       let loaded = false;
-
-      const rawUrl = provider.url();
-      const encoded = btoa(rawUrl).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-      playerFrame.src = `/ocho/${encoded}`;
+      playerFrame.src = proxiedUrl;
 
       playerFrame.onload = () => {
         loaded = true;
         clearTimeout(loadTimer);
         setButtonState(index, "active");
-        setTimeout(() => loadingEl.style.display = "none", 700);
+        setTimeout(() => { loadingEl.style.display = "none"; }, 700);
       };
 
+      // 10s per source then auto-advance
       loadTimer = setTimeout(() => {
         if (!loaded) {
           failed.add(index);
           setButtonState(index, "failed");
           tryProvider(index + 1);
         }
-      }, 12000);
+      }, 10000);
     }
 
     function showError(msg) {
