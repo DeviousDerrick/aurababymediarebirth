@@ -1,13 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@800;900&display=swap');
 
 :root {
-  --spring-green: #52b788;
-  --spring-light: #95d5b2;
-  --sky-blue: #87CEEB;
-  --egg-gold: #f9c74f;
-  --egg-orange: #f3722c;
-  --grass-dark: #1b4332;
-  --text-primary: #1a1a2e;
+  --cyan: #00d4ff;
+  --purple: #a55eea;
+  --dark-purple: #0a0015;
+  --darker-purple: #1a0033;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
 }
 
 * {
@@ -19,7 +18,7 @@
 body {
   font-family: 'Poppins', sans-serif;
   font-weight: 800;
-  background: linear-gradient(180deg, #87CEEB 0%, #b7e4f7 16%, #d8f3dc 42%, #a8d5a2 68%, #52b788 100%);
+  background: linear-gradient(135deg, #0a0015 0%, #1a0033 25%, #2d0052 50%, #1a0033 75%, #0f001a 100%);
   background-attachment: fixed;
   color: var(--text-primary);
   overflow-x: hidden;
@@ -27,145 +26,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-
-/* ════════════════════════════════════
-   EASTER BACKGROUND
-════════════════════════════════════ */
-
-.easter-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.sun {
-  position: fixed;
-  top: 20px;
-  right: 60px;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fffde7 20%, #ffe566 55%, #ffcc00 100%);
-  box-shadow: 0 0 40px rgba(255, 220, 0, 0.5);
-  animation: sunPulse 4s ease-in-out infinite;
-  z-index: 2;
-}
-
-@keyframes sunPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-}
-
-.cloud {
-  position: fixed;
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.83);
-  z-index: 1;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.07));
-}
-
-.cloud::before, .cloud::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-}
-
-.c1 {
-  width: 130px;
-  height: 40px;
-  top: 60px;
-  left: 40px;
-  animation: drift 18s ease-in-out infinite;
-}
-
-.c1::before {
-  width: 68px;
-  height: 68px;
-  top: -32px;
-  left: 12px;
-}
-
-.c1::after {
-  width: 48px;
-  height: 48px;
-  top: -20px;
-  left: 70px;
-}
-
-.c2 {
-  width: 100px;
-  height: 32px;
-  top: 140px;
-  right: 50px;
-  animation: drift 22s ease-in-out infinite reverse;
-}
-
-.c2::before {
-  width: 52px;
-  height: 52px;
-  top: -26px;
-  left: 10px;
-}
-
-.c2::after {
-  width: 38px;
-  height: 38px;
-  top: -14px;
-  left: 54px;
-}
-
-@keyframes drift {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(45px); }
-}
-
-/* Petals */
-.petal {
-  position: fixed;
-  font-size: 1.2rem;
-  animation: fall var(--fd, 7s) linear infinite;
-  opacity: 0.7;
-  pointer-events: none;
-  z-index: 1;
-}
-
-@keyframes fall {
-  0% { transform: translateY(-30px) rotate(0deg); opacity: 0.8; }
-  100% { transform: translateY(100vh) rotate(540deg); opacity: 0; }
-}
-
-.pt1 { left: 5%; --fd: 7s; }
-.pt2 { left: 18%; --fd: 8s; animation-delay: 1s; }
-.pt3 { left: 35%; --fd: 6.5s; animation-delay: 2s; }
-.pt4 { left: 55%; --fd: 8.5s; animation-delay: 0.5s; }
-.pt5 { left: 75%; --fd: 7.5s; animation-delay: 1.5s; }
-
-/* Bees */
-.bee {
-  position: fixed;
-  font-size: 1rem;
-  animation: beeDrift var(--bc, 16s) linear infinite, beeBob 1.2s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 1;
-}
-
-@keyframes beeDrift {
-  0% { left: -40px; top: var(--bt, 20%); opacity: 0; }
-  4% { opacity: 1; }
-  96% { opacity: 1; }
-  100% { left: calc(100vw + 40px); top: var(--bt, 20%); opacity: 0; }
-}
-
-@keyframes beeBob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.be1 { --bt: 15%; --bc: 18s; }
-.be2 { --bt: 50%; --bc: 20s; animation-delay: 5s; }
 
 /* ════════════════════════════════════
    HEADER
@@ -176,10 +36,10 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 16px 30px;
-  background: rgba(255, 255, 255, 0.92);
-  border-bottom: 3px solid var(--spring-green);
+  background: rgba(10, 0, 21, 0.9);
+  border-bottom: 3px solid var(--cyan);
   backdrop-filter: blur(15px);
-  box-shadow: 0 4px 20px rgba(82, 183, 136, 0.25);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
   position: relative;
   z-index: 100;
   flex-wrap: wrap;
@@ -193,20 +53,20 @@ header {
 }
 
 .back-link {
-  background: linear-gradient(135deg, var(--spring-green), var(--spring-light));
-  color: white;
+  background: linear-gradient(135deg, var(--cyan), #00a8cc);
+  color: #000;
   padding: 8px 18px;
   border-radius: 20px;
   text-decoration: none;
   font-weight: 800;
   font-size: 13px;
   transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(82, 183, 136, 0.3);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
 }
 
 .back-link:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(82, 183, 136, 0.5);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.7);
 }
 
 header h1 {
@@ -214,28 +74,13 @@ header h1 {
   font-size: 20px;
   font-weight: 900;
   letter-spacing: 1px;
-  color: var(--grass-dark);
-  text-shadow: 0 0 10px rgba(82, 183, 136, 0.3);
-}
-
-.easter-badge {
-  font-size: 11px;
-  background: linear-gradient(135deg, var(--egg-gold), var(--egg-orange));
-  color: white;
-  padding: 3px 10px;
-  border-radius: 20px;
-  margin-left: 8px;
-  animation: eggBadgePulse 2s ease-in-out infinite;
-}
-
-@keyframes eggBadgePulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(249, 199, 79, 0.4); }
-  50% { box-shadow: 0 0 20px rgba(249, 199, 79, 0.8); }
+  color: var(--cyan);
+  text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
 }
 
 header input {
-  background: rgba(82, 183, 136, 0.05);
-  border: 2px solid var(--spring-green);
+  background: rgba(0, 212, 255, 0.05);
+  border: 2px solid var(--cyan);
   color: var(--text-primary);
   padding: 11px 18px;
   border-radius: 20px;
@@ -245,16 +90,16 @@ header input {
   font-weight: 700;
   font-size: 13px;
   transition: all 0.3s;
-  box-shadow: 0 0 15px rgba(82, 183, 136, 0.1);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
 }
 
 header input::placeholder {
-  color: rgba(27, 67, 50, 0.5);
+  color: rgba(176, 176, 176, 0.5);
 }
 
 header input:focus {
-  border-color: var(--egg-gold);
-  box-shadow: 0 0 0 3px rgba(249, 199, 79, 0.15), 0 0 25px rgba(82, 183, 136, 0.3);
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(165, 94, 234, 0.15), 0 0 25px rgba(0, 212, 255, 0.3);
 }
 
 /* ════════════════════════════════════
@@ -266,8 +111,8 @@ header input:focus {
   justify-content: center;
   gap: 12px;
   padding: 14px 0;
-  background: rgba(212, 237, 218, 0.4);
-  border-bottom: 2px solid rgba(82, 183, 136, 0.3);
+  background: rgba(0, 212, 255, 0.05);
+  border-bottom: 2px solid rgba(0, 212, 255, 0.2);
   position: relative;
   z-index: 99;
 }
@@ -278,8 +123,8 @@ header input:focus {
   font-weight: 800;
   letter-spacing: 1px;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.7);
-  color: var(--grass-dark);
+  background: rgba(13, 0, 30, 0.6);
+  color: var(--text-secondary);
   border: 2px solid transparent;
   padding: 10px 24px;
   border-radius: 20px;
@@ -288,19 +133,19 @@ header input:focus {
 }
 
 #tabs .tab:hover {
-  color: white;
-  border-color: var(--spring-green);
+  color: var(--cyan);
+  border-color: var(--cyan);
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(82, 183, 136, 0.3);
-  background: linear-gradient(135deg, var(--spring-green), var(--spring-light));
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  background: rgba(0, 212, 255, 0.1);
 }
 
 #tabs .tab.active {
-  color: white;
-  border-color: var(--spring-green);
-  background: linear-gradient(135deg, var(--spring-green), var(--spring-light));
-  box-shadow: 0 6px 25px rgba(82, 183, 136, 0.4);
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  color: #000;
+  border-color: var(--cyan);
+  background: linear-gradient(135deg, var(--cyan), #00a8cc);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 /* ════════════════════════════════════
@@ -321,26 +166,26 @@ main {
 }
 
 .movie {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(13, 0, 30, 0.6);
   border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 4px 15px rgba(82, 183, 136, 0.15);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
   border: 2px solid transparent;
 }
 
 .movie:hover {
   transform: translateY(-8px) scale(1.05);
-  box-shadow: 0 12px 35px rgba(82, 183, 136, 0.35), 0 0 25px rgba(249, 199, 79, 0.2);
-  border-color: var(--egg-gold);
+  box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), 0 0 20px rgba(165, 94, 234, 0.2);
+  border-color: var(--purple);
 }
 
 .movie-poster {
   position: relative;
   overflow: hidden;
   aspect-ratio: 2/3;
-  background: linear-gradient(135deg, #f0f0f0, #e8e8e8);
+  background: linear-gradient(135deg, #1a0033, #0f001a);
 }
 
 .movie-poster img {
@@ -372,7 +217,7 @@ main {
 .play-icon {
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, var(--egg-gold), var(--egg-orange));
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -396,7 +241,7 @@ main {
 .movie-info h3 {
   font-size: 12px;
   font-weight: 800;
-  color: var(--grass-dark);
+  color: var(--cyan);
   margin-bottom: 6px;
   line-height: 1.3;
   overflow: hidden;
@@ -408,7 +253,7 @@ main {
 
 .movie-info span {
   font-size: 11px;
-  color: var(--egg-gold);
+  color: var(--purple);
   font-weight: 700;
 }
 
@@ -419,7 +264,7 @@ main {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(27, 67, 50, 0.6);
+  background: rgba(10, 0, 21, 0.8);
   backdrop-filter: blur(6px);
   z-index: 200;
   display: flex;
@@ -434,18 +279,18 @@ main {
 }
 
 .overlay-content {
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(13, 0, 30, 0.95);
   border-radius: 20px;
   padding: 30px;
   max-width: 900px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(27, 67, 50, 0.3);
+  box-shadow: 0 0 60px rgba(0, 212, 255, 0.3);
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: 28px;
   max-height: 80vh;
   overflow-y: auto;
-  border: 3px solid var(--spring-green);
+  border: 3px solid var(--cyan);
   animation: overlayPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -460,41 +305,41 @@ main {
   right: 20px;
   font-size: 32px;
   cursor: pointer;
-  color: var(--grass-dark);
+  color: var(--cyan);
   transition: all 0.2s;
 }
 
 #closeOverlay:hover {
   transform: scale(1.2) rotate(90deg);
-  color: var(--egg-orange);
+  color: var(--purple);
 }
 
 .overlay-left h2 {
   font-family: 'Fredoka One', cursive;
   font-size: 28px;
-  color: var(--grass-dark);
+  color: var(--cyan);
   margin-bottom: 12px;
-  text-shadow: 0 2px 5px rgba(82, 183, 136, 0.2);
+  text-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
 }
 
 .overlay-left p {
   font-size: 14px;
-  color: rgba(27, 67, 50, 0.75);
+  color: var(--text-secondary);
   line-height: 1.7;
   margin-bottom: 10px;
   font-weight: 600;
 }
 
 .overlay-left p strong {
-  color: var(--grass-dark);
+  color: var(--cyan);
 }
 
 .tv-controls {
   margin-top: 20px;
   padding: 16px;
-  background: rgba(82, 183, 136, 0.08);
+  background: rgba(0, 212, 255, 0.08);
   border-radius: 12px;
-  border-left: 4px solid var(--spring-green);
+  border-left: 4px solid var(--cyan);
 }
 
 .season-episode-grid {
@@ -508,7 +353,7 @@ main {
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
-  color: var(--grass-dark);
+  color: var(--cyan);
   display: block;
   margin-bottom: 6px;
   letter-spacing: 1px;
@@ -517,10 +362,10 @@ main {
 .select-input {
   width: 100%;
   padding: 8px 12px;
-  border: 2px solid var(--spring-green);
+  border: 2px solid var(--cyan);
   border-radius: 8px;
-  background: white;
-  color: var(--grass-dark);
+  background: rgba(13, 0, 30, 0.8);
+  color: var(--text-primary);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
@@ -528,27 +373,27 @@ main {
 }
 
 .select-input:hover, .select-input:focus {
-  border-color: var(--egg-gold);
-  box-shadow: 0 0 10px rgba(249, 199, 79, 0.3);
+  border-color: var(--purple);
+  box-shadow: 0 0 10px rgba(165, 94, 234, 0.3);
 }
 
 .episode-info {
   margin-top: 12px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(0, 212, 255, 0.05);
   border-radius: 8px;
 }
 
 .episode-details h4 {
   font-family: 'Fredoka One', cursive;
-  color: var(--grass-dark);
+  color: var(--cyan);
   margin-bottom: 6px;
   font-size: 14px;
 }
 
 .episode-details p {
   font-size: 12px;
-  color: rgba(27, 67, 50, 0.6);
+  color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
@@ -556,15 +401,15 @@ main {
   display: flex;
   gap: 10px;
   font-size: 11px;
-  color: var(--egg-gold);
+  color: var(--purple);
   font-weight: 700;
 }
 
 .play-button {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, var(--spring-green), var(--spring-light));
-  color: white;
+  background: linear-gradient(135deg, var(--cyan), #00a8cc);
+  color: #000;
   border: none;
   border-radius: 12px;
   font-family: 'Fredoka One', cursive;
@@ -573,23 +418,14 @@ main {
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 6px 20px rgba(82, 183, 136, 0.3);
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
   margin-top: 16px;
   text-transform: uppercase;
 }
 
 .play-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 35px rgba(82, 183, 136, 0.5);
-}
-
-.play-button.easter {
-  background: linear-gradient(135deg, var(--egg-gold), var(--egg-orange));
-  box-shadow: 0 6px 20px rgba(249, 199, 79, 0.3);
-}
-
-.play-button.easter:hover {
-  box-shadow: 0 10px 35px rgba(249, 199, 79, 0.5);
+  box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
 }
 
 .overlay-right {
@@ -599,8 +435,8 @@ main {
 #overlayPoster {
   width: 100%;
   border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(27, 67, 50, 0.2);
-  border: 3px solid var(--spring-green);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+  border: 3px solid var(--cyan);
 }
 
 @media (max-width: 768px) {
