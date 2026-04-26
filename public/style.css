@@ -1,12 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@800;900&display=swap');
 
 :root {
-  --cyan: #00d4ff;
-  --purple: #a55eea;
-  --dark-purple: #0a0015;
-  --darker-purple: #1a0033;
-  --text-primary: #ffffff;
-  --text-secondary: #b0b0b0;
+  --primary-cyan: #00d4ff;
+  --primary-purple: #7b2cbf;
+  --secondary-blue: #00b4d8;
+  --neon-pink: #f72585;
+  --white: #ffffff;
+  --dark-bg: #0a0015;
+  --dark-bg-2: #1a0033;
+  --dark-bg-3: #2d0052;
 }
 
 * {
@@ -18,14 +20,100 @@
 body {
   font-family: 'Poppins', sans-serif;
   font-weight: 800;
-  background: linear-gradient(135deg, #0a0015 0%, #1a0033 25%, #2d0052 50%, #1a0033 75%, #0f001a 100%);
+  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-2) 25%, var(--dark-bg-3) 50%, var(--dark-bg-2) 75%, var(--dark-bg) 100%);
   background-attachment: fixed;
-  color: var(--text-primary);
+  color: var(--white);
   overflow-x: hidden;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
+
+/* ════════════════════════════════════
+   SPACE BACKGROUND ELEMENTS
+════════════════════════════════════ */
+
+.planet {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  animation: float 25s infinite ease-in-out;
+}
+
+.planet-sm {
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle at 30% 30%, #ff6b9d, #c44569);
+  top: 15%;
+  left: 8%;
+  box-shadow: 0 0 50px rgba(255, 107, 157, 0.5);
+  animation-delay: 0s;
+}
+
+.planet-md {
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle at 30% 30%, #a29bfe, #6c5ce7);
+  bottom: 25%;
+  right: 10%;
+  box-shadow: 0 0 70px rgba(162, 155, 254, 0.4);
+  animation-delay: 3s;
+}
+
+.planet-lg {
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle at 30% 30%, #00d4ff, #0984e3);
+  top: 50%;
+  right: 5%;
+  box-shadow: 0 0 60px rgba(0, 212, 255, 0.5);
+  animation-delay: 1.5s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-25px) translateX(12px); }
+  50% { transform: translateY(-15px) translateX(-18px); }
+  75% { transform: translateY(-35px) translateX(8px); }
+}
+
+.star {
+  position: fixed;
+  width: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  z-index: 0;
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.shooting-star {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 8px 1px rgba(0, 212, 255, 0.6);
+  animation: shoot 4s linear infinite;
+  z-index: 0;
+}
+
+@keyframes shoot {
+  0% { transform: translateX(0) translateY(0); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateX(-250px) translateY(250px); opacity: 0; }
+}
+
+.shooting-star:nth-child(1) { top: 12%; right: 18%; animation-delay: 0s; }
+.shooting-star:nth-child(2) { top: 35%; right: 35%; animation-delay: 2s; }
+.shooting-star:nth-child(3) { top: 22%; right: 55%; animation-delay: 4s; }
 
 /* ════════════════════════════════════
    HEADER
@@ -36,10 +124,10 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 16px 30px;
-  background: rgba(10, 0, 21, 0.9);
-  border-bottom: 3px solid var(--cyan);
+  background: rgba(10, 0, 30, 0.7);
   backdrop-filter: blur(15px);
-  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+  border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
   position: relative;
   z-index: 100;
   flex-wrap: wrap;
@@ -53,8 +141,8 @@ header {
 }
 
 .back-link {
-  background: linear-gradient(135deg, var(--cyan), #00a8cc);
-  color: #000;
+  background: linear-gradient(135deg, var(--primary-cyan), var(--secondary-blue));
+  color: var(--dark-bg);
   padding: 8px 18px;
   border-radius: 20px;
   text-decoration: none;
@@ -62,6 +150,8 @@ header {
   font-size: 13px;
   transition: all 0.3s;
   box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+  border: none;
+  cursor: pointer;
 }
 
 .back-link:hover {
@@ -73,15 +163,15 @@ header h1 {
   font-family: 'Fredoka One', cursive;
   font-size: 20px;
   font-weight: 900;
-  letter-spacing: 1px;
-  color: var(--cyan);
-  text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+  letter-spacing: 2px;
+  color: var(--primary-cyan);
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
 }
 
 header input {
   background: rgba(0, 212, 255, 0.05);
-  border: 2px solid var(--cyan);
-  color: var(--text-primary);
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  color: var(--white);
   padding: 11px 18px;
   border-radius: 20px;
   width: 280px;
@@ -94,12 +184,12 @@ header input {
 }
 
 header input::placeholder {
-  color: rgba(176, 176, 176, 0.5);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 header input:focus {
-  border-color: var(--purple);
-  box-shadow: 0 0 0 3px rgba(165, 94, 234, 0.15), 0 0 25px rgba(0, 212, 255, 0.3);
+  border-color: var(--primary-cyan);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15), 0 0 25px rgba(0, 212, 255, 0.3);
 }
 
 /* ════════════════════════════════════
@@ -111,7 +201,7 @@ header input:focus {
   justify-content: center;
   gap: 12px;
   padding: 14px 0;
-  background: rgba(0, 212, 255, 0.05);
+  background: rgba(10, 0, 30, 0.5);
   border-bottom: 2px solid rgba(0, 212, 255, 0.2);
   position: relative;
   z-index: 99;
@@ -123,9 +213,9 @@ header input:focus {
   font-weight: 800;
   letter-spacing: 1px;
   text-transform: uppercase;
-  background: rgba(13, 0, 30, 0.6);
-  color: var(--text-secondary);
-  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(0, 212, 255, 0.2);
   padding: 10px 24px;
   border-radius: 20px;
   cursor: pointer;
@@ -133,23 +223,22 @@ header input:focus {
 }
 
 #tabs .tab:hover {
-  color: var(--cyan);
-  border-color: var(--cyan);
+  color: var(--primary-cyan);
+  border-color: var(--primary-cyan);
   transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
   background: rgba(0, 212, 255, 0.1);
 }
 
 #tabs .tab.active {
-  color: #000;
-  border-color: var(--cyan);
-  background: linear-gradient(135deg, var(--cyan), #00a8cc);
-  box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  color: var(--dark-bg);
+  border-color: var(--primary-cyan);
+  background: linear-gradient(135deg, var(--primary-cyan), var(--secondary-blue));
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.5);
 }
 
 /* ════════════════════════════════════
-   GRID
+   GRID & MAIN
 ════════════════════════════════════ */
 
 main {
@@ -166,26 +255,26 @@ main {
 }
 
 .movie {
-  background: rgba(13, 0, 30, 0.6);
+  background: rgba(30, 60, 114, 0.3);
   border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
-  border: 2px solid transparent;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+  border: 2px solid rgba(0, 212, 255, 0.2);
 }
 
 .movie:hover {
   transform: translateY(-8px) scale(1.05);
-  box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), 0 0 20px rgba(165, 94, 234, 0.2);
-  border-color: var(--purple);
+  box-shadow: 0 0 35px rgba(0, 212, 255, 0.4), 0 0 20px rgba(247, 37, 133, 0.2);
+  border-color: var(--neon-pink);
 }
 
 .movie-poster {
   position: relative;
   overflow: hidden;
   aspect-ratio: 2/3;
-  background: linear-gradient(135deg, #1a0033, #0f001a);
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(123, 44, 191, 0.1));
 }
 
 .movie-poster img {
@@ -217,12 +306,12 @@ main {
 .play-icon {
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  background: linear-gradient(135deg, var(--primary-cyan), var(--secondary-blue));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--dark-bg);
   font-size: 24px;
   animation: iconPulse 1s ease-in-out;
 }
@@ -241,7 +330,7 @@ main {
 .movie-info h3 {
   font-size: 12px;
   font-weight: 800;
-  color: var(--cyan);
+  color: var(--primary-cyan);
   margin-bottom: 6px;
   line-height: 1.3;
   overflow: hidden;
@@ -253,7 +342,7 @@ main {
 
 .movie-info span {
   font-size: 11px;
-  color: var(--purple);
+  color: var(--secondary-blue);
   font-weight: 700;
 }
 
@@ -264,7 +353,7 @@ main {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 0, 21, 0.8);
+  background: rgba(10, 0, 30, 0.8);
   backdrop-filter: blur(6px);
   z-index: 200;
   display: flex;
@@ -279,18 +368,18 @@ main {
 }
 
 .overlay-content {
-  background: rgba(13, 0, 30, 0.95);
+  background: rgba(30, 60, 114, 0.4);
   border-radius: 20px;
   padding: 30px;
   max-width: 900px;
   width: 100%;
-  box-shadow: 0 0 60px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 212, 255, 0.2);
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: 28px;
   max-height: 80vh;
   overflow-y: auto;
-  border: 3px solid var(--cyan);
+  border: 2px solid rgba(0, 212, 255, 0.3);
   animation: overlayPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -305,33 +394,33 @@ main {
   right: 20px;
   font-size: 32px;
   cursor: pointer;
-  color: var(--cyan);
+  color: var(--primary-cyan);
   transition: all 0.2s;
 }
 
 #closeOverlay:hover {
   transform: scale(1.2) rotate(90deg);
-  color: var(--purple);
+  color: var(--neon-pink);
 }
 
 .overlay-left h2 {
   font-family: 'Fredoka One', cursive;
   font-size: 28px;
-  color: var(--cyan);
+  color: var(--primary-cyan);
   margin-bottom: 12px;
-  text-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
 }
 
 .overlay-left p {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.75);
   line-height: 1.7;
   margin-bottom: 10px;
   font-weight: 600;
 }
 
 .overlay-left p strong {
-  color: var(--cyan);
+  color: var(--primary-cyan);
 }
 
 .tv-controls {
@@ -339,7 +428,7 @@ main {
   padding: 16px;
   background: rgba(0, 212, 255, 0.08);
   border-radius: 12px;
-  border-left: 4px solid var(--cyan);
+  border-left: 4px solid var(--primary-cyan);
 }
 
 .season-episode-grid {
@@ -353,7 +442,7 @@ main {
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
-  color: var(--cyan);
+  color: var(--primary-cyan);
   display: block;
   margin-bottom: 6px;
   letter-spacing: 1px;
@@ -362,10 +451,10 @@ main {
 .select-input {
   width: 100%;
   padding: 8px 12px;
-  border: 2px solid var(--cyan);
+  border: 2px solid rgba(0, 212, 255, 0.3);
   border-radius: 8px;
-  background: rgba(13, 0, 30, 0.8);
-  color: var(--text-primary);
+  background: rgba(10, 0, 30, 0.6);
+  color: var(--primary-cyan);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
@@ -373,27 +462,27 @@ main {
 }
 
 .select-input:hover, .select-input:focus {
-  border-color: var(--purple);
-  box-shadow: 0 0 10px rgba(165, 94, 234, 0.3);
+  border-color: var(--primary-cyan);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
 .episode-info {
   margin-top: 12px;
   padding: 12px;
-  background: rgba(0, 212, 255, 0.05);
+  background: rgba(0, 212, 255, 0.1);
   border-radius: 8px;
 }
 
 .episode-details h4 {
   font-family: 'Fredoka One', cursive;
-  color: var(--cyan);
+  color: var(--primary-cyan);
   margin-bottom: 6px;
   font-size: 14px;
 }
 
 .episode-details p {
   font-size: 12px;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 8px;
 }
 
@@ -401,15 +490,15 @@ main {
   display: flex;
   gap: 10px;
   font-size: 11px;
-  color: var(--purple);
+  color: var(--secondary-blue);
   font-weight: 700;
 }
 
 .play-button {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, var(--cyan), #00a8cc);
-  color: #000;
+  background: linear-gradient(135deg, var(--primary-cyan), var(--secondary-blue));
+  color: var(--dark-bg);
   border: none;
   border-radius: 12px;
   font-family: 'Fredoka One', cursive;
@@ -418,14 +507,14 @@ main {
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
   margin-top: 16px;
   text-transform: uppercase;
 }
 
 .play-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
+  box-shadow: 0 0 35px rgba(0, 212, 255, 0.6);
 }
 
 .overlay-right {
@@ -435,8 +524,8 @@ main {
 #overlayPoster {
   width: 100%;
   border-radius: 12px;
-  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
-  border: 3px solid var(--cyan);
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2);
+  border: 2px solid rgba(0, 212, 255, 0.3);
 }
 
 @media (max-width: 768px) {
