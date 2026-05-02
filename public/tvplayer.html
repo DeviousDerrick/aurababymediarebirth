@@ -6,9 +6,7 @@
   <title>Player | AuraBaby Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@800&display=swap" rel="stylesheet">
 
-  <!-- UV Scripts (same as Astriex) -->
-  <script src="/uv/uv.bundle.js"></script>
-  <script src="/uv/uv.config.js"></script>
+
 
   <style>
     :root {
@@ -428,14 +426,15 @@
     const season  = params.get("season")  || 1;
     const episode = params.get("episode") || 1;
 
-    // ── UV proxy (same approach as Astriex) ──────────────────────────────────
-    function cinemaProxy(url) {
-      if (typeof __uv$config !== "undefined") {
-        return __uv$config.prefix + __uv$config.encodeUrl(url);
-      }
-      // fallback if UV config hasn't loaded yet
-      return "/uv/service/" + encodeURIComponent(url);
-    }
+  
+// REPLACE with this — uses your existing /ocho/ proxy:
+function cinemaProxy(url) {
+  const encoded = btoa(unescape(encodeURIComponent(url)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+  return '/ocho/' + encoded;
+}
 
     const PROVIDERS = type === "movie" ? [
       { name: "CinemaOS",   url: () => `https://cinemaos.tech/player/${id}` },
@@ -488,47 +487,12 @@
       ? `🎬 S${season}E${episode}`
       : "🎬 NOW PLAYING";
 
-    // ── Register UV service worker (replaces media-sw.js) ────────────────────
-    async function registerUVSW() {
-      if (!('serviceWorker' in navigator)) {
-        swStatusEl.textContent = '⚠ SW not supported';
-        return false;
-      }
-      try {
-        swStatusEl.textContent = '🔄 Activating stream...';
-        const reg = await navigator.serviceWorker.register('/uv/uv.sw.js', { scope: '/uv/service/' });
 
-        if (reg.active) {
-          swStatusEl.textContent = '✅ Stream active';
-          return true;
-        }
-
-        return new Promise(resolve => {
-          const sw = reg.installing || reg.waiting;
-          if (!sw) { swStatusEl.textContent = '✅ Stream active'; resolve(true); return; }
-          sw.addEventListener('statechange', function() {
-            if (this.state === 'activated') {
-              swStatusEl.textContent = '✅ Stream active';
-              resolve(true);
-            }
-          });
-          setTimeout(() => {
-            swStatusEl.textContent = '⚡ Starting...';
-            resolve(true);
-          }, 3000);
-        });
-      } catch(err) {
-        console.warn('UV SW failed:', err.message);
-        swStatusEl.textContent = '⚠ Limited (no SW)';
-        return false;
-      }
-    }
-
-    (async function init() {
-      if (!type || !id) { showError("Missing required parameters."); return; }
-      await registerUVSW();
-      tryProvider(0);
-    })();
+ (async function init() {
+  if (!type || !id) { showError("Missing required parameters."); return; }
+  swStatusEl.textContent = '✅ Ready';
+  tryProvider(0);
+})();
 
     function setButtonState(index, state) {
       document.querySelectorAll(".source-btn").forEach(b => {
