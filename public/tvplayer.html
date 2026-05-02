@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Player | AuraBaby Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@800&display=swap" rel="stylesheet">
+
+  <!-- UV Scripts (same as Astriex) -->
+  <script src="/uv/uv.bundle.js"></script>
+  <script src="/uv/uv.config.js"></script>
+
   <style>
     :root {
       --primary-cyan: #00d4ff;
@@ -29,10 +34,6 @@
       overflow: hidden;
       position: relative;
     }
-
-    /* ════════════════════════════════════
-       SPACE ELEMENTS
-    ════════════════════════════════════ */
 
     .planet {
       position: fixed;
@@ -104,10 +105,6 @@
     .shooting-star:nth-child(1) { top: 15%; right: 25%; animation-delay: 0s; }
     .shooting-star:nth-child(2) { top: 40%; right: 45%; animation-delay: 2s; }
     .shooting-star:nth-child(3) { top: 25%; right: 65%; animation-delay: 4s; }
-
-    /* ════════════════════════════════════
-       HEADER
-    ════════════════════════════════════ */
 
     .player-header {
       background: rgba(10, 0, 30, 0.8);
@@ -199,7 +196,7 @@
     .source-btn.active {
       background: linear-gradient(135deg, var(--primary-cyan), var(--secondary-blue));
       color: var(--dark-bg);
-      border-color: var(--white);
+      border-color: var(--primary-cyan);
       box-shadow: 0 0 20px rgba(0, 212, 255, 0.7);
     }
 
@@ -220,10 +217,6 @@
       50% { box-shadow: 0 0 25px rgba(0, 212, 255, 0.8); }
     }
 
-    /* ════════════════════════════════════
-       PLAYER CONTAINER
-    ════════════════════════════════════ */
-
     .player-container {
       flex: 1;
       position: relative;
@@ -243,10 +236,6 @@
       border: none;
       background: #000;
     }
-
-    /* ════════════════════════════════════
-       LOADING & ERROR
-    ════════════════════════════════════ */
 
     .loading {
       position: absolute;
@@ -315,7 +304,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(10, 0, 30, 0.98);
-      color: var(--white);
+      color: var(--primary-cyan);
       padding: 28px;
       border-radius: 15px;
       text-align: center;
@@ -373,27 +362,14 @@
     }
 
     @media(max-width: 600px) {
-      .player-header {
-        padding: 8px 10px;
-      }
-
-      .player-header h1 {
-        font-size: 12px;
-      }
-
-      .source-btn {
-        font-size: 10px;
-        padding: 5px 8px;
-      }
-
-      .source-label {
-        display: none;
-      }
+      .player-header { padding: 8px 10px; }
+      .player-header h1 { font-size: 12px; }
+      .source-btn { font-size: 10px; padding: 5px 8px; }
+      .source-label { display: none; }
     }
   </style>
 </head>
 <body>
-  <!-- Space Background Elements -->
   <div class="star" style="top: 8%; left: 12%;"></div>
   <div class="star" style="top: 25%; left: 22%;"></div>
   <div class="star" style="top: 45%; left: 15%;"></div>
@@ -452,10 +428,13 @@
     const season  = params.get("season")  || 1;
     const episode = params.get("episode") || 1;
 
-    function ochoProxy(rawUrl) {
-      const enc = btoa(unescape(encodeURIComponent(rawUrl)))
-        .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-      return `/ocho/${enc}`;
+    // ── UV proxy (same approach as Astriex) ──────────────────────────────────
+    function cinemaProxy(url) {
+      if (typeof __uv$config !== "undefined") {
+        return __uv$config.prefix + __uv$config.encodeUrl(url);
+      }
+      // fallback if UV config hasn't loaded yet
+      return "/uv/service/" + encodeURIComponent(url);
     }
 
     const PROVIDERS = type === "movie" ? [
@@ -509,14 +488,15 @@
       ? `🎬 S${season}E${episode}`
       : "🎬 NOW PLAYING";
 
-    async function registerMediaSW() {
+    // ── Register UV service worker (replaces media-sw.js) ────────────────────
+    async function registerUVSW() {
       if (!('serviceWorker' in navigator)) {
         swStatusEl.textContent = '⚠ SW not supported';
         return false;
       }
       try {
         swStatusEl.textContent = '🔄 Activating stream...';
-        const reg = await navigator.serviceWorker.register('/media-sw.js', { scope: '/' });
+        const reg = await navigator.serviceWorker.register('/uv/uv.sw.js', { scope: '/uv/service/' });
 
         if (reg.active) {
           swStatusEl.textContent = '✅ Stream active';
@@ -538,7 +518,7 @@
           }, 3000);
         });
       } catch(err) {
-        console.warn('Media SW failed:', err.message);
+        console.warn('UV SW failed:', err.message);
         swStatusEl.textContent = '⚠ Limited (no SW)';
         return false;
       }
@@ -546,7 +526,7 @@
 
     (async function init() {
       if (!type || !id) { showError("Missing required parameters."); return; }
-      await registerMediaSW();
+      await registerUVSW();
       tryProvider(0);
     })();
 
@@ -577,7 +557,8 @@
       if (loadTimer) clearTimeout(loadTimer);
 
       let loaded = false;
-      playerFrame.src = ochoProxy(p.url());
+      // All providers go through UV proxy now (matches Astriex approach)
+      playerFrame.src = cinemaProxy(p.url());
 
       playerFrame.onload = () => {
         loaded = true;
